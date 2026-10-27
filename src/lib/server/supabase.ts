@@ -21,7 +21,10 @@ export async function db(): Promise<SupabaseClient> {
 
 /** Unwraps a Supabase result, throwing on errors so they surface instead of reading as empty data. */
 export function must<T>({ data, error }: { data: T; error: PostgrestError | null }): T {
-  if (error) throw new Error(`Database error: ${error.message}`);
+  if (error) {
+    const detail = [error.message, error.code && `code ${error.code}`, error.details, error.hint].filter(Boolean).join(" | ");
+    throw new Error(`Database error: ${detail || JSON.stringify(error)}`);
+  }
   return data;
 }
 
