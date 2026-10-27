@@ -83,8 +83,9 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
     <div className="flex flex-col gap-5">
       {/* Controls */}
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-wrap items-end gap-3">
-          <div role="tablist" aria-label="Report period" className="flex rounded-xl bg-foreground/5 p-1 text-sm">
+        <div className="flex w-full flex-wrap items-end gap-3 sm:w-auto">
+          {/* Phones: a tidy 3 + 2 grid; wider screens: one row. */}
+          <div role="tablist" aria-label="Report period" className="grid w-full grid-cols-3 gap-1 rounded-xl bg-foreground/5 p-1 text-sm sm:flex sm:w-auto">
             {MODES.map((m) => (
               <button
                 key={m.value}
@@ -99,7 +100,7 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
                     setDate(shift("day", shift("week", todayISO(), -1), 1));
                   }
                 }}
-                className={`rounded-lg px-4 py-1.5 font-medium transition-all duration-200 ${
+                className={`whitespace-nowrap rounded-lg px-2 py-1.5 font-medium transition-all duration-200 sm:px-4 ${
                   mode === m.value ? "bg-brand text-white shadow-sm shadow-brand/30" : "text-foreground/60 hover:text-foreground"
                 }`}
               >
@@ -108,8 +109,8 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
             ))}
           </div>
           {mode === "custom" && (
-            <div className="flex flex-wrap items-end gap-2">
-              <label className="flex flex-col gap-1 text-xs font-medium text-foreground/60">
+            <div className="flex w-full items-end gap-2 sm:w-auto">
+              <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs font-medium text-foreground/60 sm:flex-none">
                 From
                 <span className="relative flex items-center">
                   <CalendarDays className="pointer-events-none absolute left-3 h-4 w-4 text-brand" aria-hidden />
@@ -118,14 +119,14 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
                     value={date}
                     max={endDate}
                     onChange={(e) => e.target.value && setDate(e.target.value)}
-                    className={`${inputClass} w-44 pl-9`}
+                    className={`${inputClass} w-full pl-9 sm:w-44`}
                   />
                 </span>
               </label>
               <span className="pb-2.5 text-foreground/40" aria-hidden>
                 →
               </span>
-              <label className="flex flex-col gap-1 text-xs font-medium text-foreground/60">
+              <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs font-medium text-foreground/60 sm:flex-none">
                 To
                 <span className="relative flex items-center">
                   <CalendarDays className="pointer-events-none absolute left-3 h-4 w-4 text-brand" aria-hidden />
@@ -134,7 +135,7 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
                     value={endDate}
                     min={date}
                     onChange={(e) => e.target.value && setEndDate(e.target.value)}
-                    className={`${inputClass} w-44 pl-9`}
+                    className={`${inputClass} w-full pl-9 sm:w-44`}
                   />
                 </span>
               </label>
@@ -166,7 +167,7 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
           </div>
           )}
         </div>
-        <button onClick={() => download("current", mode, reportDate)} disabled={downloading !== null} className={buttonClass("primary", "sm")}>
+        <button onClick={() => download("current", mode, reportDate)} disabled={downloading !== null} className={`${buttonClass("primary", "sm")} w-full sm:w-auto`}>
           {downloading === "current" ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : <FileDown className="h-3.5 w-3.5" aria-hidden />}
           Download {REPORT_NAME[mode].toLowerCase()} PDF
         </button>

@@ -17,11 +17,11 @@ export default function CreditsPage() {
           title="Image credits"
           description="The material and vehicle photos come from Wikimedia Commons and are used under the licences below. Thank you to the photographers."
         />
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {imageCredits.map((credit, i) => (
             <li
               key={credit.source}
-              className="animate-fade-up flex gap-3 rounded-2xl border border-foreground/[0.07] bg-surface p-3 shadow-sm"
+              className="animate-fade-up flex min-w-0 gap-3 rounded-2xl border border-foreground/[0.07] bg-surface p-3 shadow-sm"
               style={stagger(i, 30)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

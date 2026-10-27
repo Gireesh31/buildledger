@@ -174,7 +174,90 @@ export function RecordManager({
       {records.length === 0 ? (
         <EmptyState>{emptyText ?? `No ${def.label.toLowerCase()} yet.`}</EmptyState>
       ) : (
-        <div className={`overflow-x-auto rounded-2xl border border-foreground/[0.07] bg-surface shadow-sm transition-opacity ${refreshing ? "opacity-60" : ""}`}>
+        <>
+        {/* Phones: one card per entry, so nothing hides off the side of a wide table. */}
+        <ul className={`flex flex-col gap-2 transition-opacity sm:hidden ${refreshing ? "opacity-60" : ""}`}>
+          {visible.map((record) => {
+            // A long text "title" (daily log's work done) reads better in full below the date.
+            const namedField = def.fields.find((f) => f.name === def.titleField);
+            const dateAsTitle = namedField?.kind === "textarea";
+            const titleField = dateAsTitle ? def.fields.find((f) => f.name === def.dateField) : namedField;
+            const dateField = dateAsTitle ? undefined : def.fields.find((f) => f.name === def.dateField);
+            const detailFields = columns.filter(
+              (f) => f !== titleField && f !== dateField && f.name !== "paymentStatus" && f !== moneyField && display(f, record) !== "—",
+            );
+            const files = filesByRecord.get(record.id) ?? [];
+            return (
+              <li key={record.id} className="rounded-2xl border border-foreground/[0.07] bg-surface p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{titleField ? display(titleField, record) : def.singular}</p>
+                    {dateField && <p className="text-xs text-foreground/55">{display(dateField, record)}</p>}
+                  </div>
+                  {record.paymentStatus ? <PaymentStatusBadge status={String(record.paymentStatus)} /> : null}
+                </div>
+                {detailFields.length > 0 && (
+                  <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+                    {detailFields.map((field) => (
+                      <div key={field.name} className={`min-w-0 ${field.kind === "textarea" ? "col-span-2" : ""}`}>
+                        <dt className="text-xs text-foreground/50">{field.label}</dt>
+                        <dd className={`break-words ${field.kind === "textarea" ? "whitespace-pre-line" : ""} ${field.kind === "money" || field.kind === "number" ? "tabular-nums" : ""}`}>
+                          {display(field, record)}
+                        </dd>
+                      </div>
+                    ))}
+                    {extraColumns.map((column) => {
+                      const cell = column.values[record.id];
+                      return cell ? (
+                        <div key={column.label} className="min-w-0">
+                          <dt className="text-xs text-foreground/50">{column.label}</dt>
+                          <dd className={`font-medium tabular-nums ${cell.tone === "critical" ? "text-critical" : ""}`}>{cell.text}</dd>
+                        </div>
+                      ) : null;
+                    })}
+                  </dl>
+                )}
+                {files.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {files.map((file, i) => (
+                      <a
+                        key={file.id}
+                        href={`/api/projects/${projectId}/files/${file.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-md bg-rose-100 px-2 py-1 text-xs text-rose-700 dark:bg-rose-500/15 dark:text-rose-300"
+                      >
+                        {file.mimeType === "application/pdf" ? "PDF" : "📷"} {i + 1}
+                      </a>
+                    ))}
+                  </div>
+                )}
+                {(moneyField || canEdit) && (
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-foreground/[0.07] pt-3">
+                    <span className="text-lg font-semibold tabular-nums">{moneyField ? display(moneyField, record) : ""}</span>
+                    {canEdit && (
+                      <span className="flex gap-1">
+                        <button onClick={() => setEditing(record)} className={buttonClass("secondary", "sm")}>
+                          Edit
+                        </button>
+                        <button onClick={() => remove(record)} className="rounded-lg px-3 py-1.5 text-sm text-critical hover:bg-critical/10">
+                          Delete
+                        </button>
+                      </span>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+          {moneyField && visible.length > 0 && (
+            <li className="flex items-center justify-between rounded-2xl bg-brand px-4 py-3 font-semibold text-white shadow-sm shadow-brand/30">
+              <span>{query ? "Total (filtered)" : "Total"}</span>
+              <span className="tabular-nums">{formatINR(total, true)}</span>
+            </li>
+          )}
+        </ul>
+        <div className={`hidden overflow-x-auto rounded-2xl border border-foreground/[0.07] bg-surface shadow-sm transition-opacity sm:block ${refreshing ? "opacity-60" : ""}`}>
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-brand-soft/60 text-left text-xs text-foreground/70">
               <tr>
@@ -266,6 +349,7 @@ export function RecordManager({
             )}
           </table>
         </div>
+        </>
       )}
     </section>
   );
