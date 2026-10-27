@@ -1,6 +1,6 @@
 "use client";
 
-import { Banknote, CalendarClock, CircleAlert, CircleCheck, FileText, Landmark, Smartphone, type LucideIcon } from "lucide-react";
+import { Banknote, CalendarClock, CircleAlert, CircleCheck, FileText, Landmark, Plus, Smartphone, Trash2, type LucideIcon } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, inputClass } from "@/components/ui/primitives";
@@ -31,8 +31,12 @@ export interface RecordFormProps {
   scan?: "material";
   /** Shop-style picture picker shown above the fields. */
   catalog?: CatalogName;
+  /** Show "Add more" so several items can be entered and saved together. */
+  multiple?: boolean;
   onDone: () => void;
   onCancel: () => void;
+  /** Called when some items were saved but a later one failed, so the list can show the saved ones. */
+  onSaved?: () => void;
 }
 
 type ScanState =
@@ -61,9 +65,13 @@ function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Valu
   return values;
 }
 
-export function RecordForm({ projectId, collection, record, refOptions, voice, attachmentKind, scan, catalog, onDone, onCancel }: RecordFormProps) {
+export function RecordForm({ projectId, collection, record, refOptions, voice, attachmentKind, scan, catalog, multiple, onDone, onCancel, onSaved }: RecordFormProps) {
   const def = getCollection(collection);
-  const [values, setValues] = useState<Values>(() => initialValues(def.fields, record));
+  // A new entry can hold several items ("Add more"), saved together; editing is always one item.
+  const [items, setItems] = useState<Values[]>(() => [initialValues(def.fields, record)]);
+  // The item the picture picker, voice and bill scan fill in.
+  const [active, setActive] = useState(0);
+  const values = items[active] ?? items[0];
   const [files, setFiles] = useState<File[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,10 +80,13 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
   const [billTotal, setBillTotal] = useState<number | null>(null);
   const [priceFromTotal, setPriceFromTotal] = useState(false);
 
-  function set(name: string, value: string) {
-    setValues((current) => {
+  const updateItem = (index: number, change: (current: Values) => Values) =>
+    setItems((list) => list.map((item, i) => (i === index ? change(item) : item)));
+
+  function set(name: string, value: string, index = active) {
+    updateItem(index, (current) => {
       const next = { ...current, [name]: value };
-      if (name === "quantity" && priceFromTotal && billTotal && Number(value) > 0) {
+      if (name === "quantity" && index === active && priceFromTotal && billTotal && Number(value) > 0) {
         next.unitPrice = String(Math.round((billTotal / Number(value)) * 100) / 100);
       }
       return next;
@@ -83,10 +94,25 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
     if (name === "unitPrice") setPriceFromTotal(false);
   }
 
+  /** Adds another item below, starting from the same date so a day's purchases go in quickly. */
+  function addItem() {
+    const fresh = initialValues(def.fields);
+    if (def.dateField && values[def.dateField]) fresh[def.dateField] = values[def.dateField];
+    setItems((list) => [...list, fresh]);
+    setActive(items.length);
+    setBillTotal(null);
+    setPriceFromTotal(false);
+  }
+
+  function removeItem(index: number) {
+    setItems((list) => list.filter((_, i) => i !== index));
+    setActive((current) => (current === index ? Math.max(0, index - 1) : current > index ? current - 1 : current));
+  }
+
   /** Applies whichever parsed values were found; returns the labels of the fields it filled. */
   function applyMaterialValues(parsed: MaterialValues): string[] {
     const found = Object.entries(parsed).filter(([name, value]) => value && def.fields.some((f) => f.name === name)) as [string, string][];
-    setValues((current) => ({ ...current, ...Object.fromEntries(found) }));
+    updateItem(active, (current) => ({ ...current, ...Object.fromEntries(found) }));
     return found.map(([name]) => def.fields.find((f) => f.name === name)!.label);
   }
 
@@ -125,7 +151,7 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
     if (voice === "material") {
       applyMaterialValues(parseMaterialSpeech(transcript));
     } else if (voice && typeof voice === "object") {
-      setValues((current) => ({
+      updateItem(active, (current) => ({
         ...current,
         [voice.appendTo]: [current[voice.appendTo], transcript].filter(Boolean).join(current[voice.appendTo] ? ". " : ""),
       }));
@@ -137,25 +163,31 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
     setPending(true);
     setError(null);
 
-    const body = Object.fromEntries(
-      def.fields.filter((f) => !f.computed && isFieldVisible(f, values)).map((f) => [f.name, values[f.name]]),
-    );
     const base = `/api/projects/${projectId}/records/${collection}`;
-    const result = record
-      ? await sendJson<LedgerRecord>(`${base}/${record.id}`, body, "PUT")
-      : await sendJson<LedgerRecord>(base, body);
-    if (!result.ok) {
-      setError(result.error);
-      setPending(false);
-      return;
+    let firstSavedId: string | undefined;
+    // Items are saved one by one; if one fails, the saved ones leave the form so a retry doesn't duplicate them.
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const body = Object.fromEntries(def.fields.filter((f) => !f.computed && isFieldVisible(f, item)).map((f) => [f.name, item[f.name]]));
+      const result = record ? await sendJson<LedgerRecord>(`${base}/${record.id}`, body, "PUT") : await sendJson<LedgerRecord>(base, body);
+      if (!result.ok) {
+        setItems((list) => list.slice(i));
+        setActive(0);
+        setError(items.length > 1 ? `Item ${i + 1}: ${result.error}${i > 0 ? ` (the ${i} item${i === 1 ? "" : "s"} before it were saved)` : ""}` : result.error);
+        setPending(false);
+        if (i > 0) onSaved?.();
+        return;
+      }
+      firstSavedId ??= result.data.id;
     }
 
+    // A bill or photos belong with the first item (one bill usually covers the whole purchase).
     for (const file of files) {
       const form = new FormData();
       form.set("file", file);
       form.set("kind", attachmentKind ?? "document");
       form.set("collection", collection);
-      form.set("recordId", result.data.id);
+      form.set("recordId", firstSavedId!);
       const upload = await fetch(`/api/projects/${projectId}/files`, { method: "POST", body: form });
       if (!upload.ok) {
         const data = await upload.json().catch(() => ({}));
@@ -193,40 +225,112 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
         <CatalogPicker catalog={catalogs[catalog]} values={values} onChange={(changes) => Object.entries(changes).forEach(([name, value]) => set(name, value))} />
       )}
 
-      {groupFields(def.fields.filter((field) => !field.computed && isFieldVisible(field, values))).map(([group, fields], index, groups) => (
-        <section key={group} className={groups.length > 1 ? "rounded-xl border border-foreground/[0.08] p-4" : ""}>
-          {groups.length > 1 && (
-            <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground/50">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-soft text-[10px] text-brand">{index + 1}</span>
-              {group}
-            </h4>
-          )}
-          <div className={`grid gap-x-4 gap-y-3 sm:grid-cols-2 ${COLUMNS[fields.filter((f) => f.kind !== "radio" && f.kind !== "textarea").length] ?? "lg:grid-cols-3"}`}>
-            {fields.map((field) =>
-              field.kind === "radio" ? (
-                <RadioField key={field.name} field={field} value={values[field.name] ?? ""} onChange={(v) => set(field.name, v)} />
-              ) : (
-                <label key={field.name} className={`flex flex-col gap-1.5 text-sm ${field.kind === "textarea" ? "col-span-full" : ""}`}>
-                  <FieldLabel field={field} />
-                  <FieldInput field={field} value={values[field.name] ?? ""} onChange={(v) => set(field.name, v)} options={field.ref ? refOptions[field.ref] : undefined} />
-                </label>
-              ),
+      {items.map((item, itemIndex) => {
+        const many = items.length > 1;
+        return (
+          <div
+            key={itemIndex}
+            onFocusCapture={() => setActive(itemIndex)}
+            onPointerDownCapture={() => setActive(itemIndex)}
+            className={
+              many
+                ? `animate-fade-up flex flex-col gap-4 rounded-2xl border-2 p-4 transition-colors ${itemIndex === active ? "border-brand/50 bg-brand-soft/30" : "border-foreground/[0.08]"}`
+                : "flex flex-col gap-4"
+            }
+          >
+            {many && (
+              <div className="flex items-center justify-between gap-2">
+                <h4 className="flex items-center gap-2 text-sm font-semibold">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-xs text-white">{itemIndex + 1}</span>
+                  {def.singular} {itemIndex + 1}
+                  {itemIndex === active && catalog && <span className="text-xs font-normal text-brand">· picker fills this one</span>}
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => removeItem(itemIndex)}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-foreground/60 hover:bg-critical/10 hover:text-critical"
+                >
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden /> Remove
+                </button>
+              </div>
             )}
-          </div>
-        </section>
-      ))}
 
-      {def.fields
-        .filter((field) => field.computed)
-        .map((field) => {
-          const total = computeField(def, field, values);
-          return (
-            <div key={field.name} className="flex items-baseline justify-between rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 dark:from-orange-500/10 dark:to-amber-500/10" aria-live="polite">
-              <span className="text-sm font-medium text-foreground/70">{field.label}</span>
-              <span className="text-2xl font-semibold tabular-nums">{formatINR(total, true)}</span>
+            {groupFields(def.fields.filter((field) => !field.computed && isFieldVisible(field, item))).map(([group, fields], index, groups) => (
+              <section key={group} className={groups.length > 1 ? "rounded-xl border border-foreground/[0.08] bg-surface p-4" : ""}>
+                {groups.length > 1 && (
+                  <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground/50">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-soft text-[10px] text-brand">{index + 1}</span>
+                    {group}
+                  </h4>
+                )}
+                <div className={`grid gap-x-4 gap-y-3 sm:grid-cols-2 ${COLUMNS[fields.filter((f) => f.kind !== "radio" && f.kind !== "textarea").length] ?? "lg:grid-cols-3"}`}>
+                  {fields.map((field) =>
+                    field.kind === "radio" ? (
+                      <RadioField
+                        key={field.name}
+                        field={field}
+                        name={`${field.name}-${itemIndex}`}
+                        value={item[field.name] ?? ""}
+                        onChange={(v) => set(field.name, v, itemIndex)}
+                      />
+                    ) : (
+                      <label key={field.name} className={`flex flex-col gap-1.5 text-sm ${field.kind === "textarea" ? "col-span-full" : ""}`}>
+                        <FieldLabel field={field} />
+                        <FieldInput
+                          field={field}
+                          value={item[field.name] ?? ""}
+                          onChange={(v) => set(field.name, v, itemIndex)}
+                          options={field.ref ? refOptions[field.ref] : undefined}
+                        />
+                      </label>
+                    ),
+                  )}
+                </div>
+              </section>
+            ))}
+
+            {def.fields
+              .filter((field) => field.computed)
+              .map((field) => (
+                <div
+                  key={field.name}
+                  className="flex items-baseline justify-between rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 dark:from-orange-500/10 dark:to-amber-500/10"
+                  aria-live="polite"
+                >
+                  <span className="text-sm font-medium text-foreground/70">{field.label}</span>
+                  <span className="text-2xl font-semibold tabular-nums">{formatINR(computeField(def, field, item), true)}</span>
+                </div>
+              ))}
+          </div>
+        );
+      })}
+
+      {multiple && !record && (
+        <button
+          type="button"
+          onClick={addItem}
+          className="flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand/40 py-3 text-sm font-semibold text-brand transition-colors hover:border-brand hover:bg-brand-soft"
+        >
+          <Plus className="h-4 w-4" aria-hidden /> Add more <span className="font-normal text-foreground/60">(another {def.singular.toLowerCase()})</span>
+        </button>
+      )}
+
+      {items.length > 1 &&
+        def.fields
+          .filter((field) => field.computed)
+          .map((field) => (
+            <div key={field.name} className="flex items-baseline justify-between rounded-xl bg-brand px-4 py-3 text-white shadow-sm shadow-brand/30" aria-live="polite">
+              <span className="text-sm font-medium">
+                Grand total · {items.length} {def.label.toLowerCase()}
+              </span>
+              <span className="text-2xl font-semibold tabular-nums">
+                {formatINR(
+                  items.reduce((sum, item) => sum + computeField(def, field, item), 0),
+                  true,
+                )}
+              </span>
             </div>
-          );
-        })}
+          ))}
 
       {attachmentKind && !scan && <AttachmentPicker kind={attachmentKind} files={files} onChange={setFiles} />}
 
@@ -235,7 +339,7 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
           Cancel
         </button>
         <button type="submit" disabled={pending} className={buttonClass("primary")}>
-          {pending ? "Saving…" : "Save"}
+          {pending ? "Saving…" : items.length > 1 ? `Save all ${items.length}` : "Save"}
         </button>
       </div>
     </form>
@@ -334,7 +438,7 @@ const CHOICE_ICONS: Record<string, LucideIcon> = {
 };
 
 /** A select shown as a row of choice buttons (real radio inputs underneath, so keyboard and screen readers work). */
-function RadioField({ field, value, onChange }: { field: FieldDef; value: string; onChange: (value: string) => void }) {
+function RadioField({ field, name, value, onChange }: { field: FieldDef; name: string; value: string; onChange: (value: string) => void }) {
   return (
     <fieldset className="col-span-full flex flex-col gap-1.5 text-sm">
       <legend className="mb-1.5">
@@ -347,7 +451,7 @@ function RadioField({ field, value, onChange }: { field: FieldDef; value: string
             <label key={option.value} className="cursor-pointer">
               <input
                 type="radio"
-                name={field.name}
+                name={name}
                 value={option.value}
                 checked={value === option.value}
                 onChange={() => onChange(option.value)}

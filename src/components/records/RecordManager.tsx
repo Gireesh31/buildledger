@@ -23,6 +23,8 @@ interface RecordManagerProps {
   scan?: "material";
   /** Shop-style picture picker in the form. */
   catalog?: CatalogName;
+  /** Let a new entry hold several items ("Add more"). */
+  multiple?: boolean;
   title?: string;
   emptyText?: string;
   /** Calculated columns from the page, e.g. a worker's amount due. Keyed by record id. */
@@ -46,6 +48,7 @@ export function RecordManager({
   voice,
   scan,
   catalog,
+  multiple,
   title,
   emptyText,
   extraColumns = [],
@@ -160,9 +163,11 @@ export function RecordManager({
           voice={voice}
           scan={scan}
           catalog={catalog}
+          multiple={multiple}
           attachmentKind={attachmentKind}
           onDone={done}
           onCancel={() => setEditing(null)}
+          onSaved={() => startTransition(() => router.refresh())}
         />
       )}
 

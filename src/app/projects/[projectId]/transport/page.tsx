@@ -35,6 +35,7 @@ export default async function TransportPage({ params }: PageProps<"/projects/[pr
         <StatTile index={2} icon={Truck} accent="orange" label="Entries" value={String(vehicles.length)} />
       </div>
       <RecordManager
+        multiple
         projectId={projectId}
         collection="transport"
         records={vehicles}

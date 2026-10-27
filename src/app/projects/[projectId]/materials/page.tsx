@@ -27,6 +27,7 @@ export default async function MaterialsPage({ params }: PageProps<"/projects/[pr
         }
       />
       <RecordManager
+        multiple
         projectId={projectId}
         collection="materials"
         records={materials}

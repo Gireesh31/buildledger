@@ -90,6 +90,7 @@ export default async function LabourPage({ params }: PageProps<"/projects/[proje
       )}
 
       <RecordManager
+        multiple
         projectId={projectId}
         collection="workers"
         records={records.workers}
