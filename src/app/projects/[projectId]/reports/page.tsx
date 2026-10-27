@@ -90,7 +90,7 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
         </Card>
       </div>
 
-      <Card title="Daily, weekly & monthly report">
+      <Card title="Daily, weekly, monthly & custom-date report">
         <PeriodReportView data={reportData} projectName={project.name} />
       </Card>
 

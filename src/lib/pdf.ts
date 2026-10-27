@@ -25,7 +25,8 @@ async function createDocument(title: string, subtitle: string, orientation: "por
   doc.setFillColor(234, 88, 12).rect(0, 0, doc.internal.pageSize.getWidth(), 6, "F");
   doc.setFont("helvetica", "bold").setFontSize(16).setTextColor(28, 25, 23).text(title, margin, y + 10);
   y += 28;
-  doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(100).text(subtitle, margin, y);
+  // The built-in PDF font has no en/em dash ("23 Oct – 27 Oct" would lose its dash).
+  doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(100).text(subtitle.replace(/[–—]/g, "-"), margin, y);
   doc.text(`Generated ${formatDate(new Date().toISOString())} by BuildLedger`, margin, y + 14);
   doc.setTextColor(0);
   y += 34;
@@ -82,7 +83,7 @@ async function createDocument(title: string, subtitle: string, orientation: "por
   return api;
 }
 
-const MODE_NAME = { day: "Daily", week: "Weekly", month: "Monthly", total: "Day 1 to today" } as const;
+const MODE_NAME = { day: "Daily", week: "Weekly", month: "Monthly", total: "Day 1 to today", custom: "Custom dates" } as const;
 
 export async function buildPeriodReportPdf(report: PeriodReport, projectName: string, periodLabel: string) {
   const pdf = await createDocument(`${MODE_NAME[report.mode]} report - ${projectName}`, periodLabel);

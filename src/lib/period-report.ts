@@ -4,8 +4,11 @@
  * Plain data in, plain data out, so the page and the PDF show exactly the same numbers.
  */
 
-/** "total" runs from the project's first day (its start date, or its first entry) to today. */
-export type PeriodMode = "day" | "week" | "month" | "total";
+/**
+ * "total" runs from the project's first day (its start date, or its first entry) to today;
+ * "custom" covers any chosen from–to dates.
+ */
+export type PeriodMode = "day" | "week" | "month" | "total" | "custom";
 
 export interface ReportData {
   /** Day 1 of the project: its start date, or the earliest entry. */
@@ -46,10 +49,14 @@ const addDays = (iso: string, days: number) => fromUTC(toUTC(iso) + days * 86_40
 
 /**
  * First and last date of the day, week (Monday–Sunday) or month containing `date`;
- * for "total", from `startDate` (day 1) to `date`.
+ * for "total", from `startDate` (day 1) to `date`; for "custom", from `date` to `endDate` (either order).
  */
-export function periodRange(mode: PeriodMode, date: string, startDate?: string): { from: string; to: string } {
+export function periodRange(mode: PeriodMode, date: string, startDate?: string, endDate?: string): { from: string; to: string } {
   if (mode === "day") return { from: date, to: date };
+  if (mode === "custom") {
+    const end = endDate ?? date;
+    return end < date ? { from: end, to: date } : { from: date, to: end };
+  }
   if (mode === "total") return { from: startDate && startDate < date ? startDate : date, to: date };
   if (mode === "week") {
     const mondayOffset = (new Date(toUTC(date)).getUTCDay() + 6) % 7;
@@ -93,8 +100,8 @@ export interface PeriodReport {
   totals: { materials: number; labour: number; transport: number; spent: number; billsDue: number; paid: number; due: number };
 }
 
-export function buildPeriodReport(data: ReportData, mode: PeriodMode, date: string, today?: string): PeriodReport {
-  const { from, to } = periodRange(mode, date, data.startDate);
+export function buildPeriodReport(data: ReportData, mode: PeriodMode, date: string, today?: string, endDate?: string): PeriodReport {
+  const { from, to } = periodRange(mode, date, data.startDate, endDate);
   const duesAsOf = today && today < to ? today : to;
   const inRange = (d: string) => d >= from && d <= to;
   const byId = new Map(data.workers.map((w) => [w.id, w]));

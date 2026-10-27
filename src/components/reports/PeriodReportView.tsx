@@ -12,9 +12,10 @@ const MODES: { value: PeriodMode; label: string }[] = [
   { value: "week", label: "Weekly" },
   { value: "month", label: "Monthly" },
   { value: "total", label: "Day 1 to today" },
+  { value: "custom", label: "Custom dates" },
 ];
 
-const REPORT_NAME: Record<PeriodMode, string> = { day: "Daily", week: "Weekly", month: "Monthly", total: "Day 1 to today" };
+const REPORT_NAME: Record<PeriodMode, string> = { day: "Daily", week: "Weekly", month: "Monthly", total: "Day 1 to today", custom: "Custom dates" };
 
 /** One-click PDFs for today, this week, this month and the whole project so far. */
 const QUICK_PDFS: { mode: PeriodMode; label: string }[] = [
@@ -31,6 +32,10 @@ function periodLabel(mode: PeriodMode, from: string, to: string) {
   if (mode === "day") return longDate(from);
   if (mode === "total") return `${formatDate(from)} (day 1) – ${formatDate(to)}`;
   if (mode === "month") return new Date(`${from}T00:00:00`).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  if (mode === "custom") {
+    const days = Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1;
+    return from === to ? longDate(from) : `${formatDate(from)} – ${formatDate(to)} (${days} days)`;
+  }
   return `${formatDate(from)} – ${formatDate(to)}`;
 }
 
@@ -45,13 +50,15 @@ function shift(mode: PeriodMode, date: string, step: -1 | 1) {
 export function PeriodReportView({ data, projectName }: { data: ReportData; projectName: string }) {
   const [mode, setMode] = useState<PeriodMode>("day");
   const [date, setDate] = useState(todayISO);
+  // Custom dates: `date` is the first day, `endDate` the last.
+  const [endDate, setEndDate] = useState(todayISO);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // "Day 1 to today" always ends today, so the date picker doesn't apply to it.
   const reportDate = mode === "total" ? todayISO() : date;
-  const report = useMemo(() => buildPeriodReport(data, mode, reportDate, todayISO()), [data, mode, reportDate]);
-  const { from, to } = periodRange(mode, reportDate, data.startDate);
+  const report = useMemo(() => buildPeriodReport(data, mode, reportDate, todayISO(), endDate), [data, mode, reportDate, endDate]);
+  const { from, to } = periodRange(mode, reportDate, data.startDate, endDate);
   const label = periodLabel(mode, from, to);
   const t = report.totals;
   const isToday = mode === "day" && date === todayISO();
@@ -62,8 +69,8 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
     setError(null);
     try {
       const { downloadPeriodReportPdf } = await import("@/lib/pdf");
-      const pdfReport = pdfMode === mode && pdfDate === reportDate ? report : buildPeriodReport(data, pdfMode, pdfDate, todayISO());
-      const range = periodRange(pdfMode, pdfDate, data.startDate);
+      const pdfReport = pdfMode === mode && pdfDate === reportDate ? report : buildPeriodReport(data, pdfMode, pdfDate, todayISO(), endDate);
+      const range = periodRange(pdfMode, pdfDate, data.startDate, endDate);
       await downloadPeriodReportPdf(pdfReport, projectName, periodLabel(pdfMode, range.from, range.to));
     } catch {
       setError("Couldn't create the PDF. Please try again.");
@@ -86,6 +93,11 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
                 onClick={() => {
                   setMode(m.value);
                   if (m.value === "day") setDate(todayISO());
+                  // Start custom dates on the last 7 days; both ends can then be changed.
+                  if (m.value === "custom") {
+                    setEndDate(todayISO());
+                    setDate(shift("day", shift("week", todayISO(), -1), 1));
+                  }
                 }}
                 className={`rounded-lg px-4 py-1.5 font-medium transition-all duration-200 ${
                   mode === m.value ? "bg-brand text-white shadow-sm shadow-brand/30" : "text-foreground/60 hover:text-foreground"
@@ -95,7 +107,40 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
               </button>
             ))}
           </div>
-          {mode !== "total" && (
+          {mode === "custom" && (
+            <div className="flex flex-wrap items-end gap-2">
+              <label className="flex flex-col gap-1 text-xs font-medium text-foreground/60">
+                From
+                <span className="relative flex items-center">
+                  <CalendarDays className="pointer-events-none absolute left-3 h-4 w-4 text-brand" aria-hidden />
+                  <input
+                    type="date"
+                    value={date}
+                    max={endDate}
+                    onChange={(e) => e.target.value && setDate(e.target.value)}
+                    className={`${inputClass} w-44 pl-9`}
+                  />
+                </span>
+              </label>
+              <span className="pb-2.5 text-foreground/40" aria-hidden>
+                →
+              </span>
+              <label className="flex flex-col gap-1 text-xs font-medium text-foreground/60">
+                To
+                <span className="relative flex items-center">
+                  <CalendarDays className="pointer-events-none absolute left-3 h-4 w-4 text-brand" aria-hidden />
+                  <input
+                    type="date"
+                    value={endDate}
+                    min={date}
+                    onChange={(e) => e.target.value && setEndDate(e.target.value)}
+                    className={`${inputClass} w-44 pl-9`}
+                  />
+                </span>
+              </label>
+            </div>
+          )}
+          {mode !== "total" && mode !== "custom" && (
           <div className="flex items-center gap-1">
             <button onClick={() => setDate(shift(mode, date, -1))} aria-label={`Previous ${mode}`} className={buttonClass("ghost", "sm")}>
               <ChevronLeft className="h-4 w-4" />
@@ -138,7 +183,7 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
       </div>
       {error && <p className="text-xs text-critical">{error}</p>}
 
-      <div key={`${mode}-${from}`} className="animate-fade-in flex flex-col gap-5">
+      <div key={`${mode}-${from}-${to}`} className="animate-fade-in flex flex-col gap-5">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-brand">{REPORT_NAME[mode]} report</p>
           <h3 className="text-lg font-semibold">{label}</h3>
