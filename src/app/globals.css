@@ -1,0 +1,314 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --surface: #ffffff;
+  --foreground: #1c1917;
+  /* Construction orange brand, with a teal accent. */
+  --brand: #ea580c;
+  --brand-strong: #c2410c;
+  --brand-soft: #fff1e6;
+  --accent: #0d9488;
+  --accent-soft: #e6f7f5;
+  /* Chart tokens (single-series blue, hairline grid, reserved status colors). */
+  --series-1: #2a78d6;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-critical: #d03b3b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-series-1: var(--series-1);
+  --color-grid: var(--grid);
+  --color-axis: var(--axis);
+  --color-good: var(--status-good);
+  --color-warning: var(--status-warning);
+  --color-critical: var(--status-critical);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-jakarta);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0c0a09;
+    --surface: #171412;
+    --foreground: #f5f5f4;
+    --brand: #fb923c;
+    --brand-strong: #f97316;
+    --brand-soft: rgba(251, 146, 60, 0.12);
+    --accent: #2dd4bf;
+    --accent-soft: rgba(45, 212, 191, 0.12);
+    --series-1: #3987e5;
+    --grid: #2c2c2a;
+    --axis: #383835;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  letter-spacing: -0.005em;
+}
+
+/* Headings and the logo in Plus Jakarta Sans. */
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Animated background ---------- */
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.35;
+  will-change: transform;
+}
+.bg-orb-1 {
+  width: 38rem;
+  height: 38rem;
+  left: -10rem;
+  top: -12rem;
+  background: radial-gradient(circle, #fb923c 0%, transparent 65%);
+  animation: orb-drift-1 26s ease-in-out infinite;
+}
+.bg-orb-2 {
+  width: 32rem;
+  height: 32rem;
+  right: -8rem;
+  top: 20%;
+  background: radial-gradient(circle, #2dd4bf 0%, transparent 65%);
+  animation: orb-drift-2 32s ease-in-out infinite;
+}
+.bg-orb-3 {
+  width: 30rem;
+  height: 30rem;
+  left: 30%;
+  bottom: -14rem;
+  background: radial-gradient(circle, #fbbf24 0%, transparent 65%);
+  animation: orb-drift-3 38s ease-in-out infinite;
+}
+
+@keyframes orb-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(14vw, 10vh) scale(1.15); }
+}
+@keyframes orb-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-16vw, 12vh) scale(0.9); }
+}
+@keyframes orb-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10vw, -14vh) scale(1.1); }
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-orb { opacity: 0.18; }
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* Stagger with style={{ "--delay": "120ms" }}. */
+.animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.animate-scale-in {
+  animation: scale-in 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--foreground) 6%, transparent) 25%, color-mix(in srgb, var(--foreground) 11%, transparent) 50%, color-mix(in srgb, var(--foreground) 6%, transparent) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Cards and links that lift slightly on hover. */
+.lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .lift:hover {
+    transform: none;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Number boxes without the browser's up/down arrows, so they line up with the other fields. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ---------- Footer construction scene ---------- */
+
+:root {
+  --scene-sky-top: var(--surface);
+  --scene-sky-bottom: #fde7cf;
+  --scene-sun: #fdba74;
+  --scene-cloud: #ffffff;
+  --scene-hill: #f3d2ad;
+  --scene-far: #c9a586;
+  --scene-mid: #e7c9a9;
+  --scene-window: #f8e3cc;
+  --scene-ground: #7c4a24;
+  --scene-ground-edge: #a16207;
+  --scene-dust: #d6b48c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --scene-sky-bottom: #24170f;
+    --scene-sun: #fde68a;
+    --scene-cloud: #3a2c22;
+    --scene-hill: #2e2018;
+    --scene-far: #5c4535;
+    --scene-mid: #3b2a1f;
+    --scene-window: #4a3626;
+    --scene-ground: #3a2214;
+    --scene-ground-edge: #6b3f1d;
+    --scene-dust: #8a6a4c;
+  }
+}
+
+.scene-sky {
+  background: linear-gradient(to bottom, var(--scene-sky-top) 0%, var(--scene-sky-top) 35%, var(--scene-sky-bottom) 100%);
+}
+.scene-sun { fill: var(--scene-sun); opacity: 0.7; }
+.scene-cloud { fill: var(--scene-cloud); opacity: 0.8; }
+.scene-hill { fill: var(--scene-hill); }
+.scene-mid { fill: var(--scene-mid); }
+.scene-window { fill: var(--scene-window); }
+.scene-line { stroke: var(--scene-far); stroke-width: 2; fill: none; }
+.scene-ground { fill: var(--scene-ground); }
+.scene-ground-edge { fill: var(--scene-ground-edge); }
+.scene-tracks { stroke: color-mix(in srgb, var(--scene-ground-edge) 60%, transparent); stroke-width: 3; fill: none; }
+.scene-dust { fill: var(--scene-dust); }
+
+/* ---------- Product picker cards ---------- */
+
+/* Soft studio backdrop behind background-free product photos. */
+.product-stage {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 40%, #ffffff 0%, transparent 70%),
+    linear-gradient(to bottom, #f7f6f4, #ecebe8);
+}
+@media (prefers-color-scheme: dark) {
+  .product-stage {
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 40%, #3a3532 0%, transparent 70%),
+      linear-gradient(to bottom, #2a2624, #1d1a18);
+  }
+}

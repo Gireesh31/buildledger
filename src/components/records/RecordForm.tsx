@@ -1,0 +1,399 @@
+"use client";
+
+import { Banknote, CalendarClock, CircleAlert, CircleCheck, FileText, Landmark, Smartphone, type LucideIcon } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { FormMessage, sendJson } from "@/components/auth/form";
+import { buttonClass, inputClass } from "@/components/ui/primitives";
+import { VoiceInputButton } from "@/components/voice/VoiceInputButton";
+import { computeField, getCollection, isFieldVisible, type CollectionName, type FieldDef, type Option } from "@/lib/collections";
+import { catalogs, type CatalogName } from "@/lib/catalogs";
+import { formatINR, todayISO } from "@/lib/format";
+import { parseMaterialBill, parseMaterialSpeech, type MaterialValues } from "@/lib/material-parse";
+import { scanBill } from "@/lib/ocr";
+import type { AttachmentKind, LedgerRecord } from "@/lib/types";
+import { AttachmentPicker } from "./AttachmentPicker";
+import { CatalogPicker } from "./CatalogPicker";
+
+/**
+ * "material" parses the spoken sentence into form fields;
+ * { appendTo } dictates into a text field.
+ */
+export type VoiceMode = "material" | { appendTo: string };
+
+export interface RecordFormProps {
+  projectId: string;
+  collection: CollectionName;
+  record?: LedgerRecord;
+  refOptions: Partial<Record<CollectionName, Option[]>>;
+  voice?: VoiceMode;
+  attachmentKind?: AttachmentKind;
+  /** Read bill photos with OCR and fill the form from them. */
+  scan?: "material";
+  /** Shop-style picture picker shown above the fields. */
+  catalog?: CatalogName;
+  onDone: () => void;
+  onCancel: () => void;
+}
+
+type ScanState =
+  | { status: "idle" }
+  | { status: "reading"; progress: number }
+  | { status: "done"; filled: string[]; missing: string[]; billTotal: number | null; text: string }
+  | { status: "failed"; message: string; text?: string };
+
+const VOICE_HINTS: Record<string, string> = {
+  material: "Try: “cement 50 bags at 380 rupees per bag, paid by UPI” or “sand 3 loads total 36,000 cash”.",
+};
+
+type Values = Record<string, string>;
+
+function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Values {
+  const values: Values = {};
+  for (const field of fields) {
+    if (field.computed) continue;
+    const existing = record?.[field.name];
+    if (existing !== undefined) values[field.name] = String(existing);
+    else if (field.defaultValue !== undefined) values[field.name] = field.defaultValue;
+    else if (field.kind === "date") values[field.name] = todayISO();
+    else if ((field.kind === "select" || field.kind === "radio") && field.required) values[field.name] = field.options?.[0]?.value ?? "";
+    else values[field.name] = "";
+  }
+  return values;
+}
+
+export function RecordForm({ projectId, collection, record, refOptions, voice, attachmentKind, scan, catalog, onDone, onCancel }: RecordFormProps) {
+  const def = getCollection(collection);
+  const [values, setValues] = useState<Values>(() => initialValues(def.fields, record));
+  const [files, setFiles] = useState<File[]>([]);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [scanState, setScanState] = useState<ScanState>({ status: "idle" });
+  // When a bill shows only its total, price per unit is worked out from the quantity the user types.
+  const [billTotal, setBillTotal] = useState<number | null>(null);
+  const [priceFromTotal, setPriceFromTotal] = useState(false);
+
+  function set(name: string, value: string) {
+    setValues((current) => {
+      const next = { ...current, [name]: value };
+      if (name === "quantity" && priceFromTotal && billTotal && Number(value) > 0) {
+        next.unitPrice = String(Math.round((billTotal / Number(value)) * 100) / 100);
+      }
+      return next;
+    });
+    if (name === "unitPrice") setPriceFromTotal(false);
+  }
+
+  /** Applies whichever parsed values were found; returns the labels of the fields it filled. */
+  function applyMaterialValues(parsed: MaterialValues): string[] {
+    const found = Object.entries(parsed).filter(([name, value]) => value && def.fields.some((f) => f.name === name)) as [string, string][];
+    setValues((current) => ({ ...current, ...Object.fromEntries(found) }));
+    return found.map(([name]) => def.fields.find((f) => f.name === name)!.label);
+  }
+
+  async function handleBillImage(file: File) {
+    if (scan !== "material") return;
+    if (!file.type.startsWith("image/") || file.type === "image/heic") {
+      setScanState({ status: "failed", message: "Only JPG, PNG or WebP photos can be read automatically. The file is still attached." });
+      return;
+    }
+    setScanState({ status: "reading", progress: 0 });
+    try {
+      const { result, text } = await scanBill(
+        file,
+        parseMaterialBill,
+        (r) => Boolean(r.quantity && r.unitPrice),
+        (progress) => setScanState({ status: "reading", progress }),
+      );
+      const filled = applyMaterialValues(result);
+      const missing = (["quantity", "unitPrice"] as const)
+        .filter((name) => !result[name])
+        .map((name) => def.fields.find((f) => f.name === name)!.label);
+      const total = result.billTotal && missing.length > 0 ? Number(result.billTotal) : null;
+      setBillTotal(total);
+      setPriceFromTotal(total !== null);
+      setScanState(
+        filled.length > 0 || total
+          ? { status: "done", filled, missing, billTotal: total, text }
+          : { status: "failed", message: "Couldn't find the material details on this bill. Please fill them in.", text },
+      );
+    } catch {
+      setScanState({ status: "failed", message: "Couldn't read the bill (check your internet connection the first time). Please fill in the form." });
+    }
+  }
+
+  function handleVoice(transcript: string) {
+    if (voice === "material") {
+      applyMaterialValues(parseMaterialSpeech(transcript));
+    } else if (voice && typeof voice === "object") {
+      setValues((current) => ({
+        ...current,
+        [voice.appendTo]: [current[voice.appendTo], transcript].filter(Boolean).join(current[voice.appendTo] ? ". " : ""),
+      }));
+    }
+  }
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+
+    const body = Object.fromEntries(
+      def.fields.filter((f) => !f.computed && isFieldVisible(f, values)).map((f) => [f.name, values[f.name]]),
+    );
+    const base = `/api/projects/${projectId}/records/${collection}`;
+    const result = record
+      ? await sendJson<LedgerRecord>(`${base}/${record.id}`, body, "PUT")
+      : await sendJson<LedgerRecord>(base, body);
+    if (!result.ok) {
+      setError(result.error);
+      setPending(false);
+      return;
+    }
+
+    for (const file of files) {
+      const form = new FormData();
+      form.set("file", file);
+      form.set("kind", attachmentKind ?? "document");
+      form.set("collection", collection);
+      form.set("recordId", result.data.id);
+      const upload = await fetch(`/api/projects/${projectId}/files`, { method: "POST", body: form });
+      if (!upload.ok) {
+        const data = await upload.json().catch(() => ({}));
+        setError(`Saved, but "${file.name}" didn't upload: ${data.error ?? "upload failed"}`);
+        setPending(false);
+        setFiles([]);
+        return;
+      }
+    }
+    onDone();
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="animate-scale-in flex flex-col gap-4 rounded-2xl border border-brand/20 bg-surface p-5 shadow-lg shadow-orange-500/5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold">{record ? `Edit ${def.singular.toLowerCase()}` : `New ${def.singular.toLowerCase()}`}</h3>
+        {voice && (
+          <VoiceInputButton
+            onTranscript={handleVoice}
+            label={voice === "material" ? "Speak material" : "Dictate"}
+          />
+        )}
+      </div>
+      {typeof voice === "string" && <p className="-mt-2 text-xs text-foreground/50">{VOICE_HINTS[voice]}</p>}
+      {error && <FormMessage tone="error">{error}</FormMessage>}
+
+      {attachmentKind && scan && (
+        <>
+          <AttachmentPicker kind={attachmentKind} files={files} onChange={setFiles} onImageAdded={handleBillImage} />
+          <ScanStatus state={scanState} />
+        </>
+      )}
+
+      {catalog && (
+        <CatalogPicker catalog={catalogs[catalog]} values={values} onChange={(changes) => Object.entries(changes).forEach(([name, value]) => set(name, value))} />
+      )}
+
+      {groupFields(def.fields.filter((field) => !field.computed && isFieldVisible(field, values))).map(([group, fields], index, groups) => (
+        <section key={group} className={groups.length > 1 ? "rounded-xl border border-foreground/[0.08] p-4" : ""}>
+          {groups.length > 1 && (
+            <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground/50">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-soft text-[10px] text-brand">{index + 1}</span>
+              {group}
+            </h4>
+          )}
+          <div className={`grid gap-x-4 gap-y-3 sm:grid-cols-2 ${COLUMNS[fields.filter((f) => f.kind !== "radio" && f.kind !== "textarea").length] ?? "lg:grid-cols-3"}`}>
+            {fields.map((field) =>
+              field.kind === "radio" ? (
+                <RadioField key={field.name} field={field} value={values[field.name] ?? ""} onChange={(v) => set(field.name, v)} />
+              ) : (
+                <label key={field.name} className={`flex flex-col gap-1.5 text-sm ${field.kind === "textarea" ? "col-span-full" : ""}`}>
+                  <FieldLabel field={field} />
+                  <FieldInput field={field} value={values[field.name] ?? ""} onChange={(v) => set(field.name, v)} options={field.ref ? refOptions[field.ref] : undefined} />
+                </label>
+              ),
+            )}
+          </div>
+        </section>
+      ))}
+
+      {def.fields
+        .filter((field) => field.computed)
+        .map((field) => {
+          const total = computeField(def, field, values);
+          return (
+            <div key={field.name} className="flex items-baseline justify-between rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 dark:from-orange-500/10 dark:to-amber-500/10" aria-live="polite">
+              <span className="text-sm font-medium text-foreground/70">{field.label}</span>
+              <span className="text-2xl font-semibold tabular-nums">{formatINR(total, true)}</span>
+            </div>
+          );
+        })}
+
+      {attachmentKind && !scan && <AttachmentPicker kind={attachmentKind} files={files} onChange={setFiles} />}
+
+      <div className="flex justify-end gap-2">
+        <button type="button" onClick={onCancel} className={buttonClass("secondary")}>
+          Cancel
+        </button>
+        <button type="submit" disabled={pending} className={buttonClass("primary")}>
+          {pending ? "Saving…" : "Save"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function FieldInput({
+  field,
+  value,
+  onChange,
+  options,
+}: {
+  field: FieldDef;
+  value: string;
+  onChange: (value: string) => void;
+  options?: Option[];
+}) {
+  const common = { value, required: field.required, className: inputClass, placeholder: field.placeholder };
+  switch (field.kind) {
+    case "textarea":
+      return <textarea rows={3} {...common} onChange={(e) => onChange(e.target.value)} maxLength={2000} />;
+    case "select":
+    case "ref": {
+      const list = field.kind === "ref" ? (options ?? []) : (field.options ?? []);
+      return (
+        <select {...common} onChange={(e) => onChange(e.target.value)}>
+          {(!field.required || !value) && <option value="">{field.kind === "ref" && list.length === 0 ? "None added yet" : "Select…"}</option>}
+          {list.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      );
+    }
+    case "money":
+      return (
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground/50">₹</span>
+          <input {...common} type="number" inputMode="decimal" min={0} step="0.01" onChange={(e) => onChange(e.target.value)} className={`${inputClass} pl-7`} />
+        </div>
+      );
+    case "number":
+      return <input {...common} type="number" inputMode="decimal" min={0} step="any" onChange={(e) => onChange(e.target.value)} />;
+    case "date":
+      return <input {...common} type="date" onChange={(e) => onChange(e.target.value)} />;
+    case "phone":
+      return <input {...common} type="tel" inputMode="tel" placeholder="98765 43210" onChange={(e) => onChange(e.target.value)} />;
+    default:
+      return <input {...common} maxLength={200} onChange={(e) => onChange(e.target.value)} />;
+  }
+}
+
+function ScanStatus({ state }: { state: ScanState }) {
+  if (state.status === "idle") return null;
+  if (state.status === "reading") {
+    return (
+      <p className="text-xs text-foreground/70" role="status">
+        Reading bill… {Math.round(state.progress * 100)}%
+        {state.progress === 0 && " (the first scan downloads the reader, so it takes a little longer)"}
+      </p>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-1">
+      {state.status === "done" ? (
+        <FormMessage tone={state.missing.length === 0 ? "success" : "error"}>
+          {state.filled.length > 0 && `Filled from bill: ${state.filled.join(", ")}. `}
+          {state.missing.length === 0
+            ? "Check the values before saving."
+            : state.billTotal
+              ? `Bill total ${formatINR(state.billTotal, true)} found. Enter the quantity and the price per unit is worked out from it.`
+              : `Couldn't read: ${state.missing.join(", ")}. Please fill ${state.missing.length === 1 ? "it" : "them"} in.`}
+        </FormMessage>
+      ) : (
+        <FormMessage tone="error">{state.message}</FormMessage>
+      )}
+      {state.text && (
+        <details className="text-xs text-foreground/60">
+          <summary className="cursor-pointer">Text read from the bill</summary>
+          <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap rounded bg-foreground/5 p-2 font-mono">{state.text}</pre>
+        </details>
+      )}
+    </div>
+  );
+}
+
+const CHOICE_ICONS: Record<string, LucideIcon> = {
+  upi: Smartphone,
+  cash: Banknote,
+  netbanking: Landmark,
+  cheque: FileText,
+  advance: CalendarClock,
+  paid: CircleCheck,
+  due: CircleAlert,
+};
+
+/** A select shown as a row of choice buttons (real radio inputs underneath, so keyboard and screen readers work). */
+function RadioField({ field, value, onChange }: { field: FieldDef; value: string; onChange: (value: string) => void }) {
+  return (
+    <fieldset className="col-span-full flex flex-col gap-1.5 text-sm">
+      <legend className="mb-1.5">
+        <FieldLabel field={field} />
+      </legend>
+      <div className="flex flex-wrap gap-2">
+        {field.options?.map((option) => {
+          const Icon = CHOICE_ICONS[option.value];
+          return (
+            <label key={option.value} className="cursor-pointer">
+              <input
+                type="radio"
+                name={field.name}
+                value={option.value}
+                checked={value === option.value}
+                onChange={() => onChange(option.value)}
+                required={field.required}
+                className="peer sr-only"
+              />
+              <span className="flex items-center gap-1.5 rounded-full border border-foreground/15 bg-surface px-3.5 py-2 text-sm transition-all duration-200 hover:border-brand/50 peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-checked:shadow-sm peer-checked:shadow-brand/30 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40">
+                {Icon && <Icon className="h-4 w-4" aria-hidden />}
+                {option.label}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
+// Columns on wide screens by number of text boxes in the panel, so rows end up full.
+const COLUMNS: Record<number, string> = { 1: "lg:grid-cols-2", 2: "lg:grid-cols-2", 4: "lg:grid-cols-4" };
+
+function FieldLabel({ field }: { field: FieldDef }) {
+  return (
+    <span className="font-medium text-foreground/80">
+      {field.label}
+      {field.required && <span className="text-critical"> *</span>}
+    </span>
+  );
+}
+
+/**
+ * Splits fields into their form panels, keeping the order they're defined in.
+ * Text boxes come before choice buttons inside a panel so columns line up,
+ * except a choice that controls which fields show (like "Charged"), which stays first.
+ */
+function groupFields(fields: FieldDef[]): [string, FieldDef[]][] {
+  const groups = new Map<string, FieldDef[]>();
+  for (const field of fields) {
+    const name = field.group ?? "Details";
+    groups.set(name, [...(groups.get(name) ?? []), field]);
+  }
+  return [...groups].map(([name, list]) => {
+    const controls = new Set(fields.flatMap((f) => (f.showIf ? [f.showIf.field] : [])));
+    const leading = list.filter((f) => f.kind === "radio" && controls.has(f.name));
+    const inputs = list.filter((f) => f.kind !== "radio");
+    const choices = list.filter((f) => f.kind === "radio" && !controls.has(f.name));
+    return [name, [...leading, ...inputs, ...choices]];
+  });
+}
