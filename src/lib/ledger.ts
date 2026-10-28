@@ -119,8 +119,19 @@ export const LEDGER_COLLECTIONS = [
   "materials",
 ] as const;
 
-/** Bills (materials or transport) saved with payment status "Due": how much is still owed and on how many bills. */
+/**
+ * What's still owed on one bill: the whole total when it's "Due", total minus the amount paid
+ * when it's "Part paid", and nothing otherwise.
+ */
+export function balanceDue(bill: Record<string, unknown>): number {
+  const total = Number(bill.amount) || 0;
+  if (bill.paymentStatus === "due") return total;
+  if (bill.paymentStatus === "partial") return Math.max(0, Math.round((total - (Number(bill.paidAmount) || 0)) * 100) / 100);
+  return 0;
+}
+
+/** Bills (materials or transport) with money still owed ("Due" or "Part paid"): how much in total, and on how many bills. */
 export function outstandingBills(records: LedgerRecord[]): { amount: number; count: number } {
-  const due = records.filter((r) => r.paymentStatus === "due");
-  return { amount: due.reduce((sum, r) => sum + (typeof r.amount === "number" ? r.amount : Number(r.amount) || 0), 0), count: due.length };
+  const owed = records.map((record) => balanceDue(record)).filter((amount) => amount > 0);
+  return { amount: owed.reduce((sum, amount) => sum + amount, 0), count: owed.length };
 }

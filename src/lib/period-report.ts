@@ -13,7 +13,8 @@ export type PeriodMode = "day" | "week" | "month" | "total" | "custom";
 export interface ReportData {
   /** Day 1 of the project: its start date, or the earliest entry. */
   startDate: string;
-  materials: { date: string; material: string; unit: string; quantity: number; unitPrice: number; amount: number; status: PaymentStatus }[];
+  /** `balance` is what is still owed on the bill (all of it when Due, the rest when Part paid). */
+  materials: { date: string; material: string; unit: string; quantity: number; unitPrice: number; amount: number; status: PaymentStatus; balance: number }[];
   workers: {
     id: string;
     name: string;
@@ -28,13 +29,13 @@ export interface ReportData {
   }[];
   attendance: { date: string; workerId: string; status: string }[];
   /** `hours` and `ratePerHour` are null for full-amount hires. */
-  transport: { date: string; vehicle: string; transportName: string; hours: number | null; ratePerHour: number | null; amount: number; status: PaymentStatus }[];
+  transport: { date: string; vehicle: string; transportName: string; hours: number | null; ratePerHour: number | null; amount: number; status: PaymentStatus; balance: number }[];
 }
 
-/** Payment status of a bill: "advance" | "paid" | "due", or "" for older entries without one. */
+/** Payment status of a bill: "advance" | "paid" | "partial" | "due", or "" for older entries without one. */
 export type PaymentStatus = string;
 
-export const PAYMENT_STATUS_LABEL: Record<string, string> = { advance: "Paid in advance", paid: "Paid", due: "Due" };
+export const PAYMENT_STATUS_LABEL: Record<string, string> = { advance: "Paid in advance", paid: "Paid", partial: "Part paid", due: "Due" };
 
 const DAY_FRACTION: Record<string, number> = { present: 1, half: 0.5, absent: 0 };
 const STATUS_LABEL: Record<string, string> = { present: "Present", half: "Half day", absent: "Absent" };
@@ -145,8 +146,8 @@ export function buildPeriodReport(data: ReportData, mode: PeriodMode, date: stri
   const materialTotal = materials.reduce((s, m) => s + m.amount, 0);
   const labourTotal = labour.reduce((s, l) => s + l.amount, 0);
   const transportTotal = transport.reduce((s, t) => s + t.amount, 0);
-  // Material and transport bills in this period that were saved as "Due".
-  const billsDue = [...materials, ...transport].filter((b) => b.status === "due").reduce((s, b) => s + b.amount, 0);
+  // Still owed on this period's material and transport bills ("Due" in full, "Part paid" the rest).
+  const billsDue = [...materials, ...transport].reduce((s, b) => s + b.balance, 0);
   return {
     mode,
     from,

@@ -1,11 +1,11 @@
 "use client";
 
-import { Banknote, CalendarClock, CircleAlert, CircleCheck, FileText, Landmark, Plus, Smartphone, Trash2, type LucideIcon } from "lucide-react";
+import { Banknote, CalendarClock, CircleAlert, CircleCheck, CircleDollarSign, FileText, Landmark, List, Plus, Smartphone, Trash2, type LucideIcon } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, inputClass } from "@/components/ui/primitives";
 import { computeField, getCollection, isFieldVisible, type CollectionName, type FieldDef, type Option } from "@/lib/collections";
-import { catalogs, type CatalogName } from "@/lib/catalogs";
+import { catalogs, type Catalog, type CatalogName } from "@/lib/catalogs";
 import { formatINR, todayISO } from "@/lib/format";
 import { parseMaterialBill, type MaterialValues } from "@/lib/material-parse";
 import { scanBill } from "@/lib/ocr";
@@ -58,6 +58,13 @@ function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Valu
 
 export function RecordForm({ projectId, collection, record, refOptions, attachmentKind, scan, catalog, multiple, onDone, onCancel, onSaved, cancelLabel = "Cancel" }: RecordFormProps) {
   const def = getCollection(collection);
+  // Text fields that only appear for "Other" in a dropdown (material name, vehicle name) are typed into that dropdown's own box.
+  const otherText = new Map(
+    def.fields
+      .filter((f) => f.kind === "text" && f.showIf?.in.length === 1 && f.showIf.in[0] === "other")
+      .map((f) => [f.showIf!.field, f] as const),
+  );
+  const otherTextNames = new Set([...otherText.values()].map((f) => f.name));
   // A new entry can hold several items ("Add more"), saved together; editing is always one item.
   const [items, setItems] = useState<Values[]>(() => [initialValues(def.fields, record)]);
   // The item the picture picker and bill scan fill in.
@@ -77,6 +84,12 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
   function set(name: string, value: string, index = active) {
     updateItem(index, (current) => {
       const next = { ...current, [name]: value };
+      // Choosing a material from the list fills in its usual unit (cement → bag, steel → ton …).
+      const pickerDef: Catalog | undefined = catalog ? catalogs[catalog] : undefined;
+      if (pickerDef && pickerDef.unitField && name === pickerDef.choiceField) {
+        const unit = pickerDef.items.find((item) => item.value === value)?.unit;
+        if (unit) next[pickerDef.unitField] = unit;
+      }
       if (name === "quantity" && index === active && priceFromTotal && billTotal && Number(value) > 0) {
         next.unitPrice = String(Math.round((billTotal / Number(value)) * 100) / 100);
       }
@@ -226,7 +239,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
               </div>
             )}
 
-            {groupFields(def.fields.filter((field) => !field.computed && isFieldVisible(field, item))).map(([group, fields], index, groups) => (
+            {groupFields(def.fields.filter((field) => !field.computed && !otherTextNames.has(field.name) && isFieldVisible(field, item))).map(([group, fields], index, groups) => (
               <section key={group} className={groups.length > 1 ? "rounded-xl border border-foreground/[0.08] bg-surface p-4" : ""}>
                 {groups.length > 1 && (
                   <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground/50">
@@ -243,6 +256,16 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
                         name={`${field.name}-${itemIndex}`}
                         value={item[field.name] ?? ""}
                         onChange={(v) => set(field.name, v, itemIndex)}
+                      />
+                    ) : otherText.has(field.name) && item[field.name] === "other" ? (
+                      // "Other" chosen: the same box becomes a text box for its name.
+                      <OtherNameInput
+                        key={field.name}
+                        field={field}
+                        textField={otherText.get(field.name)!}
+                        value={item[otherText.get(field.name)!.name] ?? ""}
+                        onChange={(v) => set(otherText.get(field.name)!.name, v, itemIndex)}
+                        onBackToList={() => set(field.name, "", itemIndex)}
                       />
                     ) : (
                       <label key={field.name} className={`flex flex-col gap-1.5 text-sm ${field.kind === "textarea" ? "col-span-full" : ""}`}>
@@ -272,6 +295,8 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
                   <span className="text-2xl font-semibold tabular-nums">{formatINR(computeField(def, field, item), true)}</span>
                 </div>
               ))}
+
+            {item.paymentStatus === "partial" && <BalanceDue total={def.fields.filter((f) => f.computed).reduce((s, f) => s + computeField(def, f, item), 0)} paid={Number(item.paidAmount) || 0} />}
           </div>
         );
       })}
@@ -364,6 +389,66 @@ function FieldInput({
   }
 }
 
+/** A dropdown with "Other" chosen: its box turns into a text box for the name, with a way back to the list. */
+function OtherNameInput({
+  field,
+  textField,
+  value,
+  onChange,
+  onBackToList,
+}: {
+  field: FieldDef;
+  textField: FieldDef;
+  value: string;
+  onChange: (value: string) => void;
+  onBackToList: () => void;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5 text-sm">
+      <FieldLabel field={field} />
+      <span className="relative flex items-center">
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          required={textField.required}
+          maxLength={200}
+          autoFocus
+          placeholder={textField.placeholder ? `Other: ${textField.placeholder}` : `Type the ${field.label.toLowerCase()} name`}
+          aria-label={textField.label}
+          className={`${inputClass} pr-24`}
+        />
+        <button
+          type="button"
+          onClick={onBackToList}
+          className="absolute right-1.5 flex items-center gap-1 rounded-md bg-brand-soft px-2 py-1 text-xs font-medium text-brand hover:bg-brand hover:text-white"
+        >
+          <List className="h-3.5 w-3.5" aria-hidden /> List
+        </button>
+      </span>
+    </label>
+  );
+}
+
+/** Part paid: what was paid and the balance still due, worked out as you type. */
+function BalanceDue({ total, paid }: { total: number; paid: number }) {
+  const balance = Math.round((total - paid) * 100) / 100;
+  return (
+    <div className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 dark:border-rose-500/30 dark:bg-rose-500/10" aria-live="polite">
+      <span className="text-sm text-foreground/70">
+        Paid {formatINR(paid, true)} of {formatINR(total, true)}
+      </span>
+      {balance > 0 ? (
+        <span className="text-right">
+          <span className="block text-xs font-medium uppercase tracking-wide text-critical">Balance due</span>
+          <span className="text-2xl font-semibold tabular-nums text-critical">{formatINR(balance, true)}</span>
+        </span>
+      ) : (
+        <span className="text-sm font-medium text-critical">Amount paid must be less than the total. Choose “Paid” if it’s fully paid.</span>
+      )}
+    </div>
+  );
+}
+
 function ScanStatus({ state }: { state: ScanState }) {
   if (state.status === "idle") return null;
   if (state.status === "reading") {
@@ -405,6 +490,7 @@ const CHOICE_ICONS: Record<string, LucideIcon> = {
   cheque: FileText,
   advance: CalendarClock,
   paid: CircleCheck,
+  partial: CircleDollarSign,
   due: CircleAlert,
 };
 

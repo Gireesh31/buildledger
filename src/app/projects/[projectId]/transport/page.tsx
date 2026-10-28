@@ -4,7 +4,7 @@ import { ExportPdfButton } from "@/components/reports/ExportPdfButtons";
 import { RecordManager } from "@/components/records/RecordManager";
 import { PageHeader, StatTile } from "@/components/ui/primitives";
 import { formatINR, formatNumber } from "@/lib/format";
-import { outstandingBills } from "@/lib/ledger";
+import { balanceDue, outstandingBills } from "@/lib/ledger";
 import { canWrite } from "@/lib/server/access";
 import { listAttachments } from "@/lib/server/attachment-store";
 import { requirePageAccess } from "@/lib/server/page-data";
@@ -39,7 +39,7 @@ export default async function TransportPage({ params }: PageProps<"/projects/[pr
           accent="rose"
           label="Outstanding due"
           value={formatINR(due.amount)}
-          hint={due.count > 0 ? `${due.count} bill${due.count === 1 ? "" : "s"} marked Due` : "No unpaid bills"}
+          hint={due.count > 0 ? `${due.count} bill${due.count === 1 ? "" : "s"} not fully paid` : "No unpaid bills"}
           tone={due.amount > 0 ? "critical" : undefined}
         />
         <StatTile index={2} icon={Clock} accent="blue" label="Hours hired" value={formatNumber(hours)} hint="Per-hour vehicles only" />
@@ -52,6 +52,12 @@ export default async function TransportPage({ params }: PageProps<"/projects/[pr
         collection="transport"
         records={vehicles}
         canEdit={canWrite(role)}
+        extraColumns={[
+          {
+            label: "Balance due",
+            values: Object.fromEntries(vehicles.filter((r) => balanceDue(r) > 0).map((r) => [r.id, { text: formatINR(balanceDue(r)), tone: "critical" as const }])),
+          },
+        ]}
         catalog="vehicle"
         attachments={attachments.filter((a) => a.collection === "transport")}
         attachmentKind="bill"

@@ -36,9 +36,9 @@ To copy old local data (`.data/`) into Supabase: `node --env-file=.env.local scr
 | --- | --- | --- |
 | Dashboard | `/` | All your projects with spend vs budget and money owed to workers (landing page when signed out) |
 | Overview | `/projects/[id]` | Total cost, budget left, cost per sq ft, worker dues, recent material purchases, spend by category, latest log |
-| Materials | `…/materials` | Material purchases: shop-style picker (picture cards with − / + that fill the form), unit, quantity, price per unit → total, payment mode (UPI / Cash / Net banking / Cheque). **Scan bill** fills the form. Shows the outstanding amount of bills marked Due |
+| Materials | `…/materials` | Material purchases: shop-style picker (picture cards with − / + that fill the form), unit, quantity, price per unit → total, payment mode (UPI / Cash / Net banking / Cheque). **Scan bill** fills the form; choosing a material sets its unit; "Other" is typed into the same box. Payment status Paid in advance / Paid / **Part paid** (amount paid → balance due) / Due; the outstanding total is shown |
 | Labour | `…/labour` | Workers (paid a daily wage by attendance, P / ½ / A) and teams (paid a fixed amount); amount paid and due |
-| Transport | `…/transport` | Vehicles and machinery hired (JCB, Hitachi, crane, truck, tractor, mixer, roller, tanker, other) with a picture picker (− hours +), name of the transport, **per hour** (hours × rate) or **full amount**. Shows the outstanding amount of bills marked Due |
+| Transport | `…/transport` | Vehicles and machinery hired (JCB, Hitachi, crane, truck, tractor, mixer, roller, tanker, other) with a picture picker (− hours +), name of the transport, **per hour** (hours × rate) or **full amount**; "Other" is typed into the same box; Part paid shows the balance due and the outstanding total |
 | Daily log | `…/daily-log` | Work done, weather, issues, site photos |
 | Bills & photos | `…/files` | Upload or take photos of bills/receipts/site; gallery with filters |
 | Team | `…/team` | Invite people by email as editor or viewer |

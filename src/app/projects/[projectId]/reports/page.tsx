@@ -6,7 +6,7 @@ import { PeriodReportView } from "@/components/reports/PeriodReportView";
 import { Card, EmptyState, PageHeader, StatTile } from "@/components/ui/primitives";
 import { choiceLabel, getCollection, isTeam, optionLabel } from "@/lib/collections";
 import { formatINR } from "@/lib/format";
-import { computeLedger, LEDGER_COLLECTIONS } from "@/lib/ledger";
+import { balanceDue, computeLedger, LEDGER_COLLECTIONS } from "@/lib/ledger";
 import type { ReportData } from "@/lib/period-report";
 import { requirePageAccess } from "@/lib/server/page-data";
 import { loadRecords } from "@/lib/server/record-store";
@@ -42,6 +42,7 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
         unitPrice: Number(m.unitPrice),
         amount: Number(m.amount ?? 0),
         status: String(m.paymentStatus ?? ""),
+        balance: balanceDue(m),
       })),
     workers: records.workers.map((w) => ({
       id: w.id,
@@ -62,6 +63,7 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
       ratePerHour: t.chargeType === "hourly" ? Number(t.ratePerHour ?? 0) : null,
       amount: Number(t.amount ?? 0),
       status: String(t.paymentStatus ?? ""),
+      balance: balanceDue(t),
     })),
   };
 

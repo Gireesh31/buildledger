@@ -98,6 +98,9 @@ export const isTeam = (record: Record<string, unknown>) => record.workerType ===
 
 export const paymentStatuses = opts(["advance", "Paid in advance"], ["paid", "Paid"], ["due", "Due"]);
 
+/** Material and transport bills can also be part paid: some money given now, the rest still due. */
+export const billPaymentStatuses = opts(["advance", "Paid in advance"], ["paid", "Paid"], ["partial", "Part paid"], ["due", "Due"]);
+
 export const paymentModes = opts(["upi", "UPI"], ["cash", "Cash"], ["netbanking", "Net banking"], ["cheque", "Cheque"]);
 
 /** How the money was given: same choice on the material, labour and transport forms. */
@@ -111,6 +114,17 @@ const paymentStatusField = {
   required: true,
   options: paymentStatuses,
   defaultValue: "paid",
+  group: "Payment",
+} as const;
+
+/** Payment status on bills, with "Part paid" and the amount paid so far. */
+const billPaymentStatusField = { ...paymentStatusField, options: billPaymentStatuses } as const;
+const paidAmountField = {
+  name: "paidAmount",
+  label: "Amount paid",
+  kind: "money",
+  required: true,
+  showIf: { field: "paymentStatus", in: ["partial"] },
   group: "Payment",
 } as const;
 
@@ -154,7 +168,8 @@ export const collections = {
       { name: "ratePerHour", label: "Rate per hour", kind: "money", required: true, showIf: { field: "chargeType", in: ["hourly"] }, group: "Charges" },
       { name: "fullAmount", label: "Full amount", kind: "money", required: true, showIf: { field: "chargeType", in: ["full"] }, hideInTable: true, group: "Charges" },
       paymentModeField,
-      paymentStatusField,
+      billPaymentStatusField,
+      paidAmountField,
       { name: "amount", label: "Total", kind: "money", computed: { product: ["hours", "ratePerHour"], fallback: "fullAmount" } },
     ],
   },
@@ -181,7 +196,8 @@ export const collections = {
       { name: "quantity", label: "Quantity", kind: "number", required: true },
       { name: "unitPrice", label: "Price per unit", kind: "money", required: true },
       paymentModeField,
-      paymentStatusField,
+      billPaymentStatusField,
+      paidAmountField,
       { name: "amount", label: "Total price", kind: "money", computed: { product: ["quantity", "unitPrice"] } },
     ],
   },

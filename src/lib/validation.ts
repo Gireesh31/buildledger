@@ -155,6 +155,13 @@ export async function parseRecord(
     if (!field.computed) continue;
     values[field.name] = computeField(getCollection(collection), field, values);
   }
+
+  // Part paid: something was paid, but less than the total (the rest is the balance due).
+  if (values.paymentStatus === "partial" && typeof values.amount === "number") {
+    const paid = Number(values.paidAmount) || 0;
+    if (paid <= 0) return { ok: false, error: "Enter the amount paid." };
+    if (paid >= values.amount) return { ok: false, error: "Amount paid must be less than the total. Choose “Paid” if it's fully paid." };
+  }
   return { ok: true, values };
 }
 

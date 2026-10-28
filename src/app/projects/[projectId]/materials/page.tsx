@@ -4,7 +4,7 @@ import { ExportPdfButton } from "@/components/reports/ExportPdfButtons";
 import { RecordManager } from "@/components/records/RecordManager";
 import { PageHeader, StatTile } from "@/components/ui/primitives";
 import { formatINR } from "@/lib/format";
-import { outstandingBills } from "@/lib/ledger";
+import { balanceDue, outstandingBills } from "@/lib/ledger";
 import { canWrite } from "@/lib/server/access";
 import { listAttachments } from "@/lib/server/attachment-store";
 import { requirePageAccess } from "@/lib/server/page-data";
@@ -38,7 +38,7 @@ export default async function MaterialsPage({ params }: PageProps<"/projects/[pr
           accent="rose"
           label="Outstanding due"
           value={formatINR(due.amount)}
-          hint={due.count > 0 ? `${due.count} bill${due.count === 1 ? "" : "s"} marked Due` : "No unpaid bills"}
+          hint={due.count > 0 ? `${due.count} bill${due.count === 1 ? "" : "s"} not fully paid` : "No unpaid bills"}
           tone={due.amount > 0 ? "critical" : undefined}
         />
         <StatTile index={2} icon={Hash} accent="orange" label="Entries" value={String(materials.length)} />
@@ -50,6 +50,12 @@ export default async function MaterialsPage({ params }: PageProps<"/projects/[pr
         collection="materials"
         records={materials}
         canEdit={canWrite(role)}
+        extraColumns={[
+          {
+            label: "Balance due",
+            values: Object.fromEntries(materials.filter((r) => balanceDue(r) > 0).map((r) => [r.id, { text: formatINR(balanceDue(r)), tone: "critical" as const }])),
+          },
+        ]}
         attachments={attachments.filter((a) => a.collection === "materials")}
         attachmentKind="bill"
         scan="material"

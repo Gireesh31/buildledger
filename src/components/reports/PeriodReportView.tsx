@@ -200,7 +200,7 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
             accent="orange"
             label="Total spent"
             value={formatINR(t.spent)}
-            hint={t.billsDue > 0 ? `${formatINR(t.billsDue)} of bills marked due` : undefined}
+            hint={t.billsDue > 0 ? `${formatINR(t.billsDue)} still owed on bills` : undefined}
             tone={t.billsDue > 0 ? "critical" : undefined}
           />
           <StatTile index={4} icon={Wallet} accent="blue" label="Paid out" value={formatINR(t.paid)} />

@@ -96,7 +96,7 @@ export async function buildPeriodReportPdf(report: PeriodReport, projectName: st
       ["Labour (workers & teams)", rs(t.labour)],
       ["Transport & machinery", rs(t.transport)],
       ["Total spent", rs(t.spent)],
-      ["Material & transport bills marked due", rs(t.billsDue)],
+      ["Still owed on material & transport bills", rs(t.billsDue)],
       ["Paid out", rs(t.paid)],
       [`Outstanding dues as of ${formatDate(report.duesAsOf)}`, rs(t.due)],
     ],
