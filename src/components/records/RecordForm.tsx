@@ -1,6 +1,6 @@
 "use client";
 
-import { Banknote, CalendarClock, CircleAlert, CircleCheck, CircleDollarSign, FileText, Landmark, List, Plus, Smartphone, Trash2, type LucideIcon } from "lucide-react";
+import { Banknote, CalendarClock, CircleAlert, CircleCheck, FileText, IndianRupee, Landmark, List, Plus, Smartphone, Trash2, type LucideIcon } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, inputClass } from "@/components/ui/primitives";
@@ -490,7 +490,7 @@ const CHOICE_ICONS: Record<string, LucideIcon> = {
   cheque: FileText,
   advance: CalendarClock,
   paid: CircleCheck,
-  partial: CircleDollarSign,
+  partial: IndianRupee,
   due: CircleAlert,
 };
 
