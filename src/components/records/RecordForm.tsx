@@ -33,10 +33,13 @@ export interface RecordFormProps {
   catalog?: CatalogName;
   /** Show "Add more" so several items can be entered and saved together. */
   multiple?: boolean;
-  onDone: () => void;
+  /** Called after saving, with how many items were saved. */
+  onDone: (count: number) => void;
   onCancel: () => void;
   /** Called when some items were saved but a later one failed, so the list can show the saved ones. */
   onSaved?: () => void;
+  /** Label for the secondary button (e.g. "Clear" when the form is always open). */
+  cancelLabel?: string;
 }
 
 type ScanState =
@@ -65,7 +68,7 @@ function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Valu
   return values;
 }
 
-export function RecordForm({ projectId, collection, record, refOptions, voice, attachmentKind, scan, catalog, multiple, onDone, onCancel, onSaved }: RecordFormProps) {
+export function RecordForm({ projectId, collection, record, refOptions, voice, attachmentKind, scan, catalog, multiple, onDone, onCancel, onSaved, cancelLabel = "Cancel" }: RecordFormProps) {
   const def = getCollection(collection);
   // A new entry can hold several items ("Add more"), saved together; editing is always one item.
   const [items, setItems] = useState<Values[]>(() => [initialValues(def.fields, record)]);
@@ -197,7 +200,7 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
         return;
       }
     }
-    onDone();
+    onDone(items.length);
   }
 
   return (
@@ -336,7 +339,7 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
 
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel} className={buttonClass("secondary")}>
-          Cancel
+          {cancelLabel}
         </button>
         <button type="submit" disabled={pending} className={buttonClass("primary")}>
           {pending ? "Saving…" : items.length > 1 ? `Save all ${items.length}` : "Save"}

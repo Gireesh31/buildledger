@@ -27,6 +27,7 @@ export default async function DailyLogPage({ params }: PageProps<"/projects/[pro
         }
       />
       <RecordManager
+        formFirst
         projectId={projectId}
         collection="dailyLogs"
         records={logs}

@@ -38,6 +38,29 @@ export default async function LabourPage({ params }: PageProps<"/projects/[proje
         }
       />
 
+      <RecordManager
+        formFirst
+        multiple
+        projectId={projectId}
+        collection="workers"
+        records={records.workers}
+        canEdit={editable}
+        extraColumns={[
+          {
+            label: "Due",
+            values: Object.fromEntries(
+              workerDues.map((w) => [
+                w.id,
+                w.due > 0
+                  ? { text: formatINR(w.due), tone: "critical" as const }
+                  : { text: w.due < 0 ? `${formatINR(-w.due)} advance` : "Paid" },
+              ]),
+            ),
+          },
+        ]}
+        emptyText="No workers yet. Add individual workers (paid daily) or teams (paid a fixed amount)."
+      />
+
       <Card title="Daily attendance">
         <AttendanceSheet
           projectId={projectId}
@@ -89,27 +112,6 @@ export default async function LabourPage({ params }: PageProps<"/projects/[proje
         </Card>
       )}
 
-      <RecordManager
-        multiple
-        projectId={projectId}
-        collection="workers"
-        records={records.workers}
-        canEdit={editable}
-        extraColumns={[
-          {
-            label: "Due",
-            values: Object.fromEntries(
-              workerDues.map((w) => [
-                w.id,
-                w.due > 0
-                  ? { text: formatINR(w.due), tone: "critical" as const }
-                  : { text: w.due < 0 ? `${formatINR(-w.due)} advance` : "Paid" },
-              ]),
-            ),
-          },
-        ]}
-        emptyText="No workers yet. Add individual workers (paid daily) or teams (paid a fixed amount)."
-      />
     </div>
   );
 }

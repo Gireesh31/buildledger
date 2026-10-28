@@ -1,8 +1,8 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { CircleCheck, List, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { PaymentStatusBadge } from "@/components/ui/PaymentStatusBadge";
 import { buttonClass, EmptyState, inputClass } from "@/components/ui/primitives";
 import { choiceLabel, getCollection, type CollectionName, type FieldDef, type Option } from "@/lib/collections";
@@ -25,6 +25,11 @@ interface RecordManagerProps {
   catalog?: CatalogName;
   /** Let a new entry hold several items ("Add more"). */
   multiple?: boolean;
+  /**
+   * Entry-first page: the add form is always open, and the saved entries sit behind
+   * a "View saved entries" button (still there to edit or delete mistakes).
+   */
+  formFirst?: boolean;
   title?: string;
   emptyText?: string;
   /** Calculated columns from the page, e.g. a worker's amount due. Keyed by record id. */
@@ -49,6 +54,7 @@ export function RecordManager({
   scan,
   catalog,
   multiple,
+  formFirst = false,
   title,
   emptyText,
   extraColumns = [],
@@ -56,7 +62,12 @@ export function RecordManager({
   const def = getCollection(collection);
   const router = useRouter();
   const [refreshing, startTransition] = useTransition();
-  const [editing, setEditing] = useState<LedgerRecord | "new" | null>(null);
+  const [editing, setEditing] = useState<LedgerRecord | "new" | null>(formFirst && canEdit ? "new" : null);
+  // Bumped after each save so the always-open form starts fresh.
+  const [formKey, setFormKey] = useState(0);
+  const [showList, setShowList] = useState(!formFirst || !canEdit);
+  const [savedNote, setSavedNote] = useState<string | null>(null);
+  const formTop = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
 
   const refLabels = useMemo(() => {
@@ -113,9 +124,33 @@ export function RecordManager({
 
   const total = moneyField ? visible.reduce((sum, r) => sum + (typeof r.amount === "number" ? r.amount : 0), 0) : 0;
 
-  function done() {
-    setEditing(null);
+  /** After saving: entry-first pages keep a fresh form open and confirm what was saved. */
+  function done(count = 1) {
+    if (formFirst) {
+      const wasEdit = editing !== "new";
+      setSavedNote(wasEdit ? `${def.singular} updated.` : `Saved ${count} ${count === 1 ? def.singular.toLowerCase() : def.label.toLowerCase()}.`);
+      setEditing("new");
+      setFormKey((k) => k + 1);
+    } else {
+      setEditing(null);
+    }
     startTransition(() => router.refresh());
+  }
+
+  /** Cancel closes the form normally; on entry-first pages it clears it instead. */
+  function cancel() {
+    if (formFirst) {
+      setEditing("new");
+      setFormKey((k) => k + 1);
+    } else {
+      setEditing(null);
+    }
+  }
+
+  function startEdit(record: LedgerRecord) {
+    setSavedNote(null);
+    setEditing(record);
+    if (formFirst) requestAnimationFrame(() => formTop.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
   async function remove(record: LedgerRecord) {
@@ -128,50 +163,86 @@ export function RecordManager({
     startTransition(() => router.refresh());
   }
 
-  return (
-    <section className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-base font-semibold">
-          {title ?? def.label} <span className="text-sm font-normal text-foreground/50">({records.length})</span>
-        </h2>
-        <div className="no-print flex flex-wrap items-center gap-2">
-          {records.length > 5 && (
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search…"
-              aria-label={`Search ${def.label.toLowerCase()}`}
-              className={`${inputClass} w-40 py-1.5`}
-            />
-          )}
-          {canEdit && editing === null && (
+  const listHeader = (
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <h2 className="text-base font-semibold">
+        {formFirst ? "Saved entries" : (title ?? def.label)} <span className="text-sm font-normal text-foreground/50">({records.length})</span>
+      </h2>
+      <div className="no-print flex flex-wrap items-center gap-2">
+        {records.length > 5 && (
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search…"
+            aria-label={`Search ${def.label.toLowerCase()}`}
+            className={`${inputClass} w-40 py-1.5`}
+          />
+        )}
+        {formFirst ? (
+          <button onClick={() => setShowList(false)} className={buttonClass("ghost", "sm")}>
+            <X className="h-3.5 w-3.5" aria-hidden /> Hide
+          </button>
+        ) : (
+          canEdit &&
+          editing === null && (
             <button onClick={() => setEditing("new")} className={buttonClass("primary", "sm")}>
               <Plus className="h-3.5 w-3.5" aria-hidden /> Add {def.singular.toLowerCase()}
             </button>
-          )}
-        </div>
+          )
+        )}
       </div>
+    </div>
+  );
 
-      {editing !== null && (
-        <RecordForm
-          key={editing === "new" ? "new" : editing.id}
-          projectId={projectId}
-          collection={collection}
-          record={editing === "new" ? undefined : editing}
-          refOptions={refOptions}
-          voice={voice}
-          scan={scan}
-          catalog={catalog}
-          multiple={multiple}
-          attachmentKind={attachmentKind}
-          onDone={done}
-          onCancel={() => setEditing(null)}
-          onSaved={() => startTransition(() => router.refresh())}
-        />
+  return (
+    <section className="flex flex-col gap-3">
+      {!formFirst && listHeader}
+
+      {formFirst && savedNote && (
+        <div role="status" className="animate-fade-in flex items-center justify-between gap-2 rounded-xl border border-emerald-300/60 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+          <span className="flex items-center gap-2">
+            <CircleCheck className="h-4 w-4" aria-hidden /> {savedNote}
+          </span>
+          <button onClick={() => setSavedNote(null)} aria-label="Dismiss" className="rounded p-0.5 hover:bg-emerald-100 dark:hover:bg-emerald-500/20">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
 
-      {records.length === 0 ? (
+      {editing !== null && (
+        <div ref={formTop} className="scroll-mt-24">
+          <RecordForm
+            key={editing === "new" ? `new-${formKey}` : editing.id}
+            projectId={projectId}
+            collection={collection}
+            record={editing === "new" ? undefined : editing}
+            refOptions={refOptions}
+            voice={voice}
+            scan={scan}
+            catalog={catalog}
+            multiple={multiple}
+            attachmentKind={attachmentKind}
+            cancelLabel={formFirst && editing === "new" ? "Clear" : undefined}
+            onDone={done}
+            onCancel={cancel}
+            onSaved={() => startTransition(() => router.refresh())}
+          />
+        </div>
+      )}
+
+      {formFirst && !showList && (
+        <button
+          onClick={() => setShowList(true)}
+          className="no-print flex items-center justify-center gap-2 self-center rounded-full border border-foreground/15 bg-surface px-5 py-2.5 text-sm font-medium shadow-sm transition-colors hover:border-brand/50 hover:text-brand"
+        >
+          <List className="h-4 w-4" aria-hidden /> View saved entries ({records.length})
+        </button>
+      )}
+
+      {showList && formFirst && listHeader}
+
+      {!showList ? null : records.length === 0 ? (
         <EmptyState>{emptyText ?? `No ${def.label.toLowerCase()} yet.`}</EmptyState>
       ) : (
         <>
@@ -237,7 +308,7 @@ export function RecordManager({
                     <span className="text-lg font-semibold tabular-nums">{moneyField ? display(moneyField, record) : ""}</span>
                     {canEdit && (
                       <span className="flex gap-1">
-                        <button onClick={() => setEditing(record)} className={buttonClass("secondary", "sm")}>
+                        <button onClick={() => startEdit(record)} className={buttonClass("secondary", "sm")}>
                           Edit
                         </button>
                         <button onClick={() => remove(record)} className="rounded-lg px-3 py-1.5 text-sm text-critical hover:bg-critical/10">
@@ -320,7 +391,7 @@ export function RecordManager({
                   )}
                   {canEdit && (
                     <td className="whitespace-nowrap px-3 py-2 text-right">
-                      <button onClick={() => setEditing(record)} className="text-xs text-foreground/70 hover:underline">
+                      <button onClick={() => startEdit(record)} className="text-xs text-foreground/70 hover:underline">
                         Edit
                       </button>
                       <button onClick={() => remove(record)} className="ml-3 text-xs text-critical hover:underline">
