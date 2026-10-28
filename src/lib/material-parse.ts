@@ -1,7 +1,7 @@
 import { wordsToNumbers } from "@/lib/number-words";
 
 /**
- * Turns free text (a voice transcript or OCR text from a bill) into material form values.
+ * Turns OCR text from a scanned bill into material form values.
  * Keyword and pattern matching only; whatever it can't find stays empty for the user to fill.
  */
 
@@ -70,7 +70,6 @@ export interface MaterialValues {
 }
 
 const NUM = String.raw`(\d+(?:\.\d+)?)`;
-const CURRENCY = String.raw`(?:₹|rs\.?|inr|rupees?)`;
 
 /** Lowercase, spoken numbers to digits, drop thousands separators, expand "24 thousand" / "1.5 lakh". */
 function normalise(text: string): string {
@@ -105,33 +104,6 @@ function findQuantity(lower: string): { quantity: string; unit: string } | undef
   const match = lower.match(new RegExp(`${NUM}\\s*(${UNIT_PATTERN})\\b`));
   if (!match) return undefined;
   return { quantity: match[1], unit: UNIT_WORDS[match[2].replace(/\s+/g, " ")] ?? UNIT_WORDS[match[2].replace(/\s+/g, "")] };
-}
-
-/**
- * Speech like "cement 50 bags at 380 rupees per bag", "sand 3 loads total 36 thousand",
- * "bricks 5000 nos 9 rupees each".
- */
-export function parseMaterialSpeech(transcript: string): MaterialValues {
-  const lower = normalise(transcript);
-  const result: MaterialValues = { category: findCategory(lower), paymentMode: findPaymentMode(lower) };
-  const qty = findQuantity(lower);
-  if (qty) Object.assign(result, qty);
-
-  const perUnit =
-    lower.match(new RegExp(`(?:at|@|rate|price|cost)\\s*(?:of\\s*|is\\s*)?${CURRENCY}?\\s*${NUM}`)) ??
-    lower.match(new RegExp(`${CURRENCY}?\\s*${NUM}\\s*${CURRENCY}?\\s*(?:per|each|a|an|/)\\b`));
-  const total = lower.match(new RegExp(`(?:total|for|amount|altogether)\\s*(?:of\\s*|is\\s*)?${CURRENCY}?\\s*${NUM}`));
-
-  if (perUnit) {
-    result.unitPrice = perUnit[1];
-  } else if (total && result.quantity && Number(result.quantity) > 0) {
-    result.unitPrice = clean(Number(total[1]) / Number(result.quantity));
-  } else {
-    // A lone price with no "per" or "total": treat it as the price of one unit.
-    const money = lower.match(new RegExp(`${CURRENCY}\\s*${NUM}|${NUM}\\s*${CURRENCY}`));
-    if (money) result.unitPrice = money[1] ?? money[2];
-  }
-  return result;
 }
 
 const DATE_RE = /\b(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})\b/;

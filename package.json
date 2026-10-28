@@ -10,7 +10,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@huggingface/transformers": "3.8.1",
     "@supabase/supabase-js": "2.117.3",
     "jspdf": "4.2.1",
     "jspdf-autotable": "5.0.8",

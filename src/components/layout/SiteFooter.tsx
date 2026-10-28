@@ -1,4 +1,4 @@
-import { ArrowRight, Camera, Heart, IndianRupee, Mic } from "lucide-react";
+import { ArrowRight, Camera, Heart, IndianRupee, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { buttonClass } from "@/components/ui/primitives";
 import { ConstructionScene } from "./ConstructionScene";
@@ -29,7 +29,7 @@ const columns = [
 const highlights = [
   { icon: IndianRupee, text: "Amounts in ₹ with Indian grouping" },
   { icon: Camera, text: "Scan bills to fill forms" },
-  { icon: Mic, text: "Voice entry that works offline" },
+  { icon: Smartphone, text: "Works on your phone" },
 ];
 
 export function SiteFooter() {

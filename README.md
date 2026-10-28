@@ -36,10 +36,10 @@ To copy old local data (`.data/`) into Supabase: `node --env-file=.env.local scr
 | --- | --- | --- |
 | Dashboard | `/` | All your projects with spend vs budget and money owed to workers (landing page when signed out) |
 | Overview | `/projects/[id]` | Total cost, budget left, cost per sq ft, worker dues, recent material purchases, spend by category, latest log |
-| Materials | `…/materials` | Material purchases: shop-style picker (picture cards with − / + that fill the form), unit, quantity, price per unit → total, payment mode (UPI / Cash / Net banking / Cheque). **Scan bill** and **Speak material** fill the form |
+| Materials | `…/materials` | Material purchases: shop-style picker (picture cards with − / + that fill the form), unit, quantity, price per unit → total, payment mode (UPI / Cash / Net banking / Cheque). **Scan bill** fills the form. Shows the outstanding amount of bills marked Due |
 | Labour | `…/labour` | Workers (paid a daily wage by attendance, P / ½ / A) and teams (paid a fixed amount); amount paid and due |
-| Transport | `…/transport` | Vehicles and machinery hired (JCB, Hitachi, crane, truck, tractor, mixer, roller, tanker, other) with a picture picker (− hours +), name of the transport, **per hour** (hours × rate) or **full amount** |
-| Daily log | `…/daily-log` | Work done, weather, issues, site photos, with **Dictate** voice input |
+| Transport | `…/transport` | Vehicles and machinery hired (JCB, Hitachi, crane, truck, tractor, mixer, roller, tanker, other) with a picture picker (− hours +), name of the transport, **per hour** (hours × rate) or **full amount**. Shows the outstanding amount of bills marked Due |
+| Daily log | `…/daily-log` | Work done, weather, issues, site photos |
 | Bills & photos | `…/files` | Upload or take photos of bills/receipts/site; gallery with filters |
 | Team | `…/team` | Invite people by email as editor or viewer |
 | Reports | `…/reports` | Totals, spend by category and month, a **Today / Weekly / Monthly / Day 1 to today** report for any date (materials, labour, transport, payments, outstanding dues, bills marked due) with **Download PDF** and one-click PDFs for today, this week, this month and day 1 to today, and every list as a PDF table |
@@ -51,9 +51,8 @@ To copy old local data (`.data/`) into Supabase: `node --env-file=.env.local scr
 - **Worker / team due** = wages earned (or team amount) − "Amount paid" on the worker form. Shown in the worker list's Due column.
 - **Material total** = quantity × price per unit, calculated on the server (the client's value is ignored).
 
-### Voice input and bill scanning
+### Bill scanning
 
-- Voice tries the browser's built-in speech recognition first (Chrome/Edge/Safari, `en-IN`). Chrome sends that audio to Google, and other Chromium browsers (Brave, Opera, VS Code's browser) often don't have the service at all. When it isn't available, the app switches to **on-device Whisper** (`Xenova/whisper-base.en` via transformers.js, `src/lib/whisper.ts`) and remembers that choice. The model (~76 MB) downloads from Hugging Face on first use and is cached, after which voice works offline and audio never leaves the device. Spoken numbers ("fifty bags", "eighteen thousand five hundred") are converted to digits (`src/lib/number-words.ts`). Voice needs https or localhost.
 - **Scan bill** opens the phone camera and attaches the photo. On the Materials page the photo is also read with OCR ([tesseract.js](https://github.com/naptha/tesseract.js), English, in the browser, so the image stays on the device) and the form is filled from the bill: material, quantity, unit, rate and bill date (`src/lib/material-parse.ts`). The first scan downloads the reader (~15 MB, then cached). Works best on clear photos of printed bills; handwritten bills usually need manual entry.
 - Spoken materials like "cement 50 bags at 380 rupees per bag" or "sand 3 loads total 36,000" fill material, quantity, unit and price per unit.
 
@@ -97,11 +96,11 @@ src/
 │           ├── files/                  # Upload / list / serve / delete attachments
 │           ├── export/[collection]/    # PDF download
 │           └── invites/
-├── components/                     # records (generic form + table), charts, labour, files, team, voice, ui …
+├── components/                     # records (generic form + table), charts, labour, files, team, ui …
 └── lib/
     ├── collections.ts              # Field definitions for every ledger: drives forms, tables, validation and PDF
     ├── ledger.ts                   # Totals, dues, stock, by-category and by-month calculations
-    ├── material-parse.ts           # Voice transcript / bill OCR text → material fields
+    ├── material-parse.ts           # Bill OCR text → material fields
     ├── format.ts                   # ₹ / date formatting
     ├── validation.ts
     └── server/                     # Supabase stores, access control, sessions, crypto

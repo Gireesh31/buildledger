@@ -21,7 +21,7 @@ export default async function DailyLogPage({ params }: PageProps<"/projects/[pro
         icon={NotebookPen}
         accent="violet"
         title="Daily site log"
-        description="What happened on site each day, with photos. Use Dictate to speak the work done."
+        description="What happened on site each day, with photos."
         actions={
           <ExportPdfButton projectId={projectId} projectName={project.name} collection="dailyLogs" title="Daily log" />
         }
@@ -34,7 +34,6 @@ export default async function DailyLogPage({ params }: PageProps<"/projects/[pro
         canEdit={canWrite(role)}
         attachments={attachments.filter((a) => a.collection === "dailyLogs")}
         attachmentKind="photo"
-        voice={{ appendTo: "workDone" }}
         title="Entries"
       />
     </>

@@ -118,3 +118,9 @@ export const LEDGER_COLLECTIONS = [
   "transport",
   "materials",
 ] as const;
+
+/** Bills (materials or transport) saved with payment status "Due": how much is still owed and on how many bills. */
+export function outstandingBills(records: LedgerRecord[]): { amount: number; count: number } {
+  const due = records.filter((r) => r.paymentStatus === "due");
+  return { amount: due.reduce((sum, r) => sum + (typeof r.amount === "number" ? r.amount : Number(r.amount) || 0), 0), count: due.length };
+}

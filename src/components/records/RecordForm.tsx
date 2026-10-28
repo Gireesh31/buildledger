@@ -4,28 +4,20 @@ import { Banknote, CalendarClock, CircleAlert, CircleCheck, FileText, Landmark, 
 import { useState, type FormEvent } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, inputClass } from "@/components/ui/primitives";
-import { VoiceInputButton } from "@/components/voice/VoiceInputButton";
 import { computeField, getCollection, isFieldVisible, type CollectionName, type FieldDef, type Option } from "@/lib/collections";
 import { catalogs, type CatalogName } from "@/lib/catalogs";
 import { formatINR, todayISO } from "@/lib/format";
-import { parseMaterialBill, parseMaterialSpeech, type MaterialValues } from "@/lib/material-parse";
+import { parseMaterialBill, type MaterialValues } from "@/lib/material-parse";
 import { scanBill } from "@/lib/ocr";
 import type { AttachmentKind, LedgerRecord } from "@/lib/types";
 import { AttachmentPicker } from "./AttachmentPicker";
 import { CatalogPicker } from "./CatalogPicker";
-
-/**
- * "material" parses the spoken sentence into form fields;
- * { appendTo } dictates into a text field.
- */
-export type VoiceMode = "material" | { appendTo: string };
 
 export interface RecordFormProps {
   projectId: string;
   collection: CollectionName;
   record?: LedgerRecord;
   refOptions: Partial<Record<CollectionName, Option[]>>;
-  voice?: VoiceMode;
   attachmentKind?: AttachmentKind;
   /** Read bill photos with OCR and fill the form from them. */
   scan?: "material";
@@ -48,10 +40,6 @@ type ScanState =
   | { status: "done"; filled: string[]; missing: string[]; billTotal: number | null; text: string }
   | { status: "failed"; message: string; text?: string };
 
-const VOICE_HINTS: Record<string, string> = {
-  material: "Try: “cement 50 bags at 380 rupees per bag, paid by UPI” or “sand 3 loads total 36,000 cash”.",
-};
-
 type Values = Record<string, string>;
 
 function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Values {
@@ -68,11 +56,11 @@ function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Valu
   return values;
 }
 
-export function RecordForm({ projectId, collection, record, refOptions, voice, attachmentKind, scan, catalog, multiple, onDone, onCancel, onSaved, cancelLabel = "Cancel" }: RecordFormProps) {
+export function RecordForm({ projectId, collection, record, refOptions, attachmentKind, scan, catalog, multiple, onDone, onCancel, onSaved, cancelLabel = "Cancel" }: RecordFormProps) {
   const def = getCollection(collection);
   // A new entry can hold several items ("Add more"), saved together; editing is always one item.
   const [items, setItems] = useState<Values[]>(() => [initialValues(def.fields, record)]);
-  // The item the picture picker, voice and bill scan fill in.
+  // The item the picture picker and bill scan fill in.
   const [active, setActive] = useState(0);
   const values = items[active] ?? items[0];
   const [files, setFiles] = useState<File[]>([]);
@@ -150,17 +138,6 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
     }
   }
 
-  function handleVoice(transcript: string) {
-    if (voice === "material") {
-      applyMaterialValues(parseMaterialSpeech(transcript));
-    } else if (voice && typeof voice === "object") {
-      updateItem(active, (current) => ({
-        ...current,
-        [voice.appendTo]: [current[voice.appendTo], transcript].filter(Boolean).join(current[voice.appendTo] ? ". " : ""),
-      }));
-    }
-  }
-
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setPending(true);
@@ -205,16 +182,7 @@ export function RecordForm({ projectId, collection, record, refOptions, voice, a
 
   return (
     <form onSubmit={handleSubmit} className="animate-scale-in flex flex-col gap-4 rounded-2xl border border-brand/20 bg-surface p-5 shadow-lg shadow-orange-500/5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold">{record ? `Edit ${def.singular.toLowerCase()}` : `New ${def.singular.toLowerCase()}`}</h3>
-        {voice && (
-          <VoiceInputButton
-            onTranscript={handleVoice}
-            label={voice === "material" ? "Speak material" : "Dictate"}
-          />
-        )}
-      </div>
-      {typeof voice === "string" && <p className="-mt-2 text-xs text-foreground/50">{VOICE_HINTS[voice]}</p>}
+      <h3 className="text-sm font-semibold">{record ? `Edit ${def.singular.toLowerCase()}` : `New ${def.singular.toLowerCase()}`}</h3>
       {error && <FormMessage tone="error">{error}</FormMessage>}
 
       {attachmentKind && scan && (

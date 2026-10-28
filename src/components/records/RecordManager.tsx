@@ -9,7 +9,7 @@ import { choiceLabel, getCollection, type CollectionName, type FieldDef, type Op
 import type { CatalogName } from "@/lib/catalogs";
 import { formatDate, formatINR, formatNumber } from "@/lib/format";
 import type { Attachment, AttachmentKind, LedgerRecord } from "@/lib/types";
-import { RecordForm, type VoiceMode } from "./RecordForm";
+import { RecordForm } from "./RecordForm";
 
 interface RecordManagerProps {
   projectId: string;
@@ -19,7 +19,6 @@ interface RecordManagerProps {
   canEdit: boolean;
   attachments?: Attachment[];
   attachmentKind?: AttachmentKind;
-  voice?: VoiceMode;
   scan?: "material";
   /** Shop-style picture picker in the form. */
   catalog?: CatalogName;
@@ -50,7 +49,6 @@ export function RecordManager({
   canEdit,
   attachments = [],
   attachmentKind,
-  voice,
   scan,
   catalog,
   multiple,
@@ -218,7 +216,6 @@ export function RecordManager({
             collection={collection}
             record={editing === "new" ? undefined : editing}
             refOptions={refOptions}
-            voice={voice}
             scan={scan}
             catalog={catalog}
             multiple={multiple}
