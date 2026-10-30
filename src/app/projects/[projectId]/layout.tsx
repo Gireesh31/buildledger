@@ -40,10 +40,10 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
   return (
     <>
       <div className="mx-auto w-full max-w-6xl px-4 pt-6">
-        <div className="animate-fade-up relative overflow-hidden rounded-xl border border-foreground/[0.08] border-l-4 border-l-brand bg-surface px-5 py-5 shadow-sm">
-          {/* Small working skyline along the right of the header. */}
-          <div className="project-skyline pointer-events-none absolute inset-y-0 right-0 hidden w-[62%] sm:block" aria-hidden>
-            <HeroSkyline className="absolute inset-0 h-full w-full" fit="xMaxYMax meet" />
+        <div className="animate-fade-up relative overflow-hidden rounded-xl border border-foreground/[0.08] border-l-4 border-l-brand bg-surface px-5 pb-[104px] pt-5 shadow-sm sm:pb-5">
+          {/* Small working skyline: a strip under the name on phones, along the right from sm up. */}
+          <div className="project-skyline pointer-events-none absolute inset-x-0 bottom-0 h-[100px] sm:inset-x-auto sm:inset-y-0 sm:right-0 sm:h-auto sm:w-[62%]" aria-hidden>
+            <HeroSkyline className="absolute inset-0 h-full w-full" phoneClassName="absolute inset-0 h-full w-full" fit="xMaxYMax meet" />
           </div>
           <div className="relative flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">

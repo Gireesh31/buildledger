@@ -51,18 +51,37 @@ function Finished({ x, w, h, rows, cols }: { x: number; w: number; h: number; ro
  * a tower crane lifting a precast panel up onto it, a second crane slewing over another site,
  * and finished blocks either side. Pure SVG animation, frozen for reduced motion via CSS.
  */
+// On phones, a close-up framed on the rising building, its crane and the tall tower beside it,
+// so the drawing stays legible instead of shrinking to a thin strip or cropping at random.
+const PHONE_VIEW = "230 0 650 300";
+
 export function HeroSkyline({
-  className = "absolute inset-x-0 bottom-0 h-[220px] w-full sm:h-[280px]",
+  className = "absolute inset-x-0 bottom-0 h-[280px] w-full",
+  phoneClassName = "absolute inset-x-0 bottom-0 h-[190px] w-full",
   fit = "xMidYMax slice",
+  phoneFit = "xMidYMax meet",
 }: {
-  /** Size and position; defaults to a full-width band along the bottom of the parent. */
+  /** Size and position from the sm breakpoint up; defaults to a band along the bottom of the parent. */
   className?: string;
-  /** SVG preserveAspectRatio: "slice" fills a wide band, "meet" shows the whole skyline in a small box. */
+  /** Size and position on phones, where the close-up framing is used. */
+  phoneClassName?: string;
+  /** SVG preserveAspectRatio: "slice" fills a wide band, "meet" shows the whole drawing in a small box. */
   fit?: string;
+  /** preserveAspectRatio for the phone close-up; "meet" keeps the whole close-up in view. */
+  phoneFit?: string;
 } = {}) {
+  return (
+    <>
+      <SkylineSvg view={PHONE_VIEW} fit={phoneFit} className={`sm:hidden ${phoneClassName}`} />
+      <SkylineSvg view="0 0 1440 300" fit={fit} className={`hidden sm:block ${className}`} />
+    </>
+  );
+}
+
+function SkylineSvg({ view, fit, className }: { view: string; fit: string; className: string }) {
   const storeys = 8;
   return (
-    <svg aria-hidden viewBox="0 0 1440 300" preserveAspectRatio={fit} className={`hero-skyline pointer-events-none ${className}`} fill="none">
+    <svg aria-hidden viewBox={view} preserveAspectRatio={fit} className={`hero-skyline pointer-events-none ${className}`} fill="none">
       {/* Sun and ground */}
       <circle cx="1120" cy="70" r="34" className="sky-sun" />
       <path d={`M0,${GROUND} H1440`} className="sky-line" strokeWidth="2" />

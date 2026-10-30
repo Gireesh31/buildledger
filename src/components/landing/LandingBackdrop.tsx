@@ -162,22 +162,23 @@ function Floater({ kind, style }: { kind: "beam" | "rebar"; style: CSSProperties
 /**
  * Construction going on quietly behind the landing page, down both margins: a tower crane
  * carrying a beam, a builder's hoist running up its mast, a transit mixer, an excavator, and
- * steel hanging from slings. Light line drawings so the content stays clean; desktop only,
- * where there's margin to put them in.
+ * steel hanging from slings. Light line drawings so the content stays clean. The big machines
+ * need the desktop margins; on phones only the hanging steel shows, in the gaps between sections.
+ *
  */
 export function LandingBackdrop() {
   return (
-    <div aria-hidden className="landing-backdrop pointer-events-none absolute inset-0 hidden overflow-hidden lg:block">
-      <div className="absolute -left-2 top-[29%]">
+    <div aria-hidden className="landing-backdrop pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute -left-2 top-[29%] hidden lg:block">
         <MarginCrane />
       </div>
-      <div className="absolute -right-8 top-[38%]">
+      <div className="absolute -right-8 top-[38%] hidden lg:block">
         <Hoist />
       </div>
-      <div className="absolute -left-10 top-[62%]">
+      <div className="absolute -left-10 top-[62%] hidden lg:block">
         <MixerDrum />
       </div>
-      <div className="absolute -right-14 top-[79%]">
+      <div className="absolute -right-14 top-[79%] hidden lg:block">
         <Digger />
       </div>
       <Floater kind="beam" style={{ left: "1.5%", top: "48%", animationDelay: "-2s" }} />

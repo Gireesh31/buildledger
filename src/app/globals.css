@@ -545,8 +545,14 @@ input[type="number"] {
 
 /* ---------- Landing backdrop: work going on down the margins ---------- */
 
+/* Fainter on phones, where the steel sits close to the content. */
 .landing-backdrop {
-  opacity: 0.7;
+  opacity: 0.55;
+}
+@media (min-width: 1024px) {
+  .landing-backdrop {
+    opacity: 0.7;
+  }
 }
 @media (min-width: 1280px) {
   .landing-backdrop {
@@ -600,8 +606,10 @@ input[type="number"] {
 }
 
 /* Project header: the skyline fades out before it reaches the project name. */
-.project-skyline {
-  mask-image: linear-gradient(to right, transparent, black 45%);
+@media (min-width: 640px) {
+  .project-skyline {
+    mask-image: linear-gradient(to right, transparent, black 45%);
+  }
 }
 .project-skyline .hero-skyline {
   mask-image: none;
