@@ -12,7 +12,6 @@ const columns = [
       { href: "/", label: "Dashboard" },
       { href: "/projects/new", label: "New project" },
       { href: "/onboarding", label: "Getting started" },
-      { href: "/credits", label: "Image credits" },
     ],
   },
   {
