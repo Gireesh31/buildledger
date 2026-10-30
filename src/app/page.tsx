@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { HeroSkyline } from "@/components/landing/HeroSkyline";
 import { Landing } from "@/components/landing/Landing";
 import { SiteLoader } from "@/components/ui/SiteLoader";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -78,13 +79,15 @@ async function Dashboard({ user }: { user: User }) {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-      <div className="animate-fade-up mb-8 flex flex-wrap items-end justify-between gap-3">
-        <div>
+      <div className="animate-fade-up relative mb-8 flex flex-wrap items-end justify-between gap-3 overflow-hidden rounded-2xl border border-foreground/[0.08] bg-surface px-5 pb-[150px] pt-6 shadow-card sm:px-7 sm:pb-[170px]">
+        <HeroSkyline className="absolute inset-x-0 bottom-0 h-[150px] w-full sm:h-[170px]" />
+        {/* Greeting and button sit above the skyline band. */}
+        <div className="relative">
           <p className="text-sm font-medium text-brand">Dashboard</p>
           <h1 className="text-3xl font-semibold tracking-tight">Namaste, {user.name.split(" ")[0]}</h1>
           <p className="mt-1 text-sm text-foreground/60">Here’s where your sites stand today.</p>
         </div>
-        <Link href="/projects/new" className={buttonClass("primary")}>
+        <Link href="/projects/new" className={`${buttonClass("primary")} relative`}>
           <Plus className="h-4 w-4" /> New project
         </Link>
       </div>

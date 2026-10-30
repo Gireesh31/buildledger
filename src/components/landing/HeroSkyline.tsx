@@ -47,14 +47,22 @@ function Finished({ x, w, h, rows, cols }: { x: number; w: number; h: number; ro
 }
 
 /**
- * Line-drawn construction skyline behind the landing hero: a frame going up storey by storey,
+ * Line-drawn construction skyline (landing hero, dashboard, project header): a frame going up storey by storey,
  * a tower crane lifting a precast panel up onto it, a second crane slewing over another site,
  * and finished blocks either side. Pure SVG animation, frozen for reduced motion via CSS.
  */
-export function HeroSkyline() {
+export function HeroSkyline({
+  className = "absolute inset-x-0 bottom-0 h-[220px] w-full sm:h-[280px]",
+  fit = "xMidYMax slice",
+}: {
+  /** Size and position; defaults to a full-width band along the bottom of the parent. */
+  className?: string;
+  /** SVG preserveAspectRatio: "slice" fills a wide band, "meet" shows the whole skyline in a small box. */
+  fit?: string;
+} = {}) {
   const storeys = 8;
   return (
-    <svg aria-hidden viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" className="hero-skyline pointer-events-none absolute inset-x-0 bottom-0 h-[220px] w-full sm:h-[280px]" fill="none">
+    <svg aria-hidden viewBox="0 0 1440 300" preserveAspectRatio={fit} className={`hero-skyline pointer-events-none ${className}`} fill="none">
       {/* Sun and ground */}
       <circle cx="1120" cy="70" r="34" className="sky-sun" />
       <path d={`M0,${GROUND} H1440`} className="sky-line" strokeWidth="2" />

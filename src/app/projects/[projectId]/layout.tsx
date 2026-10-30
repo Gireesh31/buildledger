@@ -1,6 +1,7 @@
 import { Building2, MapPin } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { HeroSkyline } from "@/components/landing/HeroSkyline";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { getProjectAccess } from "@/lib/server/access";
@@ -40,6 +41,10 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
     <>
       <div className="mx-auto w-full max-w-6xl px-4 pt-6">
         <div className="animate-fade-up relative overflow-hidden rounded-xl border border-foreground/[0.08] border-l-4 border-l-brand bg-surface px-5 py-5 shadow-sm">
+          {/* Small working skyline along the right of the header. */}
+          <div className="project-skyline pointer-events-none absolute inset-y-0 right-0 hidden w-[62%] sm:block" aria-hidden>
+            <HeroSkyline className="absolute inset-0 h-full w-full" fit="xMaxYMax meet" />
+          </div>
           <div className="relative flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-soft text-brand" aria-hidden>
@@ -58,8 +63,8 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
               </div>
             </div>
             <div className="flex gap-2">
-              {status && <span className="rounded-md border border-foreground/10 px-2.5 py-1 text-xs font-medium text-foreground/70">{status}</span>}
-              {role === "viewer" && <span className="rounded-md border border-foreground/10 px-2.5 py-1 text-xs font-medium text-foreground/70">View only</span>}
+              {status && <span className="rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70 shadow-sm">{status}</span>}
+              {role === "viewer" && <span className="rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70 shadow-sm">View only</span>}
             </div>
           </div>
         </div>
