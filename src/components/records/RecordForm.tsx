@@ -515,7 +515,7 @@ function RadioField({ field, name, value, onChange }: { field: FieldDef; name: s
                 required={field.required}
                 className="peer sr-only"
               />
-              <span className="flex items-center gap-1.5 rounded-full border border-foreground/15 bg-surface px-3.5 py-2 text-sm transition-all duration-200 hover:border-brand/50 peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-checked:shadow-sm peer-checked:shadow-brand/30 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40">
+              <span className="flex items-center gap-1.5 rounded-full border border-foreground/15 bg-surface px-3.5 py-2 text-sm transition-all duration-200 hover:border-brand/50 peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40">
                 {Icon && <Icon className="h-4 w-4" aria-hidden />}
                 {option.label}
               </span>

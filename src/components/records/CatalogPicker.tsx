@@ -59,7 +59,7 @@ export function CatalogPicker({ catalog, values, onChange }: CatalogPickerProps)
             <li
               key={item.value}
               className={`group/card animate-fade-up flex flex-col items-center gap-1.5 rounded-xl border p-2 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-                isChosen ? "border-brand bg-brand-soft shadow-sm shadow-brand/20" : "border-foreground/[0.08] bg-surface hover:border-brand/40"
+                isChosen ? "border-brand bg-brand-soft" : "border-foreground/[0.08] bg-surface hover:border-brand/40"
               }`}
               style={stagger(i, 30)}
             >
@@ -97,7 +97,7 @@ export function CatalogPicker({ catalog, values, onChange }: CatalogPickerProps)
                   type="button"
                   onClick={() => change(item, 1)}
                   aria-label={`More ${label}`}
-                  className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white shadow-sm shadow-brand/30 transition-all hover:bg-brand-strong active:scale-90"
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white transition-all hover:bg-brand-strong active:scale-90"
                 >
                   <Plus className="h-3 w-3" />
                 </button>

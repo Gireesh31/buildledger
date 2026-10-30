@@ -102,7 +102,7 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
                   }
                 }}
                 className={`whitespace-nowrap rounded-lg px-2 py-1.5 font-medium transition-all duration-200 sm:px-4 ${
-                  mode === m.value ? "bg-brand text-white shadow-sm shadow-brand/30" : "text-foreground/60 hover:text-foreground"
+                  mode === m.value ? "bg-brand text-white" : "text-foreground/60 hover:text-foreground"
                 }`}
               >
                 {m.label}

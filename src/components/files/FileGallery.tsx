@@ -106,7 +106,7 @@ export function FileGallery({ projectId, files, canEdit }: { projectId: string; 
             role="tab"
             aria-selected={filter === k}
             onClick={() => setFilter(k)}
-            className={`rounded-full px-3 py-1 text-xs ${filter === k ? "bg-brand text-white shadow-sm shadow-brand/30" : "bg-foreground/5 hover:bg-brand-soft"}`}
+            className={`rounded-full px-3 py-1 text-xs ${filter === k ? "bg-brand text-white" : "bg-foreground/5 hover:bg-brand-soft"}`}
           >
             {k === "all" ? "All" : KIND_LABELS[k]} ({k === "all" ? files.length : files.filter((f) => f.kind === k).length})
           </button>

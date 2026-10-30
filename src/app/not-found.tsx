@@ -8,7 +8,7 @@ export default function NotFound() {
     <>
       <AppHeader />
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-20 text-center">
-        <span className="animate-fade-up flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/30">
+        <span className="animate-fade-up flex h-16 w-16 items-center justify-center rounded-xl bg-brand text-white">
           <HardHat className="h-8 w-8" aria-hidden />
         </span>
         <p className="animate-fade-up mt-6 text-sm font-semibold text-brand" style={{ animationDelay: "60ms" }}>

@@ -325,7 +325,7 @@ export function RecordManager({
             );
           })}
           {moneyField && visible.length > 0 && (
-            <li className="flex items-center justify-between rounded-xl bg-brand px-4 py-3 font-semibold text-white shadow-sm shadow-brand/30">
+            <li className="flex items-center justify-between rounded-xl bg-brand px-4 py-3 font-semibold text-white">
               <span>{query ? "Total (filtered)" : "Total"}</span>
               <span className="tabular-nums">{formatINR(total, true)}</span>
             </li>

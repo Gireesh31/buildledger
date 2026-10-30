@@ -26,7 +26,7 @@ export default async function WelcomePage() {
       <ol className="flex flex-col gap-3">
         {nextSteps.map((step, index) => (
           <li key={step.title} className="animate-fade-up flex gap-3 rounded-xl border border-foreground/[0.07] bg-brand-soft/40 p-3" style={stagger(index, 80)}>
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-400 text-xs font-medium text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-medium text-white">
               {index + 1}
             </span>
             <div>
@@ -41,7 +41,7 @@ export default async function WelcomePage() {
         <FinishOnboardingButton href="/">Skip for now</FinishOnboardingButton>
         <Link
           href="/onboarding/create-project"
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-all hover:bg-brand-strong active:scale-[0.97]"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-strong active:scale-[0.97]"
         >
           Get started
         </Link>

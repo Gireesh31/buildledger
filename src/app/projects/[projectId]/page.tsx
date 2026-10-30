@@ -162,7 +162,7 @@ export default async function ProjectOverviewPage({ params }: PageProps<"/projec
                   <span className="font-medium tabular-nums">{formatINR(c.amount)}</span>
                 </div>
                 <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-foreground/[0.07]">
-                  <div className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400" style={{ width: `${(c.amount / maxCategory) * 100}%` }} />
+                  <div className="h-full rounded-full bg-brand" style={{ width: `${(c.amount / maxCategory) * 100}%` }} />
                 </div>
               </li>
             ))}

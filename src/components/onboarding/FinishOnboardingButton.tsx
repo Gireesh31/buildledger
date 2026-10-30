@@ -25,7 +25,7 @@ export function FinishOnboardingButton({
 
   const styles =
     variant === "primary"
-      ? "rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-all hover:bg-brand-strong active:scale-[0.97] disabled:opacity-50"
+      ? "rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-strong active:scale-[0.97] disabled:opacity-50"
       : "text-sm text-foreground/60 hover:underline disabled:opacity-50";
 
   return (

@@ -277,7 +277,7 @@ export function ProfilePhoto({ photoUrl, initials }: { photoUrl?: string; initia
         onClick={() => input.current?.click()}
         disabled={pending !== null}
         title={photoUrl ? "Change photo" : "Add photo"}
-        className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-4 border-surface bg-gradient-to-br from-teal-500 to-sky-500 text-xl font-semibold text-white shadow-lg"
+        className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-4 border-surface bg-stone-700 text-xl font-semibold text-white shadow-lg"
       >
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

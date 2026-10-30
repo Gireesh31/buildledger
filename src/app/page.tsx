@@ -1,21 +1,16 @@
 import {
   ArrowRight,
   Building2,
-  Camera,
-  CheckCircle2,
   FolderKanban,
-  IndianRupee,
-  Package,
   PiggyBank,
   Plus,
-  Smartphone,
-  TrendingUp,
-  Truck,
   Users,
   Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Landing } from "@/components/landing/Landing";
+import { SiteLoader } from "@/components/ui/SiteLoader";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { BudgetMeter, buttonClass, EmptyState, IconChip, stagger, StatTile, type Accent } from "@/components/ui/primitives";
 import { formatINR, formatINRCompact } from "@/lib/format";
@@ -51,6 +46,7 @@ function DashboardSkeleton() {
           <div key={i} className="skeleton h-28 rounded-xl" />
         ))}
       </div>
+      <SiteLoader className="mt-12" label="Loading your sites…" />
     </main>
   );
 }
@@ -85,7 +81,7 @@ async function Dashboard({ user }: { user: User }) {
       <div className="animate-fade-up mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-brand">Dashboard</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Namaste, {user.name.split(" ")[0]} 👋</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Namaste, {user.name.split(" ")[0]}</h1>
           <p className="mt-1 text-sm text-foreground/60">Here’s where your sites stand today.</p>
         </div>
         <Link href="/projects/new" className={buttonClass("primary")}>
@@ -150,79 +146,6 @@ async function Dashboard({ user }: { user: User }) {
           ))}
         </ul>
       )}
-    </main>
-  );
-}
-
-const features: { icon: typeof Package; accent: Accent; title: string; body: string }[] = [
-  { icon: Package, accent: "orange", title: "Material purchases", body: "Log cement, steel, sand and more by quantity and rate. The total is worked out for you." },
-  { icon: Camera, accent: "blue", title: "Scan the bill", body: "Take a photo of the bill and the form fills itself: material, quantity, rate and date." },
-  { icon: Smartphone, accent: "violet", title: "Made for the site", body: "Works on your phone. Add several materials or vehicles in one go and see what you still owe." },
-  { icon: Users, accent: "green", title: "Labour & attendance", body: "Daily attendance for workers, fixed amounts for teams, and who you still owe." },
-  { icon: Truck, accent: "amber", title: "Transport & machinery", body: "JCB, crane, truck or tractor: pick it, set hours or a full amount, done." },
-  { icon: TrendingUp, accent: "rose", title: "Reports", body: "Budget vs actual, spend by material and month, cost per sq ft, PDF downloads." },
-];
-
-function Landing() {
-  return (
-    <main className="flex-1">
-      <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:py-28">
-          <p className="animate-fade-up inline-flex items-center gap-2 rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70">
-            <IndianRupee className="h-3.5 w-3.5" /> Construction cost tracking for Indian sites
-          </p>
-          <h1 className="animate-fade-up mt-5 text-4xl font-semibold tracking-tight sm:text-6xl" style={stagger(1, 90)}>
-            Know where every{" "}
-            <span className="text-brand">rupee on site</span> goes.
-          </h1>
-          <p className="animate-fade-up mx-auto mt-5 max-w-2xl text-foreground/70" style={stagger(2, 90)}>
-            BuildLedger keeps materials, labour, transport and daily progress for each project in one place, so you always know what you’ve
-            spent, what you owe and how much budget is left.
-          </p>
-          <div className="animate-fade-up mt-8 flex flex-wrap justify-center gap-3" style={stagger(3, 90)}>
-            <Link href="/register" className={buttonClass("primary")}>
-              Create free account <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link href="/login" className={buttonClass("secondary")}>
-              Sign in
-            </Link>
-          </div>
-          <ul className="animate-fade-up mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-foreground/60" style={stagger(4, 90)}>
-            {["Free to start", "Works on your phone", "Your data stays yours"].map((t) => (
-              <li key={t} className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-accent" aria-hidden /> {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-8">
-        <h2 className="mb-2 text-center text-2xl font-semibold tracking-tight">Everything a site needs</h2>
-        <p className="mb-8 text-center text-sm text-foreground/60">Fast to fill in on site, clear to read in the office.</p>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map(({ icon, accent, title, body }, i) => (
-            <li key={title} className="animate-fade-up lift rounded-xl border border-foreground/[0.07] bg-surface p-6 shadow-sm" style={stagger(i, 70)}>
-              <IconChip icon={icon} accent={accent} size="lg" />
-              <p className="mt-4 font-semibold">{title}</p>
-              <p className="mt-1 text-sm text-foreground/60">{body}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="relative overflow-hidden rounded-xl bg-stone-900 px-6 py-12 text-center text-white sm:px-12 dark:bg-stone-800">
-          <h2 className="relative text-2xl font-semibold sm:text-3xl">Start your first project in a minute</h2>
-          <p className="relative mx-auto mt-2 max-w-xl text-white/70">Add your site, set a budget, and start logging materials and labour today.</p>
-          <Link
-            href="/register"
-            className="relative mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-stone-900 transition-colors hover:bg-orange-50 active:scale-[0.97]"
-          >
-            Get started free <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
     </main>
   );
 }

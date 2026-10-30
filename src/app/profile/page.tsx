@@ -39,7 +39,7 @@ async function ProfileContent() {
 
   return (
     <section className="animate-fade-up overflow-hidden rounded-xl border border-foreground/[0.07] bg-surface shadow-sm">
-      <div className="relative bg-gradient-to-br from-orange-500 via-orange-500 to-amber-400 px-6 pb-14 pt-6 text-white">
+      <div className="relative bg-brand px-6 pb-14 pt-6 text-white">
         <div aria-hidden className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10" />
         <h1 className="relative text-xl font-semibold">Your profile</h1>
         <p className="relative text-sm text-white/85">Your details and how you sign in. Member since {formatDate(user.createdAt)}.</p>

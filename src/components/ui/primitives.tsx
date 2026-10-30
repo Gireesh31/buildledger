@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
+import { DiggerIllustration } from "./DiggerIllustration";
 
 const buttonVariants = {
   primary: "bg-brand text-white shadow-[inset_0_-1px_0_rgb(0_0_0/0.15)] hover:bg-brand-strong",
@@ -102,9 +103,13 @@ export function PageHeader({ title, description, actions, icon, accent = "orange
   );
 }
 
+/** Dashed panel for "nothing here yet", with a small excavator at work above the message. */
 export function EmptyState({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-foreground/15 bg-surface/60 px-4 py-10 text-center text-sm text-foreground/70">{children}</div>
+    <div className="rounded-xl border border-dashed border-foreground/15 bg-surface/60 px-4 pb-10 pt-6 text-center text-sm text-foreground/70">
+      <DiggerIllustration className="mx-auto mb-3 h-16 w-32" />
+      {children}
+    </div>
   );
 }
 

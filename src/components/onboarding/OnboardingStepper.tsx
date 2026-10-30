@@ -23,7 +23,7 @@ export function OnboardingStepper() {
         return (
           <li key={step.label} className="flex flex-1 flex-col gap-2" aria-current={state === "current" ? "step" : undefined}>
             <span
-              className={`h-1.5 rounded-full transition-colors duration-500 ${state === "upcoming" ? "bg-foreground/10" : "bg-gradient-to-r from-orange-500 to-amber-400"}`}
+              className={`h-1.5 rounded-full transition-colors duration-500 ${state === "upcoming" ? "bg-foreground/10" : "bg-brand"}`}
             />
             <span
               className={`text-xs ${state === "current" ? "font-medium text-brand" : "text-foreground/50"}`}
