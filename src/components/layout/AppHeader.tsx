@@ -8,7 +8,7 @@ export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
     <Link href="/" className={`font-display group flex items-center gap-2 font-bold tracking-tight ${size === "lg" ? "text-xl" : "text-base"}`}>
       <span
         aria-hidden
-        className={`flex items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-sm shadow-orange-500/30 transition-transform duration-300 group-hover:-rotate-6 ${
+        className={`flex items-center justify-center rounded-lg bg-brand text-white ${
           size === "lg" ? "h-10 w-10" : "h-8 w-8"
         }`}
       >

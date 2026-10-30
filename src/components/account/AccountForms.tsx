@@ -187,7 +187,7 @@ function DeleteAccountDialog({ ownedProjects, onClose }: { ownedProjects: number
         aria-labelledby="delete-title"
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="animate-scale-in w-full max-w-md rounded-2xl border border-critical/25 bg-surface p-6 shadow-2xl"
+        className="animate-scale-in w-full max-w-md rounded-xl border border-critical/25 bg-surface p-6 shadow-2xl"
       >
         <div className="mb-4 flex items-start justify-between gap-3">
           <h2 id="delete-title" className="text-lg font-semibold">
@@ -277,7 +277,7 @@ export function ProfilePhoto({ photoUrl, initials }: { photoUrl?: string; initia
         onClick={() => input.current?.click()}
         disabled={pending !== null}
         title={photoUrl ? "Change photo" : "Add photo"}
-        className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-4 border-surface bg-gradient-to-br from-teal-500 to-sky-500 text-xl font-semibold text-white shadow-lg"
+        className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-4 border-surface bg-gradient-to-br from-teal-500 to-sky-500 text-xl font-semibold text-white shadow-lg"
       >
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

@@ -312,7 +312,7 @@ function Section({ title, empty, count, children }: { title: string; empty: stri
 function Table({ head, rows, right, foot, minWidth = 520 }: { head: string[]; rows: ReactNode[][]; right: number[]; foot?: ReactNode[]; minWidth?: number }) {
   const align = (i: number) => (right.includes(i) ? "text-right tabular-nums" : "text-left");
   return (
-    <div className="overflow-x-auto rounded-2xl border border-foreground/[0.07] bg-surface shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-foreground/[0.07] bg-surface shadow-sm">
       <table className="w-full text-sm" style={{ minWidth }}>
         <thead className="bg-brand-soft/60 text-xs text-foreground/70">
           <tr>

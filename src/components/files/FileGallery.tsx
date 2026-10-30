@@ -121,7 +121,7 @@ export function FileGallery({ projectId, files, canEdit }: { projectId: string; 
             const url = `/api/projects/${projectId}/files/${file.id}`;
             const isImage = file.mimeType.startsWith("image/") && file.mimeType !== "image/heic";
             return (
-              <li key={file.id} className="animate-fade-up lift flex flex-col overflow-hidden rounded-2xl border border-foreground/[0.07] bg-surface shadow-sm">
+              <li key={file.id} className="animate-fade-up lift flex flex-col overflow-hidden rounded-xl border border-foreground/[0.07] bg-surface shadow-sm">
                 <a href={url} target="_blank" rel="noreferrer" className="block aspect-[4/3] bg-foreground/5">
                   {isImage ? (
                     // eslint-disable-next-line @next/next/no-img-element

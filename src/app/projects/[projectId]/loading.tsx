@@ -6,10 +6,10 @@ export default function ProjectSectionLoading() {
       <div className="skeleton h-7 w-48 rounded-lg" />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton h-28 rounded-2xl" />
+          <div key={i} className="skeleton h-28 rounded-xl" />
         ))}
       </div>
-      <div className="skeleton h-64 rounded-2xl" />
+      <div className="skeleton h-64 rounded-xl" />
     </div>
   );
 }

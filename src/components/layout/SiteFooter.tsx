@@ -1,4 +1,4 @@
-import { ArrowRight, Camera, Heart, IndianRupee, Smartphone } from "lucide-react";
+import { ArrowRight, Camera, IndianRupee, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { buttonClass } from "@/components/ui/primitives";
 import { ConstructionScene } from "./ConstructionScene";
@@ -34,12 +34,12 @@ const highlights = [
 export function SiteFooter() {
   return (
     <footer className="scene-sky no-print relative mt-16 overflow-hidden border-t border-foreground/[0.07]">
-      <div className="h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-teal-500" aria-hidden />
+      <div className="h-0.5 bg-brand" aria-hidden />
       <ConstructionScene />
 
       {/* Content sits above the scene; the bottom padding leaves room for the site. */}
       <div className="relative mx-auto max-w-6xl px-4 pb-[200px] pt-12 sm:pb-[270px]">
-        <div className="mb-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-foreground/[0.07] bg-surface/70 p-5 backdrop-blur-sm sm:flex-row sm:items-center">
+        <div className="mb-10 flex flex-col items-start justify-between gap-4 rounded-xl border border-foreground/[0.07] bg-surface/70 p-5 backdrop-blur-sm sm:flex-row sm:items-center">
           <div>
             <p className="font-display text-lg font-semibold">Every bag of cement, every truck, every wage.</p>
             <p className="text-sm text-foreground/60">Keep your whole site on one ledger and know where every rupee went.</p>
@@ -95,7 +95,7 @@ export function SiteFooter() {
             © <CurrentYear /> BuildLedger. All rights reserved.
           </p>
           <p className="flex items-center gap-1">
-            Made with <Heart className="h-3.5 w-3.5 fill-rose-400 text-rose-400" aria-label="love" /> for builders in India
+            Built for site engineers and contractors in India
           </p>
         </div>
       </div>

@@ -48,7 +48,7 @@ function DashboardSkeleton() {
       <div className="skeleton mb-6 h-8 w-64 rounded-lg" />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton h-28 rounded-2xl" />
+          <div key={i} className="skeleton h-28 rounded-xl" />
         ))}
       </div>
     </main>
@@ -61,8 +61,6 @@ const STATUS_STYLES: Record<string, string> = {
   "on-hold": "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
   completed: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300",
 };
-
-const CARD_BARS = ["from-orange-500 to-amber-400", "from-teal-500 to-sky-500", "from-violet-500 to-fuchsia-400", "from-rose-500 to-orange-400"];
 
 async function Dashboard({ user }: { user: User }) {
   const accessible = await listAccessibleProjects(user);
@@ -124,9 +122,8 @@ async function Dashboard({ user }: { user: User }) {
             <li key={project.id} className="animate-fade-up min-w-0" style={stagger(i, 70)}>
               <Link
                 href={`/projects/${project.id}`}
-                className="lift group relative flex h-full flex-col gap-3 overflow-hidden rounded-2xl border border-foreground/[0.07] bg-surface p-5 shadow-sm"
+                className="lift group relative flex h-full flex-col gap-3 overflow-hidden rounded-xl border border-foreground/[0.07] bg-surface p-5 shadow-sm"
               >
-                <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${CARD_BARS[i % CARD_BARS.length]}`} aria-hidden />
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-3">
                     <IconChip icon={Building2} accent={(["orange", "green", "violet", "rose"] as Accent[])[i % 4]} />
@@ -170,19 +167,13 @@ function Landing() {
   return (
     <main className="flex-1">
       <section className="relative overflow-hidden">
-        {/* Soft colour blobs behind the hero. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="animate-float absolute -left-24 -top-24 h-80 w-80 rounded-full bg-orange-400/25 blur-3xl" />
-          <div className="animate-float absolute -right-20 top-10 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl [animation-delay:-3s]" />
-          <div className="animate-float absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-amber-300/25 blur-3xl [animation-delay:-5s]" />
-        </div>
         <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:py-28">
-          <p className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand-soft px-3 py-1 text-xs font-medium text-brand">
+          <p className="animate-fade-up inline-flex items-center gap-2 rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70">
             <IndianRupee className="h-3.5 w-3.5" /> Construction cost tracking for Indian sites
           </p>
           <h1 className="animate-fade-up mt-5 text-4xl font-semibold tracking-tight sm:text-6xl" style={stagger(1, 90)}>
             Know where every{" "}
-            <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-teal-500 bg-clip-text text-transparent">rupee on site</span> goes.
+            <span className="text-brand">rupee on site</span> goes.
           </h1>
           <p className="animate-fade-up mx-auto mt-5 max-w-2xl text-foreground/70" style={stagger(2, 90)}>
             BuildLedger keeps materials, labour, transport and daily progress for each project in one place, so you always know what you’ve
@@ -211,7 +202,7 @@ function Landing() {
         <p className="mb-8 text-center text-sm text-foreground/60">Fast to fill in on site, clear to read in the office.</p>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map(({ icon, accent, title, body }, i) => (
-            <li key={title} className="animate-fade-up lift rounded-2xl border border-foreground/[0.07] bg-surface p-6 shadow-sm" style={stagger(i, 70)}>
+            <li key={title} className="animate-fade-up lift rounded-xl border border-foreground/[0.07] bg-surface p-6 shadow-sm" style={stagger(i, 70)}>
               <IconChip icon={icon} accent={accent} size="lg" />
               <p className="mt-4 font-semibold">{title}</p>
               <p className="mt-1 text-sm text-foreground/60">{body}</p>
@@ -221,14 +212,12 @@ function Landing() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 via-orange-500 to-amber-400 px-6 py-12 text-center text-white shadow-lg shadow-orange-500/20 sm:px-12">
-          <div aria-hidden className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10" />
-          <div aria-hidden className="absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-white/10" />
+        <div className="relative overflow-hidden rounded-xl bg-stone-900 px-6 py-12 text-center text-white sm:px-12 dark:bg-stone-800">
           <h2 className="relative text-2xl font-semibold sm:text-3xl">Start your first project in a minute</h2>
-          <p className="relative mx-auto mt-2 max-w-xl text-white/85">Add your site, set a budget, and start logging materials and labour today.</p>
+          <p className="relative mx-auto mt-2 max-w-xl text-white/70">Add your site, set a budget, and start logging materials and labour today.</p>
           <Link
             href="/register"
-            className="relative mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-orange-600 shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.97]"
+            className="relative mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-stone-900 transition-colors hover:bg-orange-50 active:scale-[0.97]"
           >
             Get started free <ArrowRight className="h-4 w-4" />
           </Link>

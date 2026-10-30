@@ -21,7 +21,7 @@ export default function CreditsPage() {
           {imageCredits.map((credit, i) => (
             <li
               key={credit.source}
-              className="animate-fade-up flex min-w-0 gap-3 rounded-2xl border border-foreground/[0.07] bg-surface p-3 shadow-sm"
+              className="animate-fade-up flex min-w-0 gap-3 rounded-xl border border-foreground/[0.07] bg-surface p-3 shadow-sm"
               style={stagger(i, 30)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

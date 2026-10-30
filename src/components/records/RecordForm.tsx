@@ -194,7 +194,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
   }
 
   return (
-    <form onSubmit={handleSubmit} className="animate-scale-in flex flex-col gap-4 rounded-2xl border border-brand/20 bg-surface p-5 shadow-lg shadow-orange-500/5">
+    <form onSubmit={handleSubmit} className="animate-scale-in flex flex-col gap-4 rounded-xl border border-foreground/[0.09] bg-surface p-5 shadow-sm">
       <h3 className="text-sm font-semibold">{record ? `Edit ${def.singular.toLowerCase()}` : `New ${def.singular.toLowerCase()}`}</h3>
       {error && <FormMessage tone="error">{error}</FormMessage>}
 
@@ -218,7 +218,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
             onPointerDownCapture={() => setActive(itemIndex)}
             className={
               many
-                ? `animate-fade-up flex flex-col gap-4 rounded-2xl border-2 p-4 transition-colors ${itemIndex === active ? "border-brand/50 bg-brand-soft/30" : "border-foreground/[0.08]"}`
+                ? `animate-fade-up flex flex-col gap-4 rounded-xl border-2 p-4 transition-colors ${itemIndex === active ? "border-brand/50 bg-brand-soft/30" : "border-foreground/[0.08]"}`
                 : "flex flex-col gap-4"
             }
           >
@@ -288,7 +288,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
               .map((field) => (
                 <div
                   key={field.name}
-                  className="flex items-baseline justify-between rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 dark:from-orange-500/10 dark:to-amber-500/10"
+                  className="flex items-baseline justify-between rounded-xl border border-foreground/[0.07] bg-foreground/[0.03] px-4 py-3"
                   aria-live="polite"
                 >
                   <span className="text-sm font-medium text-foreground/70">{field.label}</span>
@@ -315,7 +315,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
         def.fields
           .filter((field) => field.computed)
           .map((field) => (
-            <div key={field.name} className="flex items-baseline justify-between rounded-xl bg-brand px-4 py-3 text-white shadow-sm shadow-brand/30" aria-live="polite">
+            <div key={field.name} className="flex items-baseline justify-between rounded-xl bg-foreground px-4 py-3 text-background" aria-live="polite">
               <span className="text-sm font-medium">
                 Grand total · {items.length} {def.label.toLowerCase()}
               </span>

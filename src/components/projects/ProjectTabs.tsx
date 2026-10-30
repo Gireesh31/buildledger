@@ -74,7 +74,7 @@ function TabLink({ tab, href, active }: { tab: Tab; href: string; active: boolea
       href={href}
       aria-current={active ? "page" : undefined}
       className={`flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[11px] transition-all duration-200 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3.5 sm:py-2 sm:text-sm ${
-        active ? "bg-brand font-medium text-white shadow-sm shadow-brand/30" : "text-foreground/70 hover:bg-brand-soft hover:text-foreground"
+        active ? "bg-foreground font-medium text-background" : "text-foreground/70 hover:bg-brand-soft hover:text-foreground"
       }`}
     >
       <Icon className={`h-5 w-5 sm:h-4 sm:w-4 ${active ? "text-white" : tab.color}`} aria-hidden />
@@ -111,7 +111,7 @@ function MoreMenu({ base, active, isActive }: { base: string; active?: Tab; isAc
         aria-expanded={open}
         className={`flex w-full flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[11px] transition-all duration-200 sm:flex-row sm:gap-1.5 sm:rounded-full sm:border sm:px-3.5 sm:py-2 sm:text-sm ${
           active
-            ? "bg-brand font-medium text-white shadow-sm shadow-brand/30 sm:border-brand"
+            ? "bg-foreground font-medium text-background sm:border-foreground"
             : "text-foreground/70 hover:bg-brand-soft hover:text-foreground sm:border-foreground/15"
         }`}
       >
@@ -124,7 +124,7 @@ function MoreMenu({ base, active, isActive }: { base: string; active?: Tab; isAc
       {open && (
         <ul
           role="menu"
-          className="animate-scale-in absolute right-0 top-full z-30 mt-2 w-52 overflow-hidden rounded-2xl border border-foreground/[0.08] bg-surface p-1.5 shadow-xl"
+          className="animate-scale-in absolute right-0 top-full z-30 mt-2 w-52 overflow-hidden rounded-xl border border-foreground/[0.08] bg-surface p-1.5 shadow-xl"
         >
           {moreTabs.map((tab) => {
             const TabIcon = tab.icon;

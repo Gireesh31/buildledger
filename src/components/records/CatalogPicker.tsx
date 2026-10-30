@@ -58,7 +58,7 @@ export function CatalogPicker({ catalog, values, onChange }: CatalogPickerProps)
           return (
             <li
               key={item.value}
-              className={`group/card animate-fade-up flex flex-col items-center gap-1.5 rounded-2xl border p-2 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+              className={`group/card animate-fade-up flex flex-col items-center gap-1.5 rounded-xl border p-2 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                 isChosen ? "border-brand bg-brand-soft shadow-sm shadow-brand/20" : "border-foreground/[0.08] bg-surface hover:border-brand/40"
               }`}
               style={stagger(i, 30)}

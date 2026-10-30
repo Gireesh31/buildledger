@@ -77,7 +77,7 @@ export function AttendanceSheet({ projectId, workers, attendance, canEdit }: Att
       </div>
       {message && <FormMessage tone={message.tone}>{message.text}</FormMessage>}
 
-      <ul className="divide-y divide-foreground/[0.07] rounded-2xl border border-foreground/[0.07]">
+      <ul className="divide-y divide-foreground/[0.07] rounded-xl border border-foreground/[0.07]">
         {workers.map((worker) => (
           <li key={worker.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2">
             <div className="min-w-0">

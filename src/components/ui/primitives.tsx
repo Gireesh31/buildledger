@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
 const buttonVariants = {
-  primary: "bg-brand text-white shadow-sm shadow-brand/30 hover:bg-brand-strong",
+  primary: "bg-brand text-white shadow-[inset_0_-1px_0_rgb(0_0_0/0.15)] hover:bg-brand-strong",
   secondary: "border border-foreground/15 bg-surface hover:border-brand/40 hover:bg-brand-soft",
   danger: "border border-critical/40 text-critical hover:bg-critical/10",
   ghost: "hover:bg-brand-soft",
@@ -21,7 +21,7 @@ export const stagger = (index: number, step = 60): CSSProperties => ({ "--delay"
 
 export function Card({ title, action, children, className = "" }: { title?: string; action?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`rounded-2xl border border-foreground/[0.07] bg-surface p-5 shadow-sm ${className}`}>
+    <section className={`rounded-xl border border-foreground/[0.07] bg-surface p-5 shadow-sm ${className}`}>
       {(title || action) && (
         <div className="mb-4 flex items-center justify-between gap-3">
           {title && <h2 className="text-sm font-semibold">{title}</h2>}
@@ -35,12 +35,12 @@ export function Card({ title, action, children, className = "" }: { title?: stri
 
 // Literal class strings so Tailwind can see them.
 const ACCENTS = {
-  orange: { chip: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300", bar: "from-orange-500 to-amber-400" },
-  blue: { chip: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300", bar: "from-sky-500 to-blue-500" },
-  green: { chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300", bar: "from-emerald-500 to-teal-400" },
-  violet: { chip: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300", bar: "from-violet-500 to-fuchsia-400" },
-  rose: { chip: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300", bar: "from-rose-500 to-pink-400" },
-  amber: { chip: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300", bar: "from-amber-400 to-yellow-300" },
+  orange: { chip: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300" },
+  blue: { chip: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300" },
+  green: { chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300" },
+  violet: { chip: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300" },
+  rose: { chip: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300" },
+  amber: { chip: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300" },
 } as const;
 
 export type Accent = keyof typeof ACCENTS;
@@ -74,13 +74,12 @@ export function StatTile({
   index?: number;
 }) {
   return (
-    <div className="animate-fade-up lift relative overflow-hidden rounded-2xl border border-foreground/[0.07] bg-surface p-4 shadow-sm" style={stagger(index)}>
-      <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${ACCENTS[accent].bar}`} aria-hidden />
+    <div className="animate-fade-up lift relative overflow-hidden rounded-xl border border-foreground/[0.07] bg-surface p-4 shadow-sm" style={stagger(index)}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-medium text-foreground/60">{label}</p>
         {icon && <IconChip icon={icon} accent={accent} size="sm" />}
       </div>
-      <p className="mt-1 text-2xl font-semibold tracking-tight">{value}</p>
+      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
       {hint && (
         <div className={`mt-1 text-xs ${tone === "critical" ? "text-critical" : tone === "good" ? "text-good" : "text-foreground/60"}`}>{hint}</div>
       )}
@@ -105,7 +104,7 @@ export function PageHeader({ title, description, actions, icon, accent = "orange
 
 export function EmptyState({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-dashed border-brand/30 bg-brand-soft/40 px-4 py-10 text-center text-sm text-foreground/70">{children}</div>
+    <div className="rounded-xl border border-dashed border-foreground/15 bg-surface/60 px-4 py-10 text-center text-sm text-foreground/70">{children}</div>
   );
 }
 
@@ -125,7 +124,7 @@ export function BudgetMeter({ used, budget }: { used: number; budget: number }) 
         aria-label="Budget used"
       >
         <div
-          className={`animate-fade-in h-full rounded-full transition-[width] duration-700 ${over ? "bg-critical" : "bg-gradient-to-r from-orange-500 to-amber-400"}`}
+          className={`animate-fade-in h-full rounded-full transition-[width] duration-700 ${over ? "bg-critical" : "bg-brand"}`}
           style={{ width: `${Math.min(pct, 100)}%` }}
         />
       </div>

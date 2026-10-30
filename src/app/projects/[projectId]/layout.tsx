@@ -11,7 +11,7 @@ export default function ProjectLayout({ children, params }: LayoutProps<"/projec
   return (
     <>
       <AppHeader />
-      <Suspense fallback={<div className="skeleton mx-auto mt-6 h-32 w-full max-w-6xl rounded-3xl" />}>
+      <Suspense fallback={<div className="skeleton mx-auto mt-6 h-32 w-full max-w-6xl rounded-2xl" />}>
         <ProjectShell params={params}>{children}</ProjectShell>
       </Suspense>
     </>
@@ -39,17 +39,15 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
   return (
     <>
       <div className="mx-auto w-full max-w-6xl px-4 pt-6">
-        <div className="animate-fade-up relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 via-orange-500 to-amber-400 px-6 py-6 text-white shadow-lg shadow-orange-500/20">
-          <div aria-hidden className="absolute -right-12 -top-16 h-48 w-48 rounded-full bg-white/10" />
-          <div aria-hidden className="absolute -bottom-20 right-24 h-40 w-40 rounded-full bg-white/10" />
+        <div className="animate-fade-up relative overflow-hidden rounded-xl border border-foreground/[0.08] border-l-4 border-l-brand bg-surface px-5 py-5 shadow-sm">
           <div className="relative flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm" aria-hidden>
+              <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-soft text-brand" aria-hidden>
                 <Building2 className="h-6 w-6" />
               </span>
               <div>
                 <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
-                <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/85">
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground/60">
                   {project.location && (
                     <span className="flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5" aria-hidden /> {project.location}
@@ -60,8 +58,8 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
               </div>
             </div>
             <div className="flex gap-2">
-              {status && <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">{status}</span>}
-              {role === "viewer" && <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">View only</span>}
+              {status && <span className="rounded-md border border-foreground/10 px-2.5 py-1 text-xs font-medium text-foreground/70">{status}</span>}
+              {role === "viewer" && <span className="rounded-md border border-foreground/10 px-2.5 py-1 text-xs font-medium text-foreground/70">View only</span>}
             </div>
           </div>
         </div>

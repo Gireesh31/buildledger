@@ -23,7 +23,7 @@ export async function sendJson<T = Record<string, unknown>>(
 
 export function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
-    <div className="animate-fade-up w-full max-w-sm rounded-2xl border border-foreground/[0.07] bg-surface p-8 shadow-xl shadow-orange-500/10">
+    <div className="animate-fade-up w-full max-w-sm rounded-xl border border-foreground/[0.07] bg-surface p-8 shadow-[0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-12px_rgb(0_0_0/0.12)]">
       <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
       {subtitle && <p className="mt-1 text-sm text-foreground/60">{subtitle}</p>}
       <div className="mt-6">{children}</div>
@@ -48,7 +48,7 @@ export function SubmitButton({ pending, children }: { pending: boolean; children
     <button
       type="submit"
       disabled={pending}
-      className="mt-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-all hover:bg-brand-strong active:scale-[0.97] disabled:opacity-50"
+      className="mt-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-strong active:scale-[0.97] disabled:opacity-50"
     >
       {pending ? "Please wait…" : children}
     </button>

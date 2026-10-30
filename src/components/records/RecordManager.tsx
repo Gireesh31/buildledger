@@ -262,7 +262,7 @@ export function RecordManager({
             );
             const files = filesByRecord.get(record.id) ?? [];
             return (
-              <li key={record.id} className="rounded-2xl border border-foreground/[0.07] bg-surface p-4 shadow-sm">
+              <li key={record.id} className="rounded-xl border border-foreground/[0.07] bg-surface p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-semibold">{titleField ? display(titleField, record) : def.singular}</p>
@@ -325,13 +325,13 @@ export function RecordManager({
             );
           })}
           {moneyField && visible.length > 0 && (
-            <li className="flex items-center justify-between rounded-2xl bg-brand px-4 py-3 font-semibold text-white shadow-sm shadow-brand/30">
+            <li className="flex items-center justify-between rounded-xl bg-brand px-4 py-3 font-semibold text-white shadow-sm shadow-brand/30">
               <span>{query ? "Total (filtered)" : "Total"}</span>
               <span className="tabular-nums">{formatINR(total, true)}</span>
             </li>
           )}
         </ul>
-        <div className={`hidden overflow-x-auto rounded-2xl border border-foreground/[0.07] bg-surface shadow-sm transition-opacity sm:block ${refreshing ? "opacity-60" : ""}`}>
+        <div className={`hidden overflow-x-auto rounded-xl border border-foreground/[0.07] bg-surface shadow-sm transition-opacity sm:block ${refreshing ? "opacity-60" : ""}`}>
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-brand-soft/60 text-left text-xs text-foreground/70">
               <tr>

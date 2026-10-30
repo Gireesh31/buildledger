@@ -9,12 +9,12 @@ export const metadata: Metadata = { title: "Get started" };
 
 export default function OnboardingLayout({ children }: LayoutProps<"/onboarding">) {
   return (
-    <main className="flex flex-1 flex-col items-center gap-8 relative overflow-hidden bg-gradient-to-br from-orange-50 via-background to-teal-50 dark:from-orange-500/[0.06] dark:via-background dark:to-teal-500/[0.06] px-4 py-12">
+    <main className="flex flex-1 flex-col items-center gap-8 relative px-4 py-12">
       <Logo />
       <Suspense fallback={null}>
         <OnboardingStepper />
       </Suspense>
-      <div className="animate-fade-up w-full max-w-xl rounded-2xl border border-foreground/[0.07] bg-surface p-8 shadow-xl shadow-orange-500/10">
+      <div className="animate-fade-up w-full max-w-xl rounded-xl border border-foreground/[0.07] bg-surface p-8 shadow-[0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-12px_rgb(0_0_0/0.12)]">
         <Suspense fallback={<p className="text-sm text-foreground/60">Loading…</p>}>
           <RequireUser>{children}</RequireUser>
         </Suspense>
