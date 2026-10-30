@@ -57,6 +57,13 @@ export function RegisterForm() {
         minLength={PASSWORD_MIN_LENGTH}
       />
       <SubmitButton pending={pending}>Create account</SubmitButton>
+      <p className="text-center text-xs text-foreground/55">
+        By creating an account you agree to how we handle your data in our{" "}
+        <Link href="/privacy" className="font-medium text-foreground/75 underline underline-offset-2 hover:text-brand">
+          privacy policy
+        </Link>
+        .
+      </p>
       <p className="text-center text-sm text-foreground/60">
         Already have an account?{" "}
         <Link href="/login" className="font-medium text-foreground hover:underline">

@@ -20,6 +20,7 @@ const columns = [
       { href: "/login", label: "Sign in" },
       { href: "/register", label: "Create account" },
       { href: "/forgot-password", label: "Forgot password" },
+      { href: "/privacy", label: "Privacy policy" },
     ],
   },
 ];
@@ -77,7 +78,10 @@ export function SiteFooter() {
       <div className="absolute inset-x-0 bottom-0">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 px-4 py-1.5 text-[11px] text-white/85 sm:text-xs">
           <p>
-            © <CurrentYear /> BuildLedger. All rights reserved.
+            © <CurrentYear /> BuildLedger. All rights reserved. ·{" "}
+            <Link href="/privacy" className="underline-offset-2 hover:underline">
+              Privacy
+            </Link>
           </p>
           <p className="hidden sm:block">Built for site engineers and contractors in India</p>
         </div>
