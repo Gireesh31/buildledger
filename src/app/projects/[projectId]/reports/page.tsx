@@ -41,7 +41,9 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
         quantity: Number(m.quantity),
         unitPrice: Number(m.unitPrice),
         amount: Number(m.amount ?? 0),
+        paymentMode: m.paymentMode ? label("materials", "paymentMode", m.paymentMode) : "",
         status: String(m.paymentStatus ?? ""),
+        paidAmount: m.paymentStatus === "partial" ? Number(m.paidAmount) || 0 : 0,
         balance: balanceDue(m),
       })),
     workers: records.workers.map((w) => ({

@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheck, List, Plus, X } from "lucide-react";
+import { CircleCheck, List, Plus, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { PaymentStatusBadge } from "@/components/ui/PaymentStatusBadge";
@@ -162,22 +162,13 @@ export function RecordManager({
   }
 
   const listHeader = (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <h2 className="text-base font-semibold">
-        {formFirst ? "Saved entries" : (title ?? def.label)} <span className="text-sm font-normal text-foreground/50">({records.length})</span>
-      </h2>
-      <div className="no-print flex flex-wrap items-center gap-2">
-        {records.length > 5 && (
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search…"
-            aria-label={`Search ${def.label.toLowerCase()}`}
-            className={`${inputClass} w-40 py-1.5`}
-          />
-        )}
-        {formFirst ? (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-base font-semibold">
+          {formFirst ? "Saved entries" : (title ?? def.label)} <span className="text-sm font-normal text-foreground/50">({records.length})</span>
+        </h2>
+        <div className="no-print flex flex-wrap items-center gap-2">
+          {formFirst ? (
           <button onClick={() => setShowList(false)} className={buttonClass("ghost", "sm")}>
             <X className="h-3.5 w-3.5" aria-hidden /> Hide
           </button>
@@ -188,8 +179,23 @@ export function RecordManager({
               <Plus className="h-3.5 w-3.5" aria-hidden /> Add {def.singular.toLowerCase()}
             </button>
           )
-        )}
+          )}
+        </div>
       </div>
+      {/* Search sits under the heading, on the left, whenever there's something to search. */}
+      {records.length > 1 && (
+        <label className="no-print relative block w-full sm:max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/40" aria-hidden />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={`Search ${def.label.toLowerCase()}…`}
+            aria-label={`Search ${def.label.toLowerCase()}`}
+            className={`${inputClass} py-2 pl-9`}
+          />
+        </label>
+      )}
     </div>
   );
 
@@ -350,7 +356,7 @@ export function RecordManager({
                     <td
                       key={field.name}
                       className={`px-3 py-2 ${field.kind === "money" || field.kind === "number" ? "text-right tabular-nums" : ""} ${
-                        field.kind === "textarea" ? "max-w-xs whitespace-pre-line" : ""
+                        field.kind === "textarea" ? "max-w-xs whitespace-pre-line" : field.kind === "date" ? "whitespace-nowrap" : ""
                       }`}
                     >
                       {field.name === "paymentStatus" && record.paymentStatus ? (

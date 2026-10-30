@@ -48,7 +48,8 @@ function shift(mode: PeriodMode, date: string, step: -1 | 1) {
 }
 
 export function PeriodReportView({ data, projectName }: { data: ReportData; projectName: string }) {
-  const [mode, setMode] = useState<PeriodMode>("day");
+  // Opens on the whole project so far, so every saved entry shows (as on the Materials page).
+  const [mode, setMode] = useState<PeriodMode>("total");
   const [date, setDate] = useState(todayISO);
   // Custom dates: `date` is the first day, `endDate` the last.
   const [endDate, setEndDate] = useState(todayISO);
@@ -216,18 +217,35 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
         </div>
 
         <Section title="Material purchases" empty="No material purchases in this period." count={report.materials.length}>
+          {/* Same columns as the Materials page list. */}
           <Table
-            head={["Date", "Material", "Status", "Quantity", "Price per unit", "Total"]}
-            right={[3, 4, 5]}
+            head={["Date", "Material", "Unit", "Quantity", "Price per unit", "Payment mode", "Payment status", "Amount paid", "Total price", "Balance due"]}
+            right={[3, 4, 7, 8, 9]}
+            minWidth={980}
             rows={report.materials.map((m) => [
-              formatDate(m.date),
+              <span key="d" className="whitespace-nowrap">{formatDate(m.date)}</span>,
               m.material,
-              <PaymentStatusBadge key="s" status={m.status} />,
-              `${formatNumber(m.quantity)} ${m.unit.toLowerCase()}`,
+              m.unit,
+              formatNumber(m.quantity),
               formatINR(m.unitPrice, true),
+              m.paymentMode || "—",
+              <PaymentStatusBadge key="s" status={m.status} />,
+              m.paidAmount > 0 ? formatINR(m.paidAmount, true) : "—",
               formatINR(m.amount, true),
+              m.balance > 0 ? <span key="b" className="font-medium text-critical">{formatINR(m.balance, true)}</span> : "—",
             ])}
-            foot={["Total", "", "", "", "", formatINR(t.materials, true)]}
+            foot={[
+              "Total",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              formatINR(report.materials.reduce((s, m) => s + m.paidAmount, 0), true),
+              formatINR(t.materials, true),
+              formatINR(report.materials.reduce((s, m) => s + m.balance, 0), true),
+            ]}
           />
         </Section>
 
@@ -291,11 +309,11 @@ function Section({ title, empty, count, children }: { title: string; empty: stri
   );
 }
 
-function Table({ head, rows, right, foot }: { head: string[]; rows: ReactNode[][]; right: number[]; foot?: ReactNode[] }) {
+function Table({ head, rows, right, foot, minWidth = 520 }: { head: string[]; rows: ReactNode[][]; right: number[]; foot?: ReactNode[]; minWidth?: number }) {
   const align = (i: number) => (right.includes(i) ? "text-right tabular-nums" : "text-left");
   return (
     <div className="overflow-x-auto rounded-2xl border border-foreground/[0.07] bg-surface shadow-sm">
-      <table className="w-full min-w-[520px] text-sm">
+      <table className="w-full text-sm" style={{ minWidth }}>
         <thead className="bg-brand-soft/60 text-xs text-foreground/70">
           <tr>
             {head.map((h, i) => (

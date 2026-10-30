@@ -14,7 +14,20 @@ export interface ReportData {
   /** Day 1 of the project: its start date, or the earliest entry. */
   startDate: string;
   /** `balance` is what is still owed on the bill (all of it when Due, the rest when Part paid). */
-  materials: { date: string; material: string; unit: string; quantity: number; unitPrice: number; amount: number; status: PaymentStatus; balance: number }[];
+  materials: {
+    date: string;
+    material: string;
+    unit: string;
+    quantity: number;
+    unitPrice: number;
+    /** "UPI", "Cash", …, or "" when not recorded. */
+    paymentMode: string;
+    status: PaymentStatus;
+    /** Paid so far on a part-paid bill (0 otherwise). */
+    paidAmount: number;
+    amount: number;
+    balance: number;
+  }[];
   workers: {
     id: string;
     name: string;

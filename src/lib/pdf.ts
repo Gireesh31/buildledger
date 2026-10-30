@@ -96,7 +96,8 @@ async function createDocument(title: string, subtitle: string, orientation: "por
 const MODE_NAME = { day: "Daily", week: "Weekly", month: "Monthly", total: "Day 1 to today", custom: "Custom dates" } as const;
 
 export async function buildPeriodReportPdf(report: PeriodReport, projectName: string, periodLabel: string) {
-  const pdf = await createDocument(`${MODE_NAME[report.mode]} report - ${projectName}`, periodLabel);
+  // Landscape, so the material table can show the same columns as the Materials page.
+  const pdf = await createDocument(`${MODE_NAME[report.mode]} report - ${projectName}`, periodLabel, "landscape");
   const t = report.totals;
 
   pdf.table(
@@ -117,10 +118,21 @@ export async function buildPeriodReportPdf(report: PeriodReport, projectName: st
   if (report.materials.length === 0) pdf.note("No material purchases in this period.");
   else
     pdf.table(
-      ["Date", "Material", "Status", "Quantity", "Price per unit (Rs.)", "Total (Rs.)", "Balance due (Rs.)"],
-      report.materials.map((m) => [formatDate(m.date), m.material, status(m.status), `${num(m.quantity)} ${m.unit}`, money(m.unitPrice), money(m.amount), m.balance > 0 ? money(m.balance) : "-"]),
-      3,
-      ["Total", "", "", "", "", money(t.materials), money(report.materials.reduce((s, m) => s + m.balance, 0))],
+      ["Date", "Material", "Unit", "Quantity", "Price per unit (Rs.)", "Payment mode", "Payment status", "Amount paid (Rs.)", "Total price (Rs.)", "Balance due (Rs.)"],
+      report.materials.map((m) => [
+        formatDate(m.date),
+        m.material,
+        m.unit,
+        num(m.quantity),
+        money(m.unitPrice),
+        m.paymentMode || "-",
+        status(m.status),
+        m.paidAmount > 0 ? money(m.paidAmount) : "-",
+        money(m.amount),
+        m.balance > 0 ? money(m.balance) : "-",
+      ]),
+      [3, 4, 7, 8, 9],
+      ["Total", "", "", "", "", "", "", money(report.materials.reduce((s, m) => s + m.paidAmount, 0)), money(t.materials), money(report.materials.reduce((s, m) => s + m.balance, 0))],
     );
 
   pdf.heading("Labour");
