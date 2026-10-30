@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
@@ -8,12 +7,12 @@ import { useEffect } from "react";
  * - how far down the page you are is exposed as --scroll-p (0 to 1), which the measuring tape
  *   under the header follows;
  * - elements marked data-reveal fade and rise in as they scroll into view.
+ * New content (client navigation, streamed sections) is picked up by watching the DOM rather
+ * than the route, so this needs no request-time data and never blocks prerendering.
  * Content is only hidden once this has run, so nothing stays invisible without JavaScript,
  * and reveals are skipped for people who prefer reduced motion.
  */
 export function PageMotion() {
-  const pathname = usePathname();
-
   useEffect(() => {
     const root = document.documentElement;
 
@@ -29,7 +28,7 @@ export function PageMotion() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
 
-    let observer: IntersectionObserver | undefined;
+    let reveal: IntersectionObserver | undefined;
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       root.classList.add("reveal-ready");
       const io = new IntersectionObserver(
@@ -43,17 +42,25 @@ export function PageMotion() {
         },
         { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
       );
-      document.querySelectorAll("[data-reveal]:not(.is-revealed)").forEach((el) => io.observe(el));
-      observer = io;
+      reveal = io;
     }
+    const watchNew = () => {
+      const io = reveal;
+      if (io) document.querySelectorAll("[data-reveal]:not(.is-revealed)").forEach((el) => io.observe(el));
+      onScroll();
+    };
+    watchNew();
+    const mutations = new MutationObserver(watchNew);
+    mutations.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      observer?.disconnect();
+      mutations.disconnect();
+      reveal?.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [pathname]);
+  }, []);
 
   return null;
 }

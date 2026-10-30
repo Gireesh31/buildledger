@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Anek_Latin, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Suspense } from "react";
 import { BackgroundFX } from "@/components/layout/BackgroundFX";
 import { PageMotion } from "@/components/layout/PageMotion";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -35,7 +36,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${plexSans.variable} ${anek.variable} ${plexMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <BackgroundFX />
-        <PageMotion />
+        {/* PageMotion uses no request-time data; the boundary just keeps it off the critical path. */}
+        <Suspense fallback={null}>
+          <PageMotion />
+        </Suspense>
         <div className="flex flex-1 flex-col">{children}</div>
         <SiteFooter />
       </body>
