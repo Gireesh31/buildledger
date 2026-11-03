@@ -228,6 +228,10 @@ input[type="number"] {
 .site-footer {
   background: var(--surface);
 }
+/* Pages that drop a [data-hide-footer] marker (sign up) render without the footer. */
+body:has([data-hide-footer]) .site-footer {
+  display: none;
+}
 .day-smoke {
   fill: #6b6660;
 }

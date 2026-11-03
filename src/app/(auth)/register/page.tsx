@@ -8,6 +8,7 @@ export default function RegisterPage() {
   return (
     <AuthCard title="Create account" subtitle="Track every rupee on your construction sites.">
       <RegisterForm />
+      <span hidden data-hide-footer />
     </AuthCard>
   );
 }
