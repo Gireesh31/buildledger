@@ -108,6 +108,22 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
     setPriceFromTotal(false);
   }
 
+  /** A picture tapped in the picker: fills an empty item, or adds a new one when the form takes several. */
+  function pickItem(changes: Values) {
+    const choiceField = catalog ? catalogs[catalog].choiceField : "";
+    const empty = !values[choiceField] ? active : items.findIndex((item) => !item[choiceField]);
+    if (!multiple || record || empty !== -1) {
+      const index = multiple && !record ? empty : active;
+      updateItem(index, (current) => ({ ...current, ...changes }));
+      setActive(index);
+      return;
+    }
+    const fresh = { ...initialValues(def.fields), ...changes };
+    if (def.dateField && values[def.dateField]) fresh[def.dateField] = values[def.dateField];
+    setItems((list) => [...list, fresh]);
+    setActive(items.length);
+  }
+
   function removeItem(index: number) {
     setItems((list) => list.filter((_, i) => i !== index));
     setActive((current) => (current === index ? Math.max(0, index - 1) : current > index ? current - 1 : current));
@@ -206,7 +222,13 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
       )}
 
       {catalog && (
-        <CatalogPicker catalog={catalogs[catalog]} values={values} onChange={(changes) => Object.entries(changes).forEach(([name, value]) => set(name, value))} />
+        <CatalogPicker
+          catalog={catalogs[catalog]}
+          items={items}
+          onChange={(index, changes) => Object.entries(changes).forEach(([name, value]) => set(name, value, index))}
+          onPick={pickItem}
+          onRemove={multiple && !record && items.length > 1 ? removeItem : undefined}
+        />
       )}
 
       {items.map((item, itemIndex) => {
@@ -226,9 +248,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
               <div className="flex items-center justify-between gap-2">
                 <h4 className="flex items-center gap-2 text-sm font-semibold">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-xs text-white">{itemIndex + 1}</span>
-                  {def.singular} {itemIndex + 1}
-                  {itemIndex === active && catalog && <span className="text-xs font-normal text-brand">· picker fills this one</span>}
-                </h4>
+                  {def.singular} {itemIndex + 1}                </h4>
                 <button
                   type="button"
                   onClick={() => removeItem(itemIndex)}
