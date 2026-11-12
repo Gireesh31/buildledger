@@ -4,12 +4,21 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { FormMessage, safeRedirectPath, sendJson, SubmitButton, TextField } from "./form";
+import { GoogleButton } from "./GoogleButton";
 
-export function LoginForm() {
+/** Messages for ?error= when Google sign-in sends someone back here. */
+const GOOGLE_ERRORS: Record<string, string> = {
+  google: "Google sign-in didn't finish. Please try again, or sign in with your email.",
+  "google-unavailable": "Google sign-in isn't set up yet. Please sign in with your email.",
+};
+
+/** `google`: show "Continue with Google" (only once its keys are set up). */
+export function LoginForm({ google = false }: { google?: boolean }) {
   const router = useRouter();
-  const next = safeRedirectPath(useSearchParams().get("next"));
+  const params = useSearchParams();
+  const next = safeRedirectPath(params.get("next"));
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => GOOGLE_ERRORS[params.get("error") ?? ""] ?? null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,6 +41,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && <FormMessage tone="error">{error}</FormMessage>}
+      {google && <GoogleButton next={next} />}
       <TextField label="Email" name="email" type="email" autoComplete="email" required />
       <div className="flex flex-col gap-1">
         <TextField label="Password" name="password" type="password" autoComplete="current-password" required />

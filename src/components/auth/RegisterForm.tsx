@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { PASSWORD_MIN_LENGTH } from "@/lib/validation";
 import { FormMessage, sendJson, SubmitButton, TextField } from "./form";
+import { GoogleButton } from "./GoogleButton";
 
-export function RegisterForm() {
+/** `google`: show "Continue with Google" (only once its keys are set up). */
+export function RegisterForm({ google = false }: { google?: boolean }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +39,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && <FormMessage tone="error">{error}</FormMessage>}
+      {google && <GoogleButton />}
       <TextField label="Name" name="name" autoComplete="name" required maxLength={100} />
       <TextField label="Email" name="email" type="email" autoComplete="email" required />
       <TextField

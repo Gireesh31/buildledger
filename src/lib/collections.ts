@@ -218,7 +218,7 @@ export const collections = {
       // What's already been paid to this worker or team.
       { name: "amountPaid", label: "Amount paid", kind: "money", group: "Wages & payment" },
       { ...paymentModeField, group: "Wages & payment" },
-      { ...paymentStatusField, group: "Wages & payment" },
+      { ...billPaymentStatusField, group: "Wages & payment" },
     ],
   },
   attendance: {

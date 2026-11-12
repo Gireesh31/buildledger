@@ -157,10 +157,13 @@ export async function parseRecord(
   }
 
   // Part paid: something was paid, but less than the total (the rest is the balance due).
-  if (values.paymentStatus === "partial" && typeof values.amount === "number") {
-    const paid = Number(values.paidAmount) || 0;
+  // Bills keep it in paidAmount; workers and teams in amountPaid (a worker's total depends on attendance, so it's only checked for teams).
+  if (values.paymentStatus === "partial") {
+    const paid = Number(values.paidAmount ?? values.amountPaid) || 0;
     if (paid <= 0) return { ok: false, error: "Enter the amount paid." };
-    if (paid >= values.amount) return { ok: false, error: "Amount paid must be less than the total. Choose “Paid” if it's fully paid." };
+    if (typeof values.amount === "number" && paid >= values.amount) {
+      return { ok: false, error: "Amount paid must be less than the total. Choose “Paid” if it's fully paid." };
+    }
   }
   return { ok: true, values };
 }

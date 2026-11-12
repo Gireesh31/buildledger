@@ -13,12 +13,14 @@ const EXPORTS: { collection: CollectionName; label: string }[] = [
   { collection: "dailyLogs", label: "Daily log" },
 ];
 
-/** One button per project list, each downloading it as a PDF table. */
-export function ExportPdfButtons({ projectId, projectName }: { projectId: string; projectName: string }) {
+type Period = { from: string; to: string; label: string };
+
+/** One button per project list, each downloading it as a PDF table (only `period`'s entries when given). */
+export function ExportPdfButtons({ projectId, projectName, period }: { projectId: string; projectName: string; period?: Period }) {
   return (
     <div className="flex flex-wrap gap-2">
       {EXPORTS.map(({ collection, label }) => (
-        <ExportPdfButton key={collection} projectId={projectId} projectName={projectName} collection={collection} title={label} label={label} />
+        <ExportPdfButton key={collection} projectId={projectId} projectName={projectName} collection={collection} title={label} label={label} period={period} />
       ))}
     </div>
   );
@@ -31,6 +33,7 @@ export function ExportPdfButton({
   collection,
   title,
   label = "Download PDF",
+  period,
 }: {
   projectId: string;
   projectName: string;
@@ -38,6 +41,8 @@ export function ExportPdfButton({
   /** Heading and file name of the PDF. */
   title: string;
   label?: string;
+  /** Only entries dated in this period. */
+  period?: Period;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -47,7 +52,7 @@ export function ExportPdfButton({
     setError(false);
     try {
       const { downloadCollectionPdf } = await import("@/lib/export-pdf");
-      await downloadCollectionPdf(projectId, projectName, collection, title);
+      await downloadCollectionPdf(projectId, projectName, collection, title, period);
     } catch {
       setError(true);
     } finally {

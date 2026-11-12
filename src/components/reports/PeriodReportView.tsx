@@ -2,6 +2,7 @@
 
 import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight, FileDown, IndianRupee, Loader2, Package, Truck, Users, Wallet } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
+import { ExportPdfButtons } from "@/components/reports/ExportPdfButtons";
 import { PaymentStatusBadge } from "@/components/ui/PaymentStatusBadge";
 import { buttonClass, EmptyState, inputClass, StatTile } from "@/components/ui/primitives";
 import { formatDate, formatINR, formatNumber, todayISO } from "@/lib/format";
@@ -47,7 +48,7 @@ function shift(mode: PeriodMode, date: string, step: -1 | 1) {
   return next.toISOString().slice(0, 10);
 }
 
-export function PeriodReportView({ data, projectName }: { data: ReportData; projectName: string }) {
+export function PeriodReportView({ data, projectId, projectName }: { data: ReportData; projectId: string; projectName: string }) {
   // Opens on the whole project so far, so every saved entry shows (as on the Materials page).
   const [mode, setMode] = useState<PeriodMode>("total");
   const [date, setDate] = useState(todayISO);
@@ -185,6 +186,14 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
       </div>
       {error && <p className="text-xs text-critical">{error}</p>}
 
+      <div className="rounded-xl border border-foreground/[0.07] px-3 py-3">
+        <p className="mb-2 text-sm">
+          <span className="font-medium">Download lists as PDF</span>{" "}
+          <span className="text-foreground/60">· only entries from {label}</span>
+        </p>
+        <ExportPdfButtons projectId={projectId} projectName={projectName} period={{ from, to, label }} />
+      </div>
+
       <div key={`${mode}-${from}-${to}`} className="animate-fade-in flex flex-col gap-5">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-brand">{REPORT_NAME[mode]} report</p>
@@ -249,7 +258,46 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
           />
         </Section>
 
-        <Section title="Labour" empty="No attendance or team work in this period." count={report.labour.length}>
+        <Section title="Workers & teams" empty="No workers or teams added in this period." count={report.workers.length}>
+          {/* Same columns as the Labour page list; "Due" is as of the end of the period. */}
+          <Table
+            head={["Date", "Type", "Name", "Trade", "Daily wage", "Team amount", "Amount paid", "Payment mode", "Payment status", "Due"]}
+            right={[4, 5, 6, 9]}
+            minWidth={980}
+            rows={report.workers.map((w) => [
+              <span key="d" className="whitespace-nowrap">{formatDate(w.date)}</span>,
+              w.isTeam ? "Team" : "Worker",
+              w.name,
+              w.trade,
+              w.isTeam ? "—" : formatINR(w.dailyWage, true),
+              w.isTeam ? formatINR(w.amount, true) : "—",
+              w.amountPaid > 0 ? formatINR(w.amountPaid, true) : "—",
+              w.paymentMode || "—",
+              <PaymentStatusBadge key="s" status={w.status} />,
+              w.due > 0 ? (
+                <span key="due" className="font-medium text-critical">{formatINR(w.due, true)}</span>
+              ) : w.due < 0 ? (
+                `${formatINR(-w.due, true)} advance`
+              ) : (
+                "Paid"
+              ),
+            ])}
+            foot={[
+              "Total",
+              "",
+              "",
+              "",
+              "",
+              formatINR(report.workers.reduce((s, w) => s + (w.isTeam ? w.amount : 0), 0), true),
+              formatINR(report.workers.reduce((s, w) => s + w.amountPaid, 0), true),
+              "",
+              "",
+              formatINR(report.workers.reduce((s, w) => s + Math.max(0, w.due), 0), true),
+            ]}
+          />
+        </Section>
+
+        <Section title="Labour cost (attendance & teams)" empty="No attendance or team work in this period." count={report.labour.length}>
           <Table
             head={["Date", "Worker / team", "Details", "Amount"]}
             right={[3]}
@@ -259,11 +307,37 @@ export function PeriodReportView({ data, projectName }: { data: ReportData; proj
         </Section>
 
         <Section title="Transport & machinery" empty="No vehicles hired in this period." count={report.transport.length}>
+          {/* Same columns as the Transport page list. */}
           <Table
-            head={["Date", "Vehicle", "Transport", "Charged", "Status", "Amount"]}
-            right={[5]}
-            rows={report.transport.map((v) => [formatDate(v.date), v.vehicle, v.transportName || "—", v.hours !== null ? `${formatNumber(v.hours)} hrs × ${formatINR(v.ratePerHour ?? 0)}` : "Full amount", <PaymentStatusBadge key="s" status={v.status} />, formatINR(v.amount, true)])}
-            foot={["Total", "", "", "", "", formatINR(t.transport, true)]}
+            head={["Date", "Vehicle", "Name of the transport", "Charged", "Hours", "Rate per hour", "Payment mode", "Payment status", "Amount paid", "Total", "Balance due"]}
+            right={[4, 5, 8, 9, 10]}
+            minWidth={1080}
+            rows={report.transport.map((v) => [
+              <span key="d" className="whitespace-nowrap">{formatDate(v.date)}</span>,
+              v.vehicle,
+              v.transportName || "—",
+              v.hours !== null ? "Per hour" : "Full amount",
+              v.hours !== null ? formatNumber(v.hours) : "—",
+              v.ratePerHour !== null ? formatINR(v.ratePerHour, true) : "—",
+              v.paymentMode || "—",
+              <PaymentStatusBadge key="s" status={v.status} />,
+              v.paidAmount > 0 ? formatINR(v.paidAmount, true) : "—",
+              formatINR(v.amount, true),
+              v.balance > 0 ? <span key="b" className="font-medium text-critical">{formatINR(v.balance, true)}</span> : "—",
+            ])}
+            foot={[
+              "Total",
+              "",
+              "",
+              "",
+              formatNumber(report.transport.reduce((s, v) => s + (v.hours ?? 0), 0)),
+              "",
+              "",
+              "",
+              formatINR(report.transport.reduce((s, v) => s + v.paidAmount, 0), true),
+              formatINR(t.transport, true),
+              formatINR(report.transport.reduce((s, v) => s + v.balance, 0), true),
+            ]}
           />
         </Section>
 

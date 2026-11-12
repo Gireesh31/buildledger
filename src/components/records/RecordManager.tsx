@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheck, List, Plus, Search, X } from "lucide-react";
+import { CircleCheck, List, Pencil, Plus, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { PaymentStatusBadge } from "@/components/ui/PaymentStatusBadge";
@@ -266,7 +266,10 @@ export function RecordManager({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-semibold">{titleField ? display(titleField, record) : def.singular}</p>
-                    {dateField && <p className="text-xs text-foreground/55">{display(dateField, record)}</p>}
+                    <p className="text-xs text-foreground/55">
+                      {dateField && display(dateField, record)}
+                      <EditedBadge record={record} />
+                    </p>
                   </div>
                   {record.paymentStatus ? <PaymentStatusBadge status={String(record.paymentStatus)} /> : null}
                 </div>
@@ -352,7 +355,7 @@ export function RecordManager({
             <tbody className="divide-y divide-foreground/10">
               {visible.map((record) => (
                 <tr key={record.id} className="align-top transition-colors hover:bg-brand-soft/40">
-                  {columns.map((field) => (
+                  {columns.map((field, i) => (
                     <td
                       key={field.name}
                       className={`px-3 py-2 ${field.kind === "money" || field.kind === "number" ? "text-right tabular-nums" : ""} ${
@@ -364,6 +367,7 @@ export function RecordManager({
                       ) : (
                         display(field, record)
                       )}
+                      {i === 0 && <EditedBadge record={record} />}
                     </td>
                   ))}
                   {extraColumns.map((column) => {
@@ -429,3 +433,17 @@ export function RecordManager({
   );
 }
 
+
+/** Marks an entry that was changed after it was first saved; hover shows when. */
+function EditedBadge({ record }: { record: LedgerRecord }) {
+  // A new entry's created and updated times are the same; only an edit moves updatedAt on.
+  if (Date.parse(record.updatedAt) - Date.parse(record.createdAt) < 1000) return null;
+  return (
+    <span
+      className="ml-1.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-sky-100 px-1.5 py-0.5 align-middle text-[10px] font-medium text-sky-700 dark:bg-sky-500/15 dark:text-sky-300"
+      title={`Edited on ${formatDate(record.updatedAt)}`}
+    >
+      <Pencil className="h-2.5 w-2.5" aria-hidden /> Edited
+    </span>
+  );
+}

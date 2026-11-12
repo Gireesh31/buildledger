@@ -13,9 +13,18 @@ const fetchRecords = async (projectId: string, collection: CollectionName): Prom
   return response.json();
 };
 
-export async function downloadCollectionPdf(projectId: string, projectName: string, collection: CollectionName, title: string) {
-  const [{ downloadTablePdf, money }, records] = await Promise.all([import("@/lib/pdf"), fetchRecords(projectId, collection)]);
+/** `period`: only entries dated from `from` to `to` (inclusive, "YYYY-MM-DD"); `label` names it on the PDF. */
+export async function downloadCollectionPdf(
+  projectId: string,
+  projectName: string,
+  collection: CollectionName,
+  title: string,
+  period?: { from: string; to: string; label: string },
+) {
+  const [{ downloadTablePdf, money }, all] = await Promise.all([import("@/lib/pdf"), fetchRecords(projectId, collection)]);
   const def = getCollection(collection);
+  const dateOf = (r: LedgerRecord) => String(r[def.dateField ?? ""] ?? r.createdAt.slice(0, 10));
+  const records = period ? all.filter((r) => dateOf(r) >= period.from && dateOf(r) <= period.to) : all;
 
   // Names for referenced records (e.g. workers in attendance).
   const refNames = new Map<string, string>();
@@ -63,6 +72,7 @@ export async function downloadCollectionPdf(projectId: string, projectName: stri
   await downloadTablePdf({
     projectName,
     title,
+    period: period && { label: period.label, slug: period.from === period.to ? period.from : `${period.from}-to-${period.to}` },
     head,
     rows,
     rightColumns,

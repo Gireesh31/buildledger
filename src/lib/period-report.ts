@@ -39,10 +39,24 @@ export interface ReportData {
     /** "Amount paid" entered on the worker form; counts on the worker's date. */
     amountPaid: number;
     date: string;
+    /** "UPI", "Cash", …, or "" when not recorded. */
+    paymentMode: string;
+    status: PaymentStatus;
   }[];
   attendance: { date: string; workerId: string; status: string }[];
-  /** `hours` and `ratePerHour` are null for full-amount hires. */
-  transport: { date: string; vehicle: string; transportName: string; hours: number | null; ratePerHour: number | null; amount: number; status: PaymentStatus; balance: number }[];
+  /** `hours` and `ratePerHour` are null for full-amount hires; `paidAmount` is paid so far on a part-paid bill (0 otherwise). */
+  transport: {
+    date: string;
+    vehicle: string;
+    transportName: string;
+    hours: number | null;
+    ratePerHour: number | null;
+    paymentMode: string;
+    paidAmount: number;
+    amount: number;
+    status: PaymentStatus;
+    balance: number;
+  }[];
 }
 
 /** Payment status of a bill: "advance" | "paid" | "partial" | "due", or "" for older entries without one. */
@@ -104,6 +118,8 @@ export interface PeriodReport {
   to: string;
   materials: ReportData["materials"];
   labour: LabourLine[];
+  /** Worker and team entries dated in the period (as listed on the Labour page), each with what's due to them as of `duesAsOf`. */
+  workers: (ReportData["workers"][number] & { due: number })[];
   transport: ReportData["transport"];
   /** "Amount paid" entered on worker/team forms, on the worker's date. */
   payments: { date: string; payee: string; method: string; amount: number }[];
@@ -145,16 +161,21 @@ export function buildPeriodReport(data: ReportData, mode: PeriodMode, date: stri
     .map(({ date: d, payee, method, amount }) => ({ date: d, payee, method, amount }));
 
   // Dues as of the end of the period (or today): everything earned and paid up to that date.
-  const dues: DueLine[] = data.workers
-    .map((w) => {
-      const days = individualAttendance.filter((a) => a.workerId === w.id && a.date <= duesAsOf);
-      const earned = w.isTeam ? (w.date <= duesAsOf ? w.amount : 0) : days.reduce((s, a) => s + wageOf(a), 0);
-      const paid = allPayments.filter((p) => p.workerId === w.id && p.date <= duesAsOf).reduce((s, p) => s + p.amount, 0);
-      const worked = w.isTeam ? (w.date <= duesAsOf ? w.date : null) : (days.filter((a) => a.status !== "absent").map((a) => a.date).sort().at(-1) ?? null);
-      return { name: w.name, kind: w.isTeam ? ("Team" as const) : ("Worker" as const), lastWorked: worked, earned, paid, due: earned - paid };
-    })
+  const standing = data.workers.map((w) => {
+    const days = individualAttendance.filter((a) => a.workerId === w.id && a.date <= duesAsOf);
+    const earned = w.isTeam ? (w.date <= duesAsOf ? w.amount : 0) : days.reduce((s, a) => s + wageOf(a), 0);
+    const paid = allPayments.filter((p) => p.workerId === w.id && p.date <= duesAsOf).reduce((s, p) => s + p.amount, 0);
+    const worked = w.isTeam ? (w.date <= duesAsOf ? w.date : null) : (days.filter((a) => a.status !== "absent").map((a) => a.date).sort().at(-1) ?? null);
+    return { worker: w, line: { name: w.name, kind: w.isTeam ? ("Team" as const) : ("Worker" as const), lastWorked: worked, earned, paid, due: earned - paid } };
+  });
+  const dues: DueLine[] = standing
+    .map((s) => s.line)
     .filter((d) => d.due > 0)
     .sort((a, b) => b.due - a.due);
+  const workers = standing
+    .filter((s) => inRange(s.worker.date))
+    .map((s) => ({ ...s.worker, due: s.line.due }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   const materialTotal = materials.reduce((s, m) => s + m.amount, 0);
   const labourTotal = labour.reduce((s, l) => s + l.amount, 0);
@@ -168,6 +189,7 @@ export function buildPeriodReport(data: ReportData, mode: PeriodMode, date: stri
     duesAsOf,
     materials,
     labour,
+    workers,
     transport,
     payments,
     dues,

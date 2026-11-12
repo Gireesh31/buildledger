@@ -135,7 +135,40 @@ export async function buildPeriodReportPdf(report: PeriodReport, projectName: st
       ["Total", "", "", "", "", "", "", money(report.materials.reduce((s, m) => s + m.paidAmount, 0)), money(t.materials), money(report.materials.reduce((s, m) => s + m.balance, 0))],
     );
 
-  pdf.heading("Labour");
+  // Same columns as the Labour page list; "Due" is as of the end of the period.
+  pdf.heading("Workers & teams");
+  if (report.workers.length === 0) pdf.note("No workers or teams added in this period.");
+  else
+    pdf.table(
+      ["Date", "Type", "Name", "Trade", "Daily wage (Rs.)", "Team amount (Rs.)", "Amount paid (Rs.)", "Payment mode", "Payment status", "Due (Rs.)"],
+      report.workers.map((w) => [
+        formatDate(w.date),
+        w.isTeam ? "Team" : "Worker",
+        w.name,
+        w.trade,
+        w.isTeam ? "-" : money(w.dailyWage),
+        w.isTeam ? money(w.amount) : "-",
+        w.amountPaid > 0 ? money(w.amountPaid) : "-",
+        w.paymentMode || "-",
+        status(w.status),
+        w.due > 0 ? money(w.due) : w.due < 0 ? `${money(-w.due)} advance` : "Paid",
+      ]),
+      [4, 5, 6, 9],
+      [
+        "Total",
+        "",
+        "",
+        "",
+        "",
+        money(report.workers.reduce((s, w) => s + (w.isTeam ? w.amount : 0), 0)),
+        money(report.workers.reduce((s, w) => s + w.amountPaid, 0)),
+        "",
+        "",
+        money(report.workers.reduce((s, w) => s + Math.max(0, w.due), 0)),
+      ],
+    );
+
+  pdf.heading("Labour cost (attendance & teams)");
   if (report.labour.length === 0) pdf.note("No attendance or team work in this period.");
   else
     pdf.table(
@@ -148,11 +181,36 @@ export async function buildPeriodReportPdf(report: PeriodReport, projectName: st
   pdf.heading("Transport & machinery");
   if (report.transport.length === 0) pdf.note("No vehicles hired in this period.");
   else
+    // Same columns as the Transport page list.
     pdf.table(
-      ["Date", "Vehicle", "Transport", "Charged", "Status", "Amount (Rs.)", "Balance due (Rs.)"],
-      report.transport.map((v) => [formatDate(v.date), v.vehicle, v.transportName || "-", v.hours !== null ? `${num(v.hours)} hrs x ${rs(v.ratePerHour ?? 0)}` : "Full amount", status(v.status), money(v.amount), v.balance > 0 ? money(v.balance) : "-"]),
-      5,
-      ["Total", "", "", "", "", money(t.transport), money(report.transport.reduce((s, v) => s + v.balance, 0))],
+      ["Date", "Vehicle", "Name of the transport", "Charged", "Hours", "Rate per hour (Rs.)", "Payment mode", "Payment status", "Amount paid (Rs.)", "Total (Rs.)", "Balance due (Rs.)"],
+      report.transport.map((v) => [
+        formatDate(v.date),
+        v.vehicle,
+        v.transportName || "-",
+        v.hours !== null ? "Per hour" : "Full amount",
+        v.hours !== null ? num(v.hours) : "-",
+        v.ratePerHour !== null ? money(v.ratePerHour) : "-",
+        v.paymentMode || "-",
+        status(v.status),
+        v.paidAmount > 0 ? money(v.paidAmount) : "-",
+        money(v.amount),
+        v.balance > 0 ? money(v.balance) : "-",
+      ]),
+      [4, 5, 8, 9, 10],
+      [
+        "Total",
+        "",
+        "",
+        "",
+        num(report.transport.reduce((s, v) => s + (v.hours ?? 0), 0)),
+        "",
+        "",
+        "",
+        money(report.transport.reduce((s, v) => s + v.paidAmount, 0)),
+        money(t.transport),
+        money(report.transport.reduce((s, v) => s + v.balance, 0)),
+      ],
     );
 
   pdf.heading("Paid to workers & teams");
@@ -187,6 +245,8 @@ export async function downloadPeriodReportPdf(report: PeriodReport, projectName:
 export async function downloadTablePdf(options: {
   projectName: string;
   title: string;
+  /** Only this period's entries: `label` goes under the title, `slug` into the file name. */
+  period?: { label: string; slug: string };
   head: string[];
   rows: Cell[][];
   /** Right-aligned (numeric) columns. */
@@ -195,11 +255,13 @@ export async function downloadTablePdf(options: {
   total?: { label: string; values: Record<number, string> };
 }) {
   const wide = options.head.length > 6;
-  const pdf = await createDocument(`${options.title} - ${options.projectName}`, `${options.rows.length} entries`, wide ? "landscape" : "portrait");
-  if (options.rows.length === 0) pdf.note("Nothing recorded yet.");
+  const count = `${options.rows.length} ${options.rows.length === 1 ? "entry" : "entries"}`;
+  const subtitle = options.period ? `${options.period.label} · ${count}` : count;
+  const pdf = await createDocument(`${options.title} - ${options.projectName}`, subtitle, wide ? "landscape" : "portrait");
+  if (options.rows.length === 0) pdf.note(options.period ? "Nothing recorded in this period." : "Nothing recorded yet.");
   else {
     const foot = options.total ? options.head.map((_, i) => (i === 0 ? options.total!.label : (options.total!.values[i] ?? ""))) : undefined;
     pdf.table(options.head, options.rows, options.rightColumns, foot);
   }
-  pdf.save(`${slug(options.projectName)}-${slug(options.title)}.pdf`);
+  pdf.save(`${slug(options.projectName)}-${slug(options.title)}${options.period ? `-${options.period.slug}` : ""}.pdf`);
 }

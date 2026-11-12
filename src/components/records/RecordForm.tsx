@@ -42,12 +42,13 @@ type ScanState =
 
 type Values = Record<string, string>;
 
-function initialValues(fields: readonly FieldDef[], record?: LedgerRecord): Values {
+function initialValues(fields: readonly FieldDef[], record?: LedgerRecord, blank?: readonly string[]): Values {
   const values: Values = {};
   for (const field of fields) {
     if (field.computed) continue;
     const existing = record?.[field.name];
     if (existing !== undefined) values[field.name] = String(existing);
+    else if (blank?.includes(field.name)) values[field.name] = "";
     else if (field.defaultValue !== undefined) values[field.name] = field.defaultValue;
     else if (field.kind === "date") values[field.name] = todayISO();
     else if ((field.kind === "select" || field.kind === "radio") && field.required) values[field.name] = field.options?.[0]?.value ?? "";
@@ -66,7 +67,10 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
   );
   const otherTextNames = new Set([...otherText.values()].map((f) => f.name));
   // A new entry can hold several items ("Add more"), saved together; editing is always one item.
-  const [items, setItems] = useState<Values[]>(() => [initialValues(def.fields, record)]);
+  // New entries start with nothing picked (no material or vehicle, no unit) rather than the first option.
+  const pickerDef: Catalog | undefined = catalog ? catalogs[catalog] : undefined;
+  const pickerBlank = pickerDef ? [pickerDef.choiceField, ...(pickerDef.unitField ? [pickerDef.unitField] : [])] : [];
+  const [items, setItems] = useState<Values[]>(() => [initialValues(def.fields, record, pickerBlank)]);
   // The item the picture picker and bill scan fill in.
   const [active, setActive] = useState(0);
   const values = items[active] ?? items[0];
@@ -85,7 +89,6 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
     updateItem(index, (current) => {
       const next = { ...current, [name]: value };
       // Choosing a material from the list fills in its usual unit (cement → bag, steel → ton …).
-      const pickerDef: Catalog | undefined = catalog ? catalogs[catalog] : undefined;
       if (pickerDef && pickerDef.unitField && name === pickerDef.choiceField) {
         const unit = pickerDef.items.find((item) => item.value === value)?.unit;
         if (unit) next[pickerDef.unitField] = unit;
@@ -100,7 +103,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
 
   /** Adds another item below, starting from the same date so a day's purchases go in quickly. */
   function addItem() {
-    const fresh = initialValues(def.fields);
+    const fresh = initialValues(def.fields, undefined, pickerBlank);
     if (def.dateField && values[def.dateField]) fresh[def.dateField] = values[def.dateField];
     setItems((list) => [...list, fresh]);
     setActive(items.length);
@@ -110,7 +113,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
 
   /** A picture tapped in the picker: fills an empty item, or adds a new one when the form takes several. */
   function pickItem(changes: Values) {
-    const choiceField = catalog ? catalogs[catalog].choiceField : "";
+    const choiceField = pickerDef?.choiceField ?? "";
     const empty = !values[choiceField] ? active : items.findIndex((item) => !item[choiceField]);
     if (!multiple || record || empty !== -1) {
       const index = multiple && !record ? empty : active;
@@ -118,7 +121,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
       setActive(index);
       return;
     }
-    const fresh = { ...initialValues(def.fields), ...changes };
+    const fresh = { ...initialValues(def.fields, undefined, pickerBlank), ...changes };
     if (def.dateField && values[def.dateField]) fresh[def.dateField] = values[def.dateField];
     setItems((list) => [...list, fresh]);
     setActive(items.length);
@@ -288,7 +291,7 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
                         onBackToList={() => set(field.name, "", itemIndex)}
                       />
                     ) : (
-                      <label key={field.name} className={`flex flex-col gap-1.5 text-sm ${field.kind === "textarea" ? "col-span-full" : ""}`}>
+                      <label key={field.name} className={`flex min-w-0 flex-col gap-1.5 text-sm ${field.kind === "textarea" ? "col-span-full" : ""}`}>
                         <FieldLabel field={field} />
                         <FieldInput
                           field={field}
@@ -316,7 +319,12 @@ export function RecordForm({ projectId, collection, record, refOptions, attachme
                 </div>
               ))}
 
-            {item.paymentStatus === "partial" && <BalanceDue total={def.fields.filter((f) => f.computed).reduce((s, f) => s + computeField(def, f, item), 0)} paid={Number(item.paidAmount) || 0} />}
+            {item.paymentStatus === "partial" &&
+              (() => {
+                // Bills: the calculated total and paidAmount. Teams: their fixed amount and amountPaid (a worker's total comes from attendance).
+                const total = def.fields.filter((f) => f.computed).reduce((s, f) => s + computeField(def, f, item), 0) || Number(item.amount) || 0;
+                return total > 0 ? <BalanceDue total={total} paid={Number(item.paidAmount ?? item.amountPaid) || 0} /> : null;
+              })()}
           </div>
         );
       })}
@@ -424,7 +432,7 @@ function OtherNameInput({
   onBackToList: () => void;
 }) {
   return (
-    <label className="flex flex-col gap-1.5 text-sm">
+    <label className="flex min-w-0 flex-col gap-1.5 text-sm">
       <FieldLabel field={field} />
       <span className="relative flex items-center">
         <input

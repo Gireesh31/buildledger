@@ -1,7 +1,6 @@
 import { BarChart3, IndianRupee, Package, Truck, Users, Wallet } from "lucide-react";
 import type { Metadata } from "next";
 import { BarList, MonthlyColumns } from "@/components/charts/charts";
-import { ExportPdfButtons } from "@/components/reports/ExportPdfButtons";
 import { PeriodReportView } from "@/components/reports/PeriodReportView";
 import { Card, EmptyState, PageHeader, StatTile } from "@/components/ui/primitives";
 import { choiceLabel, getCollection, isTeam, optionLabel } from "@/lib/collections";
@@ -55,6 +54,8 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
       amount: Number(w.amount ?? 0),
       amountPaid: Number(w.amountPaid ?? 0),
       date: String(w.date ?? w.createdAt.slice(0, 10)),
+      paymentMode: w.paymentMode ? label("workers", "paymentMode", w.paymentMode) : "",
+      status: String(w.paymentStatus ?? ""),
     })),
     attendance: records.attendance.map((a) => ({ date: String(a.date), workerId: String(a.workerId), status: String(a.status) })),
     transport: records.transport.map((t) => ({
@@ -63,6 +64,8 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
       transportName: String(t.transportName ?? ""),
       hours: t.chargeType === "hourly" ? Number(t.hours ?? 0) : null,
       ratePerHour: t.chargeType === "hourly" ? Number(t.ratePerHour ?? 0) : null,
+      paymentMode: t.paymentMode ? optionLabel(transportDef.fields.find((f) => f.name === "paymentMode")!, t.paymentMode) : "",
+      paidAmount: t.paymentStatus === "partial" ? Number(t.paidAmount) || 0 : 0,
       amount: Number(t.amount ?? 0),
       status: String(t.paymentStatus ?? ""),
       balance: balanceDue(t),
@@ -95,12 +98,7 @@ export default async function ReportsPage({ params }: PageProps<"/projects/[proj
       </div>
 
       <Card title="Daily, weekly, monthly & custom-date report">
-        <PeriodReportView data={reportData} projectName={project.name} />
-      </Card>
-
-      <Card title="Download lists as PDF" className="no-print">
-        <p className="mb-3 text-sm text-foreground/60">Every entry in each list, as a PDF table.</p>
-        <ExportPdfButtons projectId={projectId} projectName={project.name} />
+        <PeriodReportView data={reportData} projectId={projectId} projectName={project.name} />
       </Card>
     </div>
   );

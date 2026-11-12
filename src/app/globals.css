@@ -213,6 +213,25 @@ h4,
 }
 
 /* Number boxes without the browser's up/down arrows, so they line up with the other fields. */
+/* Safari on iPad/iPhone gives date and select boxes a built-in minimum width, so in a two- or
+   three-column form they push past their column and run into the next field. */
+input,
+select,
+textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+@supports (-webkit-touch-callout: none) {
+  input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 2.375rem;
+  }
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+  }
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
