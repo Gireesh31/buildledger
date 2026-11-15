@@ -23,6 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
   }
 
-  await createSession(user.id);
-  return NextResponse.json({ user }, { status: 201 });
+  const token = await createSession(user.id);
+  // Only the mobile app asks for the token (see the login route).
+  return NextResponse.json({ user, ...(body?.client === "mobile" && { token }) }, { status: 201 });
 }

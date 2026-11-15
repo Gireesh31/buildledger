@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // The Expo mobile app has its own tooling.
+    "mobile/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

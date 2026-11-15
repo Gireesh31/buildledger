@@ -12,6 +12,12 @@ const signedOut = () => NextResponse.json({ error: "Please sign in." }, { status
 const bad = (error: string, status = 400) => NextResponse.json({ error }, { status });
 const text = (value: unknown, max: number) => (typeof value === "string" && value.trim().length <= max ? value.trim() : null);
 
+/** The signed-in user (the mobile app checks its saved session with this). */
+export async function GET() {
+  const user = await getCurrentUser();
+  return user ? NextResponse.json(user) : signedOut();
+}
+
 /**
  * Saves the whole profile form:
  * { firstName, lastName, phone, email, location, password?, currentPassword? }.

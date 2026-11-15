@@ -1,0 +1,22 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/lib/*": [
+        "../src/lib/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../src/lib/collections.ts",
+    "../src/lib/catalogs.ts",
+    "../src/lib/format.ts",
+    "../src/lib/ledger.ts",
+    "../src/lib/period-report.ts",
+    "../src/lib/types.ts",
+    "../src/lib/validation.ts"
+  ]
+}
