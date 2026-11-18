@@ -1,6 +1,10 @@
-import type { ReactNode } from "react";
+import { Children, useEffect, useRef, type ReactNode } from "react";
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
+  Platform,
+  type PressableProps,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -14,16 +18,51 @@ import {
 } from "react-native";
 import { colors, radius } from "./theme";
 
-/** A scrolling page with pull-to-refresh. */
-export function Screen({ children, refreshing, onRefresh }: { children: ReactNode; refreshing?: boolean; onRefresh?: () => void }) {
+const native = Platform.OS !== "web";
+
+/** Slides up and fades in when it first appears; `delay` staggers a list. */
+export function FadeIn({ children, delay = 0, style }: { children: ReactNode; delay?: number; style?: StyleProp<ViewStyle> }) {
+  const progress = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(progress, { toValue: 1, duration: 380, delay, easing: Easing.out(Easing.cubic), useNativeDriver: native }).start();
+  }, [progress, delay]);
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+  return <Animated.View style={[style, { opacity: progress, transform: [{ translateY }] }]}>{children}</Animated.View>;
+}
+
+/** A pressable that dips slightly while held, so taps feel physical. */
+export function PressableScale({
+  children,
+  style,
+  containerStyle,
+  ...props
+}: Omit<PressableProps, "style"> & { style?: StyleProp<ViewStyle>; /** Layout of the tap area itself (e.g. flex: 1 in a row). */ containerStyle?: StyleProp<ViewStyle>; children: ReactNode }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const to = (value: number) => Animated.spring(scale, { toValue: value, useNativeDriver: native, speed: 40, bounciness: 6 }).start();
+  return (
+    <Pressable {...props} style={containerStyle} onPressIn={(e) => (to(0.97), props.onPressIn?.(e))} onPressOut={(e) => (to(1), props.onPressOut?.(e))}>
+      <Animated.View style={[style, { transform: [{ scale }] }]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
+
+/** A scrolling page with pull-to-refresh; its sections animate in one after another. */
+export function Screen({ children, refreshing, onRefresh, animate = true }: { children: ReactNode; refreshing?: boolean; onRefresh?: () => void; animate?: boolean }) {
+  const items = Children.toArray(children);
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}
+      contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 48, flexGrow: 1 }}
       keyboardShouldPersistTaps="handled"
-      refreshControl={onRefresh ? <RefreshControl refreshing={Boolean(refreshing)} onRefresh={onRefresh} tintColor={colors.brand} /> : undefined}
+      refreshControl={onRefresh ? <RefreshControl refreshing={Boolean(refreshing)} onRefresh={onRefresh} tintColor={colors.brand} colors={[colors.brand]} /> : undefined}
     >
-      {children}
+      {animate
+        ? items.map((child, i) => (
+            <FadeIn key={(child as { key?: string }).key ?? i} delay={Math.min(i, 8) * 55}>
+              {child}
+            </FadeIn>
+          ))
+        : children}
     </ScrollView>
   );
 }
@@ -63,19 +102,20 @@ export function Button({
     danger: { bg: colors.surface, fg: colors.critical, border: colors.criticalSoft },
   }[tone];
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       onPress={onPress}
       disabled={disabled || busy}
-      style={({ pressed }) => [
+      style={[
         styles.button,
         small && { paddingVertical: 7, paddingHorizontal: 12 },
-        { backgroundColor: palette.bg, borderColor: palette.border, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 },
+        tone === "primary" && styles.raised,
+        { backgroundColor: palette.bg, borderColor: palette.border, opacity: disabled ? 0.5 : 1 },
       ]}
     >
       {busy ? <ActivityIndicator color={palette.fg} size="small" /> : icon}
       <Text style={[styles.buttonText, small && { fontSize: 13 }, { color: palette.fg }]}>{label}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -189,7 +229,20 @@ export function SectionTitle({ text }: { text: string }) {
 }
 
 export const styles = StyleSheet.create({
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 12 },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 16,
+    gap: 12,
+    shadowColor: "#1C1917",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  raised: { shadowColor: colors.brand, shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 3 },
   cardTitle: { fontSize: 15, fontWeight: "700", color: colors.text },
   button: {
     flexDirection: "row",
@@ -208,7 +261,22 @@ export const styles = StyleSheet.create({
   input: { flex: 1, paddingHorizontal: 12, paddingVertical: 11, fontSize: 15, color: colors.text },
   chip: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   chipText: { fontSize: 14, fontWeight: "500", color: colors.text },
-  tile: { flexGrow: 1, flexBasis: "45%", backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: 12, gap: 4 },
+  tile: {
+    flexGrow: 1,
+    flexBasis: "45%",
+    minWidth: 0,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 12,
+    gap: 4,
+    shadowColor: "#1C1917",
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
   tileLabel: { fontSize: 12, color: colors.muted },
   tileValue: { fontSize: 19, fontWeight: "700", color: colors.text },
   tileHint: { fontSize: 11, color: colors.muted },

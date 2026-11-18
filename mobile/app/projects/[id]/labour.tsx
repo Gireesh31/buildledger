@@ -1,4 +1,3 @@
-import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Text, View } from "react-native";
 import { isTeam, optionLabel, trades } from "@/lib/collections";
@@ -6,7 +5,7 @@ import { formatINR, formatNumber, todayISO } from "@/lib/format";
 import { computeLedger } from "@/lib/ledger";
 import type { LedgerRecord, Project } from "@/lib/types";
 import { api, errorMessage } from "../../../src/api";
-import { loadRecords, useLoad } from "../../../src/data";
+import { loadRecords, useLoad, useProjectId } from "../../../src/data";
 import { EntryPage } from "../../../src/EntryPage";
 import { DateInput } from "../../../src/inputs";
 import { colors } from "../../../src/theme";
@@ -17,7 +16,7 @@ const duesOf = (workers: LedgerRecord[], attendance: LedgerRecord[]) =>
   computeLedger({ project: {} as Project, workers, attendance, transport: [], materials: [] });
 
 export default function Labour() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useProjectId();
   const attendance = useLoad(() => loadRecords(id, "attendance"));
 
   return (

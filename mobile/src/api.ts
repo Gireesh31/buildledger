@@ -3,6 +3,7 @@
  * The session token from sign-in is kept in the phone's secure storage and sent as a Bearer header.
  */
 import * as SecureStore from "expo-secure-store";
+import { Linking, Platform } from "react-native";
 
 /** The website the app reads and writes. Set EXPO_PUBLIC_API_URL to use another (e.g. a local dev server). */
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? "https://buildledger-sable.vercel.app").replace(/\/$/, "");
@@ -11,16 +12,27 @@ const TOKEN_KEY = "buildledger-session";
 let token: string | null = null;
 let onSignedOut: (() => void) | null = null;
 
+// Phones keep the token in secure storage; the web preview (used for testing) has only localStorage.
+const web = Platform.OS === "web";
+const store = {
+  get: () => (web ? Promise.resolve(globalThis.localStorage?.getItem(TOKEN_KEY) ?? null) : SecureStore.getItemAsync(TOKEN_KEY)),
+  set: (v: string) => (web ? Promise.resolve(globalThis.localStorage?.setItem(TOKEN_KEY, v)) : SecureStore.setItemAsync(TOKEN_KEY, v)),
+  remove: () => (web ? Promise.resolve(globalThis.localStorage?.removeItem(TOKEN_KEY)) : SecureStore.deleteItemAsync(TOKEN_KEY)),
+};
+
 export async function loadToken(): Promise<string | null> {
-  token = await SecureStore.getItemAsync(TOKEN_KEY);
+  token = await store.get();
   return token;
 }
 
 export async function saveToken(value: string | null) {
   token = value;
-  if (value) await SecureStore.setItemAsync(TOKEN_KEY, value);
-  else await SecureStore.deleteItemAsync(TOKEN_KEY);
+  if (value) await store.set(value);
+  else await store.remove();
 }
+
+/** Headers that sign a request in, e.g. for loading a bill photo straight from the server. */
+export const authHeaders = (): Record<string, string> => (token ? { authorization: `Bearer ${token}` } : {});
 
 /** Called when the server says the session has ended, so the app can go back to sign-in. */
 export function setSignedOutHandler(handler: (() => void) | null) {
@@ -33,16 +45,20 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T = unknown>(path: string, options: { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: unknown } = {}): Promise<T> {
+export async function api<T = unknown>(
+  path: string,
+  options: { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: unknown; form?: FormData } = {},
+): Promise<T> {
   let response: Response;
+  const json = options.body !== undefined;
   try {
     response = await fetch(`${API_URL}${path}`, {
-      method: options.method ?? (options.body === undefined ? "GET" : "POST"),
+      method: options.method ?? (json || options.form ? "POST" : "GET"),
       headers: {
-        ...(options.body !== undefined && { "content-type": "application/json" }),
-        ...(token && { authorization: `Bearer ${token}` }),
+        ...(json && { "content-type": "application/json" }),
+        ...authHeaders(),
       },
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      body: options.form ?? (json ? JSON.stringify(options.body) : undefined),
       // Sign-in rides on the Bearer token only, never on cookies.
       credentials: "omit",
     });
@@ -57,6 +73,9 @@ export async function api<T = unknown>(path: string, options: { method?: "GET" |
   }
   return data as T;
 }
+
+/** Opens a page of the website in the phone's browser (privacy policy, photo credits, reset link pages). */
+export const openWebsite = (path: string) => Linking.openURL(`${API_URL}${path}`);
 
 /** Message for any error thrown while calling the API. */
 export const errorMessage = (error: unknown) => (error instanceof Error ? error.message : "Something went wrong. Please try again.");

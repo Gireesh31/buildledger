@@ -8,10 +8,15 @@ interface AuthState {
   signIn(email: string, password: string): Promise<void>;
   register(name: string, email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
+  /** Drops the saved session without calling the server (the account was just deleted). */
+  forget(): Promise<void>;
   refresh(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
+
+/** Where to go once the home screen has appeared after the welcome steps (e.g. "New project" from "Get started"). */
+export const afterWelcome: { route: "/projects/new" | null } = { route: null };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -47,6 +52,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       async signOut() {
         await api("/api/auth/logout", { method: "POST" }).catch(() => {});
+        await saveToken(null);
+        setUser(null);
+      },
+      async forget() {
         await saveToken(null);
         setUser(null);
       },

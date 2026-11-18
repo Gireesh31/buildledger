@@ -1,17 +1,25 @@
-import { useLocalSearchParams } from "expo-router";
 import { FileDown } from "lucide-react-native";
 import { useMemo, useState } from "react";
+import type { CollectionName } from "@/lib/collections";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { formatDate, formatINR, formatNumber, todayISO } from "@/lib/format";
 import { LEDGER_COLLECTIONS } from "@/lib/ledger";
 import { buildPeriodReport, periodRange, type PeriodMode } from "@/lib/period-report";
 import { errorMessage } from "../../../src/api";
-import { loadCollections, loadProject, useLoad } from "../../../src/data";
+import { loadCollections, loadProject, useLoad, useProjectId } from "../../../src/data";
 import { DateInput } from "../../../src/inputs";
 import { buildReportData } from "../../../src/reportData";
-import { sharePeriodReportPdf } from "../../../src/reportPdf";
+import { shareCollectionPdf, sharePeriodReportPdf } from "../../../src/reportPdf";
 import { colors } from "../../../src/theme";
 import { Button, Card, Chip, Empty, Field, Loading, Message, Screen, StatTile, StatusBadge, TileGrid } from "../../../src/ui";
+
+const LISTS: { collection: CollectionName; label: string }[] = [
+  { collection: "materials", label: "Materials" },
+  { collection: "workers", label: "Workers & teams" },
+  { collection: "attendance", label: "Attendance" },
+  { collection: "transport", label: "Transport" },
+  { collection: "dailyLogs", label: "Daily log" },
+];
 
 const MODES: { value: PeriodMode; label: string }[] = [
   { value: "day", label: "Day" },
@@ -28,7 +36,7 @@ function periodLabel(mode: PeriodMode, from: string, to: string) {
 
 /** The website's period report (shared code), with a PDF to share from the phone. */
 export default function Reports() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useProjectId();
   const { data: loaded, error, refreshing, onRefresh } = useLoad(async () => {
     const [project, records] = await Promise.all([loadProject(id), loadCollections(id, LEDGER_COLLECTIONS)]);
     return { project, data: buildReportData(project, records) };
@@ -36,7 +44,7 @@ export default function Reports() {
   const [mode, setMode] = useState<PeriodMode>("total");
   const [date, setDate] = useState(todayISO());
   const [endDate, setEndDate] = useState(todayISO());
-  const [sharing, setSharing] = useState(false);
+  const [sharing, setSharing] = useState<string | null>(null);
 
   const reportDate = mode === "total" ? todayISO() : date;
   const report = useMemo(() => (loaded ? buildPeriodReport(loaded.data, mode, reportDate, todayISO(), endDate) : null), [loaded, mode, reportDate, endDate]);
@@ -45,14 +53,14 @@ export default function Reports() {
   const label = periodLabel(mode, from, to);
   const t = report.totals;
 
-  async function share() {
-    setSharing(true);
+  async function share(which: string, make: () => Promise<void>) {
+    setSharing(which);
     try {
-      await sharePeriodReportPdf(report!, loaded!.project.name, label);
+      await make();
     } catch (e) {
       Alert.alert("Couldn't create the PDF", errorMessage(e));
     } finally {
-      setSharing(false);
+      setSharing(null);
     }
   }
 
@@ -91,7 +99,24 @@ export default function Reports() {
         <StatTile label="Paid out" value={formatINR(t.paid)} />
         <StatTile label="Outstanding dues" value={formatINR(t.due)} hint={`as of ${formatDate(report.duesAsOf)}`} critical={t.due > 0} />
       </TileGrid>
-      <Button label="Share PDF report" icon={<FileDown size={17} color="#fff" />} busy={sharing} onPress={share} />
+      <Button label="Share PDF report" icon={<FileDown size={17} color="#fff" />} busy={sharing === "report"} onPress={() => share("report", () => sharePeriodReportPdf(report, loaded.project.name, label))} />
+      <Card title="Share lists as PDF">
+        <Text style={{ fontSize: 12, color: colors.muted, marginTop: -6 }}>Only entries from {label}</Text>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          {LISTS.map(({ collection, label: name }) => (
+            <View key={collection} style={{ flexGrow: 1, flexBasis: "45%" }}>
+              <Button
+                small
+                tone="secondary"
+                label={name}
+                icon={<FileDown size={14} color={colors.text} />}
+                busy={sharing === collection}
+                onPress={() => share(collection, () => shareCollectionPdf(id, loaded.project.name, collection, name, { from, to, label }))}
+              />
+            </View>
+          ))}
+        </View>
+      </Card>
 
       <Card title={`Material purchases (${report.materials.length})`}>
         {report.materials.length === 0 ? <Empty text="No material purchases in this period." /> : null}

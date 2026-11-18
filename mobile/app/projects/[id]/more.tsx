@@ -1,47 +1,38 @@
-import { router, useLocalSearchParams } from "expo-router";
-import { BarChart3, ChevronRight, ExternalLink, NotebookPen, Receipt, Settings, UserRound, Users } from "lucide-react-native";
+import { router, useNavigation } from "expo-router";
+import { BarChart3, ChevronRight, NotebookPen, Receipt, Settings, UserRound, Users } from "lucide-react-native";
 import type { ReactNode } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
-import { API_URL } from "../../../src/api";
-import { colors, radius } from "../../../src/theme";
-import { Screen, SectionTitle } from "../../../src/ui";
+import { Text, View } from "react-native";
+import { colors } from "../../../src/theme";
+import { PressableScale, Screen, SectionTitle, styles } from "../../../src/ui";
 
 /** Everything beyond the four main tabs, as on the website's "More" menu. */
 export default function More() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const web = (path: string) => () => Linking.openURL(`${API_URL}/projects/${id}${path}`);
+  // Sibling screens of this project's tabs: switch to them directly.
+  const navigation = useNavigation<{ navigate: (screen: string) => void }>();
+  const go = (screen: string) => () => navigation.navigate(screen);
   return (
     <Screen>
-      <Row icon={<NotebookPen size={20} color={colors.brand} />} label="Daily log" onPress={() => router.push(`/projects/${id}/daily-log`)} />
-      <Row icon={<BarChart3 size={20} color={colors.brand} />} label="Reports & PDF" onPress={() => router.push(`/projects/${id}/reports`)} />
-      <Row icon={<UserRound size={20} color={colors.brand} />} label="Your profile" onPress={() => router.push("/profile")} />
-      <SectionTitle text="On the website" />
-      <Row icon={<Receipt size={20} color={colors.muted} />} label="Bills & photos" onPress={web("/files")} external />
-      <Row icon={<Users size={20} color={colors.muted} />} label="Team" onPress={web("/team")} external />
-      <Row icon={<Settings size={20} color={colors.muted} />} label="Project settings" onPress={web("/settings")} external />
+      <SectionTitle text="Records" />
+      <Row icon={<NotebookPen size={20} color={colors.brand} />} label="Daily log" hint="Work done, weather, notes for each day" onPress={go("daily-log")} />
+      <Row icon={<Receipt size={20} color={colors.brand} />} label="Bills & photos" hint="Snap or upload bills, site photos and PDFs" onPress={go("files")} />
+      <Row icon={<BarChart3 size={20} color={colors.brand} />} label="Reports & PDF" hint="Daily, weekly, monthly reports to share" onPress={go("reports")} />
+      <SectionTitle text="Project" />
+      <Row icon={<Users size={20} color={colors.brand} />} label="Team" hint="Invite people to view or edit this project" onPress={go("team")} />
+      <Row icon={<Settings size={20} color={colors.brand} />} label="Project settings" hint="Name, budget, dates, status, delete" onPress={go("settings")} />
+      <Row icon={<UserRound size={20} color={colors.brand} />} label="Your profile" hint="Your name, phone, password, sign out" onPress={() => router.push("/profile")} />
     </Screen>
   );
 }
 
-function Row({ icon, label, onPress, external }: { icon: ReactNode; label: string; onPress: () => void; external?: boolean }) {
+function Row({ icon, label, hint, onPress }: { icon: ReactNode; label: string; hint: string; onPress: () => void }) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 12,
-        backgroundColor: colors.surface,
-        borderRadius: radius.md,
-        borderWidth: 1,
-        borderColor: colors.border,
-        padding: 16,
-        opacity: pressed ? 0.85 : 1,
-      })}
-    >
-      {icon}
-      <Text style={{ flex: 1, fontSize: 15, fontWeight: "600", color: colors.text }}>{label}</Text>
-      <View>{external ? <ExternalLink size={16} color={colors.faint} /> : <ChevronRight size={18} color={colors.faint} />}</View>
-    </Pressable>
+    <PressableScale onPress={onPress} accessibilityRole="button" style={[styles.card, { flexDirection: "row", alignItems: "center", gap: 14, padding: 14 }]}>
+      <View style={{ backgroundColor: colors.brandSoft, borderRadius: 12, padding: 10 }}>{icon}</View>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>{label}</Text>
+        <Text style={{ fontSize: 12, color: colors.muted }}>{hint}</Text>
+      </View>
+      <ChevronRight size={18} color={colors.faint} />
+    </PressableScale>
   );
 }

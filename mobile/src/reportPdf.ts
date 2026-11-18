@@ -1,7 +1,11 @@
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
+import { choiceLabel, getCollection, isFieldVisible, type CollectionName, type FieldDef } from "@/lib/collections";
 import { formatDate, formatNumber } from "@/lib/format";
+import { balanceDue } from "@/lib/ledger";
 import { PAYMENT_STATUS_LABEL, type PeriodReport } from "@/lib/period-report";
+import type { LedgerRecord } from "@/lib/types";
+import { loadRecords } from "./data";
 
 const MODE_NAME = { day: "Daily", week: "Weekly", month: "Monthly", total: "Day 1 to today", custom: "Custom dates" } as const;
 /** Money column cells: the heading says "(₹)", so the cells are plain amounts that line up. */
@@ -99,6 +103,11 @@ export async function sharePeriodReportPdf(report: PeriodReport, projectName: st
     ),
   ].join("");
 
+  await printAndShare(`${MODE_NAME[report.mode]} report - ${projectName}`, `${periodLabel} · Generated ${formatDate(new Date().toISOString())} by BuildLedger`, body, "Share report");
+}
+
+/** An A4 landscape page in the website PDF's style, printed to a file and opened in the share sheet. */
+async function printAndShare(title: string, sub: string, body: string, dialogTitle: string) {
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     @page { size: A4 landscape; margin: 14mm; }
     body { font-family: -apple-system, Roboto, Helvetica, Arial, sans-serif; color: #1c1917; font-size: 10px; }
@@ -111,10 +120,61 @@ export async function sharePeriodReportPdf(report: PeriodReport, projectName: st
     tfoot td { background: #fff1e6; font-weight: bold; }
     .r { text-align: right; } .note { color: #777; }
   </style></head><body><div class="bar"></div>
-  <h1>${esc(`${MODE_NAME[report.mode]} report - ${projectName}`)}</h1>
-  <p class="sub">${esc(periodLabel)} · Generated ${esc(formatDate(new Date().toISOString()))} by BuildLedger</p>
+  <h1>${esc(title)}</h1>
+  <p class="sub">${esc(sub)}</p>
   ${body}</body></html>`;
 
   const { uri } = await Print.printToFileAsync({ html, width: 842, height: 595 });
-  await Sharing.shareAsync(uri, { mimeType: "application/pdf", dialogTitle: "Share report", UTI: "com.adobe.pdf" });
+  await Sharing.shareAsync(uri, { mimeType: "application/pdf", dialogTitle, UTI: "com.adobe.pdf" });
+}
+
+/**
+ * One project list (materials, workers, attendance, transport, daily log) as a PDF table, like the
+ * website's "Download lists as PDF": names for linked entries, choice labels, rupee columns and totals.
+ * `period`: only entries dated from `from` to `to`.
+ */
+export async function shareCollectionPdf(projectId: string, projectName: string, collection: CollectionName, title: string, period?: { from: string; to: string; label: string }) {
+  const def = getCollection(collection);
+  const all = await loadRecords(projectId, collection);
+  const dateOf = (r: LedgerRecord) => String(r[def.dateField ?? ""] ?? r.createdAt.slice(0, 10));
+  const records = period ? all.filter((r) => dateOf(r) >= period.from && dateOf(r) <= period.to) : all;
+
+  const refNames = new Map<string, string>();
+  for (const ref of new Set(def.fields.flatMap((f) => (f.ref ? [f.ref] : [])))) {
+    const titleField = getCollection(ref).titleField;
+    for (const r of await loadRecords(projectId, ref)) refNames.set(r.id, String(r[titleField] ?? ""));
+  }
+  const show = (field: FieldDef, record: LedgerRecord): string => {
+    const value = record[field.name];
+    if (value === undefined || value === "" || !isFieldVisible(field, record)) return "-";
+    if (field.kind === "money") return money(Number(value));
+    if (field.kind === "number") return Number(value).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+    if (field.kind === "date") return formatDate(String(value));
+    if (field.kind === "select" || field.kind === "radio") return choiceLabel(def, field, record);
+    if (field.kind === "ref") return refNames.get(String(value)) ?? "(deleted)";
+    return String(value);
+  };
+
+  const fields = def.fields.filter((f) => !f.describes);
+  const hasBalance = def.fields.some((f) => f.name === "paidAmount");
+  const head = [...fields.map((f) => (f.kind === "money" ? `${f.label} (₹)` : f.label)), ...(hasBalance ? ["Balance due (₹)"] : [])];
+  const sorted = def.dateField ? [...records].sort((a, b) => String(a[def.dateField!]).localeCompare(String(b[def.dateField!]))) : records;
+  const rows = sorted.map((r) => {
+    const balance = balanceDue(r);
+    return [...fields.map((f) => show(f, r)), ...(hasBalance ? [balance > 0 ? money(balance) : "-"] : [])];
+  });
+  const right = [...fields.flatMap((f, i) => (f.kind === "money" || f.kind === "number" ? [i] : [])), ...(hasBalance ? [fields.length] : [])];
+
+  const sum = (pick: (r: LedgerRecord) => number) => money(records.reduce((s, r) => s + pick(r), 0));
+  const foot: string[] = head.map(() => "");
+  foot[0] = "Total";
+  const amountIndex = fields.findIndex((f) => f.name === "amount" && !f.showIf);
+  if (amountIndex >= 0) foot[amountIndex] = sum((r) => (typeof r.amount === "number" ? r.amount : 0));
+  const paidIndex = fields.findIndex((f) => f.name === "paidAmount");
+  if (paidIndex >= 0) foot[paidIndex] = sum((r) => (r.paymentStatus === "partial" ? Number(r.paidAmount) || 0 : 0));
+  if (hasBalance) foot[fields.length] = sum((r) => balanceDue(r));
+  const hasTotals = amountIndex >= 0 || paidIndex >= 0 || hasBalance;
+
+  const sub = `${period ? `${period.label} · ` : ""}${records.length} ${records.length === 1 ? "entry" : "entries"} · Generated ${formatDate(new Date().toISOString())} by BuildLedger`;
+  await printAndShare(`${title} - ${projectName}`, sub, table(title, head, rows, right, hasTotals && rows.length > 0 ? foot : undefined, "No entries in this period."), `Share ${title}`);
 }

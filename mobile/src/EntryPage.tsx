@@ -1,10 +1,9 @@
-import { useLocalSearchParams } from "expo-router";
 import { List } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import type { CatalogName } from "@/lib/catalogs";
 import { getCollection, type CollectionName } from "@/lib/collections";
 import type { LedgerRecord } from "@/lib/types";
-import { canWrite, loadProject, loadRecords, useLoad } from "./data";
+import { canWrite, loadProject, loadRecords, useLoad, useProjectId } from "./data";
 import { RecordForm } from "./RecordForm";
 import { RecordList, type Extra } from "./RecordList";
 import { colors } from "./theme";
@@ -31,7 +30,7 @@ export function EntryPage({
   /** More sections below the list (e.g. labour attendance). */
   footer?: (records: LedgerRecord[], reload: () => void) => ReactNode;
 }) {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useProjectId();
   const def = getCollection(collection);
   const { data, error, refreshing, reload, onRefresh } = useLoad(async () => {
     const [project, records] = await Promise.all([loadProject(id), loadRecords(id, collection)]);

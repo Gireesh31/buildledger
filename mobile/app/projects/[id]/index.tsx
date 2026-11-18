@@ -1,14 +1,14 @@
-import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatDate, formatINR, formatNumber } from "@/lib/format";
+import { projectStatuses, projectTypes } from "@/lib/validation";
 import { computeLedger, LEDGER_COLLECTIONS, outstandingBills } from "@/lib/ledger";
-import { loadCollections, loadProject, useLoad } from "../../../src/data";
+import { loadCollections, loadProject, useLoad, useProjectId } from "../../../src/data";
 import { colors } from "../../../src/theme";
 import { Card, Empty, Loading, Message, Screen, StatTile, TileGrid } from "../../../src/ui";
 
 /** Project overview: the same totals as the website (shared ledger code). */
 export default function Overview() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useProjectId();
   const { data, error, refreshing, onRefresh } = useLoad(async () => {
     const [project, records] = await Promise.all([loadProject(id), loadCollections(id, LEDGER_COLLECTIONS)]);
     return { project, records, ledger: computeLedger({ project, ...records }) };
@@ -42,6 +42,25 @@ export default function Overview() {
         <StatTile label="Owed to workers" value={formatINR(ledger.workerDueTotal)} critical={ledger.workerDueTotal > 0} />
         <StatTile label="Unpaid bills" value={formatINR(bills.amount)} hint={`${bills.count} bill${bills.count === 1 ? "" : "s"}`} critical={bills.amount > 0} />
       </TileGrid>
+
+      <Card title="Project details">
+        {[
+          ["Status", projectStatuses.find((s) => s.value === project.status)?.label ?? project.status],
+          ["Type", projectTypes.find((t) => t.value === project.projectType)?.label ?? "—"],
+          ["Location", project.location || "—"],
+          ["Budget", project.budget ? formatINR(project.budget) : "—"],
+          ["Built-up area", project.areaSqft ? `${formatNumber(project.areaSqft)} sq ft` : "—"],
+          ["Start date", project.startDate ? formatDate(project.startDate) : "—"],
+          ["Expected finish", project.endDate ? formatDate(project.endDate) : "—"],
+          ["Your access", project.role === "owner" ? "Owner" : project.role === "editor" ? "Can edit" : "View only"],
+        ].map(([label, value]) => (
+          <View key={label} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 8 }}>
+            <Text style={{ color: colors.muted }}>{label}</Text>
+            <Text style={{ flexShrink: 1, textAlign: "right", fontWeight: "600", color: colors.text }}>{value}</Text>
+          </View>
+        ))}
+        {project.description ? <Text style={{ color: colors.text, paddingTop: 4 }}>{project.description}</Text> : null}
+      </Card>
 
       <Card title="Spend by category">
         {ledger.byCategory.length === 0 ? (

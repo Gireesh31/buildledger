@@ -18,7 +18,10 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.buildledger.app"
+      "package": "com.buildledger.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "scheme": "buildledger",
     "plugins": [
@@ -35,6 +38,17 @@
         }
       ],
       "expo-sharing"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "ec843f22-22e2-40c1-b734-5638a549bb72"
+      }
+    },
+    "owner": "gireeshtp"
   }
 }

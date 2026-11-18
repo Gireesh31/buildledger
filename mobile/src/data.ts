@@ -1,8 +1,27 @@
-import { useFocusEffect } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useFocusEffect, useGlobalSearchParams, useLocalSearchParams } from "expo-router";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
 import type { CollectionName } from "@/lib/collections";
 import type { LedgerRecord, Project, ProjectRole } from "@/lib/types";
 import { api, errorMessage } from "./api";
+
+/** The open project's id, set once by the project layout so every tab sees it (tab screens can lose route params). */
+export const ProjectIdContext = createContext("");
+
+const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
+
+/** The id from the route, for the project layout itself. */
+export function useRouteProjectId() {
+  const local = useLocalSearchParams<{ id?: string | string[] }>();
+  const global = useGlobalSearchParams<{ id?: string | string[] }>();
+  return first(local.id) || first(global.id);
+}
+
+/** The open project's id, inside any screen of a project. */
+export function useProjectId() {
+  const fromLayout = useContext(ProjectIdContext);
+  const fromRoute = useRouteProjectId();
+  return fromLayout || fromRoute;
+}
 
 export type ProjectWithRole = Project & { role: ProjectRole };
 

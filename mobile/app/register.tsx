@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Text } from "react-native";
-import { errorMessage } from "../src/api";
+import { errorMessage, openWebsite } from "../src/api";
 import { useAuth } from "../src/auth";
 import { colors } from "../src/theme";
 import { Button, Card, Field, Input, Message, Screen } from "../src/ui";
@@ -47,6 +47,13 @@ export default function RegisterScreen() {
           <Input value={confirm} onChangeText={setConfirm} secureTextEntry autoComplete="new-password" />
         </Field>
         <Button label="Create account" busy={pending} disabled={!name || !email || password.length < MIN_PASSWORD || !confirm} onPress={submit} />
+        <Text style={{ textAlign: "center", color: colors.muted, fontSize: 13 }}>
+          By creating an account you agree to our{" "}
+          <Text onPress={() => openWebsite("/privacy")} style={{ color: colors.text, fontWeight: "600", textDecorationLine: "underline" }}>
+            privacy policy
+          </Text>
+          .
+        </Text>
       </Card>
     </Screen>
   );
