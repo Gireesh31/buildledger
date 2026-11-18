@@ -19,9 +19,11 @@ interface UserRow {
   photo_updated_at: string | null;
   created_at: string;
   onboarded_at: string | null;
+  email_verified_at: string | null;
 }
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+const VERIFY_TOKEN_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 
 /** Splits a single full name at the first space. */
 function splitName(name: string): { firstName: string; lastName: string } {
@@ -44,6 +46,7 @@ function fromRow(row: UserRow): StoredUser {
     ...(photoUrl && { photoUrl }),
     createdAt: iso(row.created_at)!,
     ...(row.onboarded_at && { onboardedAt: iso(row.onboarded_at) }),
+    ...(row.email_verified_at && { emailVerifiedAt: iso(row.email_verified_at) }),
     passwordHash: row.password_hash,
   };
 }
@@ -75,12 +78,20 @@ export async function findUserWithPasswordById(id: string): Promise<StoredUser |
   return findRow("id", id);
 }
 
-export async function createUser(input: { name: string; email: string; password: string }): Promise<User | null> {
+/** `verified` is for accounts whose email was already proven (Google sign-in). */
+export async function createUser(input: { name: string; email: string; password: string; verified?: boolean }): Promise<User | null> {
   const passwordHash = await hashPassword(input.password);
   const { firstName, lastName } = splitName(input.name);
   const { data, error } = await (await db())
     .from("users")
-    .insert({ name: input.name, first_name: firstName, last_name: lastName, email: input.email, password_hash: passwordHash })
+    .insert({
+      name: input.name,
+      first_name: firstName,
+      last_name: lastName,
+      email: input.email,
+      password_hash: passwordHash,
+      email_verified_at: input.verified ? new Date().toISOString() : null,
+    })
     .select("*")
     .single<UserRow>();
   if (isUniqueViolation(error)) return null;
@@ -92,26 +103,40 @@ export async function updatePassword(userId: string, password: string) {
   must(await (await db()).from("users").update({ password_hash: passwordHash }).eq("id", userId));
 }
 
-export async function createResetToken(userId: string): Promise<string> {
+type TokenTable = "reset_tokens" | "email_verifications";
+
+/** A single-use emailed link: only its hash is stored. One live link per user; expired ones are cleaned up along the way. */
+async function issueToken(table: TokenTable, userId: string, ttlMs: number): Promise<string> {
   const token = generateToken();
   const client = await db();
-  // One live link per user; expired links are cleaned up along the way.
-  must(await client.from("reset_tokens").delete().or(`user_id.eq.${userId},expires_at.lt.${new Date().toISOString()}`));
-  must(
-    await client
-      .from("reset_tokens")
-      .insert({ token_hash: hashToken(token), user_id: userId, expires_at: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString() }),
-  );
+  must(await client.from(table).delete().or(`user_id.eq.${userId},expires_at.lt.${new Date().toISOString()}`));
+  must(await client.from(table).insert({ token_hash: hashToken(token), user_id: userId, expires_at: new Date(Date.now() + ttlMs).toISOString() }));
   return token;
 }
 
 /** Returns the user id if the token is valid, and invalidates it either way. */
-export async function consumeResetToken(token: string): Promise<string | null> {
-  const rows = must(
-    await (await db()).from("reset_tokens").delete().eq("token_hash", hashToken(token)).select("user_id, expires_at"),
-  ) as { user_id: string; expires_at: string }[];
+async function consumeToken(table: TokenTable, token: string): Promise<string | null> {
+  const rows = must(await (await db()).from(table).delete().eq("token_hash", hashToken(token)).select("user_id, expires_at")) as {
+    user_id: string;
+    expires_at: string;
+  }[];
   const match = rows[0];
   return match && Date.parse(match.expires_at) > Date.now() ? match.user_id : null;
+}
+
+export const createResetToken = (userId: string) => issueToken("reset_tokens", userId, RESET_TOKEN_TTL_MS);
+export const consumeResetToken = (token: string) => consumeToken("reset_tokens", token);
+export const createEmailVerificationToken = (userId: string) => issueToken("email_verifications", userId, VERIFY_TOKEN_TTL_MS);
+
+/** Marks the email verified if the link is valid; returns the user id. */
+export async function consumeEmailVerificationToken(token: string): Promise<string | null> {
+  const userId = await consumeToken("email_verifications", token);
+  if (userId) await setEmailVerified(userId, true);
+  return userId;
+}
+
+export async function setEmailVerified(userId: string, verified: boolean) {
+  must(await (await db()).from("users").update({ email_verified_at: verified ? new Date().toISOString() : null }).eq("id", userId));
 }
 
 export async function markOnboarded(userId: string) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { appUrl, sendEmail } from "@/lib/server/mailer";
 import { createResetToken, findUserWithPasswordByEmail } from "@/lib/server/user-store";
 import { parseEmail } from "@/lib/validation";
 
@@ -13,14 +14,11 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ message: MESSAGE });
 
   const token = await createResetToken(user.id);
-  const resetUrl = `${new URL(request.url).origin}/reset-password?token=${token}`;
-
-  // No email service yet: log the link. Replace with a real mailer before going live.
-  console.log(`[auth] Password reset link for ${email}: ${resetUrl}`);
-
-  return NextResponse.json({
-    message: MESSAGE,
-    // Exposed in development only, so the flow can be tested without email.
-    ...(process.env.NODE_ENV !== "production" && { resetUrl }),
+  // The link goes only to the account's mailbox: never into the response, and never into production logs.
+  await sendEmail({
+    to: email,
+    subject: "Reset your BuildLedger password",
+    text: `Someone asked to reset the password for your BuildLedger account.\n\nSet a new password (the link works for 1 hour):\n${appUrl(request)}/reset-password?token=${token}\n\nIf this wasn't you, ignore this email.`,
   });
+  return NextResponse.json({ message: MESSAGE });
 }

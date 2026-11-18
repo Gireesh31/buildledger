@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendVerificationEmail } from "@/lib/server/email-verification";
 import { createSession } from "@/lib/server/session";
 import { createUser } from "@/lib/server/user-store";
 import { PASSWORD_MIN_LENGTH, parseEmail, parseName, parsePassword } from "@/lib/validation";
@@ -23,6 +24,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
   }
 
+  // A failed send isn't fatal: the profile has a "send again" button.
+  await sendVerificationEmail(user, request);
   const token = await createSession(user.id);
   // Only the mobile app asks for the token (see the login route).
   return NextResponse.json({ user, ...(body?.client === "mobile" && { token }) }, { status: 201 });

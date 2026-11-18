@@ -34,6 +34,8 @@ export interface User {
   photoUrl?: string;
   createdAt: string;
   onboardedAt?: string;
+  /** Set once the person proves they own the email (link in an email, or Google sign-in). Project invites need it. */
+  emailVerifiedAt?: string;
 }
 
 export type InviteRole = "editor" | "viewer";

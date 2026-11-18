@@ -3,9 +3,10 @@ import { deletePhotoFile } from "@/lib/server/avatar-store";
 import { verifyPassword } from "@/lib/server/crypto";
 import { deleteInvitesForEmail, moveInvitesToEmail } from "@/lib/server/invite-store";
 import { deleteProjectAndData } from "@/lib/server/project-cleanup";
-import { listAllProjects } from "@/lib/server/project-store";
+import { listProjectsFor } from "@/lib/server/project-store";
 import { destroyOtherSessions, endAllSessions, getCurrentUser } from "@/lib/server/session";
-import { deleteUser, findUserWithPasswordById, updatePassword, updateProfile } from "@/lib/server/user-store";
+import { sendVerificationEmail } from "@/lib/server/email-verification";
+import { deleteUser, findUserWithPasswordById, setEmailVerified, updatePassword, updateProfile } from "@/lib/server/user-store";
 import { PASSWORD_MIN_LENGTH, parseEmail, parsePassword } from "@/lib/validation";
 
 const signedOut = () => NextResponse.json({ error: "Please sign in." }, { status: 401 });
@@ -54,13 +55,17 @@ export async function PUT(request: Request) {
   const updated = await updateProfile(user.id, { firstName, lastName, email, phone, location });
   if (updated === "email-taken") return bad("Another account already uses this email.", 409);
   if (!updated) return signedOut();
-  // Project invites are by email, so they follow the new address.
-  if (emailChanged) await moveInvitesToEmail(user.email, email);
+  // Project invites are by email, so they follow the new address, which has to be confirmed again.
+  if (emailChanged) {
+    await moveInvitesToEmail(user.email, email);
+    await setEmailVerified(user.id, false);
+    await sendVerificationEmail(updated, request);
+  }
   if (newPassword) {
     await updatePassword(user.id, newPassword);
     await destroyOtherSessions(user.id);
   }
-  return NextResponse.json({ user: updated, passwordChanged: Boolean(newPassword) });
+  return NextResponse.json({ user: emailChanged ? { ...updated, emailVerifiedAt: undefined } : updated, passwordChanged: Boolean(newPassword) });
 }
 
 /**
@@ -78,7 +83,7 @@ export async function DELETE(request: Request) {
     return bad("Password is incorrect.", 403);
   }
 
-  const owned = (await listAllProjects()).filter((p) => p.ownerId === user.id);
+  const owned = await listProjectsFor(user.id);
   for (const project of owned) await deleteProjectAndData(project.id);
   await deleteInvitesForEmail(user.email);
   await endAllSessions(user.id);

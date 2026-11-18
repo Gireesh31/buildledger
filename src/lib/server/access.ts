@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cache } from "react";
 import type { Project, ProjectRole, User } from "@/lib/types";
 import { listInvitesForEmail } from "./invite-store";
-import { getProject, listAllProjects } from "./project-store";
+import { getProject, listProjectsFor } from "./project-store";
 import { getCurrentUser } from "./session";
 
 export interface ProjectAccess {
@@ -21,13 +21,16 @@ export const getProjectAccess = cache(async (projectId: string): Promise<Project
   const project = await getProject(projectId);
   if (!project) return null;
   if (project.ownerId === user.id) return { user, project, role: "owner" };
+  // Invites are by email, so they only count once the person has proven they own that email.
+  if (!user.emailVerifiedAt) return null;
   const invite = (await listInvitesForEmail(user.email)).find((i) => i.projectId === projectId);
   return invite ? { user, project, role: invite.role } : null;
 });
 
 export async function listAccessibleProjects(user: User): Promise<{ project: Project; role: ProjectRole }[]> {
-  const [projects, invites] = await Promise.all([listAllProjects(), listInvitesForEmail(user.email)]);
+  const invites = user.emailVerifiedAt ? await listInvitesForEmail(user.email) : [];
   const invitedRoles = new Map(invites.map((i) => [i.projectId, i.role]));
+  const projects = await listProjectsFor(user.id, [...invitedRoles.keys()]);
   return projects
     .flatMap((project): { project: Project; role: ProjectRole }[] => {
       if (project.ownerId === user.id) return [{ project, role: "owner" }];

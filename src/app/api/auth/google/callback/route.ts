@@ -2,8 +2,8 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { generateToken } from "@/lib/server/crypto";
 import { fetchGoogleProfile, GOOGLE_STATE_COOKIE, googleRedirectUri, safeNext } from "@/lib/server/google";
-import { createSession } from "@/lib/server/session";
-import { createUser, findUserWithPasswordByEmail } from "@/lib/server/user-store";
+import { createSession, destroyAllSessions } from "@/lib/server/session";
+import { createUser, findUserWithPasswordByEmail, setEmailVerified, updatePassword } from "@/lib/server/user-store";
 
 /** Google sends the browser back here: sign in the matching account, or create one. */
 export async function GET(request: Request) {
@@ -25,10 +25,18 @@ export async function GET(request: Request) {
 
   // Same email as an existing account signs into it; otherwise a new account is made.
   // New accounts get a random password nobody knows; "Forgot password" can set one later.
-  let userId = (await findUserWithPasswordByEmail(profile.email))?.id;
+  const existing = await findUserWithPasswordByEmail(profile.email);
+  let userId = existing?.id;
   let isNew = false;
+  if (existing && !existing.emailVerifiedAt) {
+    // Google just proved who owns this email, but whoever registered it never did. They may not be
+    // the same person, so their password and sessions stop working before the owner is let in.
+    await updatePassword(existing.id, generateToken());
+    await destroyAllSessions(existing.id);
+    await setEmailVerified(existing.id, true);
+  }
   if (!userId) {
-    const created = await createUser({ name: profile.name, email: profile.email, password: generateToken() });
+    const created = await createUser({ name: profile.name, email: profile.email, password: generateToken(), verified: true });
     userId = created?.id ?? (await findUserWithPasswordByEmail(profile.email))?.id;
     isNew = Boolean(created);
   }

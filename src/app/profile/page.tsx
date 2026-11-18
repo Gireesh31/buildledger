@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ProfileForm, ProfilePhoto } from "@/components/account/AccountForms";
+import { VerifyEmailNotice } from "@/components/account/VerifyEmailNotice";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { BackButton } from "@/components/ui/BackButton";
 import { formatDate } from "@/lib/format";
-import { listAllProjects } from "@/lib/server/project-store";
+import { listProjectsFor } from "@/lib/server/project-store";
 import { getCurrentUser } from "@/lib/server/session";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -29,7 +30,7 @@ export default function ProfilePage() {
 async function ProfileContent() {
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/profile");
-  const ownedProjects = (await listAllProjects()).filter((p) => p.ownerId === user.id).length;
+  const ownedProjects = (await listProjectsFor(user.id)).length;
   const initials = [user.firstName, user.lastName]
     .filter(Boolean)
     .map((part) => part[0])
@@ -52,6 +53,7 @@ async function ProfileContent() {
             <p className="text-sm text-foreground/60">{user.email}</p>
           </div>
         </div>
+        {!user.emailVerifiedAt && <VerifyEmailNotice email={user.email} />}
         <ProfileForm
           firstName={user.firstName}
           lastName={user.lastName}

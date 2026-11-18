@@ -56,8 +56,12 @@ function toColumns(fields: ProjectFields) {
   );
 }
 
-export async function listAllProjects(): Promise<Project[]> {
-  return (must(await (await db()).from("projects").select("*")) as ProjectRow[]).map(fromRow);
+/** Projects the user owns, plus the given (invited) project ids. Filtered in the query, so one user's rows never count against another's. */
+export async function listProjectsFor(ownerId: string, invitedIds: string[] = []): Promise<Project[]> {
+  if (!isUuid(ownerId)) return [];
+  const ids = invitedIds.filter(isUuid);
+  const filter = ids.length ? `owner_id.eq.${ownerId},id.in.(${ids.join(",")})` : `owner_id.eq.${ownerId}`;
+  return (must(await (await db()).from("projects").select("*").or(filter)) as ProjectRow[]).map(fromRow);
 }
 
 export async function getProject(id: string): Promise<Project | undefined> {
