@@ -1,6 +1,7 @@
 import { Pencil, Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, View } from "react-native";
+import { Text } from "./text";
 import type { CatalogName } from "@/lib/catalogs";
 import { choiceLabel, getCollection, isFieldVisible, type CollectionName, type FieldDef } from "@/lib/collections";
 import { formatDate, formatINR, formatNumber } from "@/lib/format";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text } from "react-native";
+import { Text } from "./text";
 import { api, errorMessage } from "./api";
 import { colors } from "./theme";
 import { Button, Card, Message } from "./ui";

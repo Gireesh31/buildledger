@@ -1,7 +1,8 @@
 import { router } from "expo-router";
 import { Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, Platform, Text } from "react-native";
+import { Alert, Platform } from "react-native";
+import { Text } from "../../../src/text";
 import { api, errorMessage } from "../../../src/api";
 import { loadProject, useLoad, useProjectId } from "../../../src/data";
 import { ProjectForm } from "../../../src/ProjectForm";
@@ -11,7 +12,7 @@ import { Button, Card, Loading, Message, Screen } from "../../../src/ui";
 /** Edit the project's details, or delete it (owner only), as on the website's Settings page. */
 export default function Settings() {
   const id = useProjectId();
-  const { data: project, error, refreshing, onRefresh } = useLoad(() => loadProject(id));
+  const { data: project, error, refreshing, onRefresh } = useLoad(() => loadProject(id), `settings:${id}`);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   if (!project) return error ? <Screen onRefresh={onRefresh}><Message text={error} /></Screen> : <Loading />;

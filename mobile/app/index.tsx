@@ -1,7 +1,8 @@
 import { router } from "expo-router";
 import { Building2, ChevronRight, Plus, UserRound } from "lucide-react-native";
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "../src/text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatINR, formatINRCompact } from "@/lib/format";
 import { computeLedger, LEDGER_COLLECTIONS } from "@/lib/ledger";
@@ -10,9 +11,10 @@ import { projectStatuses } from "@/lib/validation";
 import { api } from "../src/api";
 import { afterWelcome, useAuth } from "../src/auth";
 import { loadCollections, useLoad } from "../src/data";
-import { colors } from "../src/theme";
+import { colors, fonts } from "../src/theme";
 import { VerifyEmailCard } from "../src/VerifyEmailCard";
-import { Badge, Button, Empty, FadeIn, Loading, Message, PressableScale, Screen, SectionTitle, StatTile, styles, TileGrid } from "../src/ui";
+import { ConstructionScene } from "../src/construction-scene";
+import { Badge, Button, Empty, Eyebrow, FadeIn, Glow, HazardTape, Loading, Message, PressableScale, Screen, SectionTitle, StatTile, styles, TileGrid } from "../src/ui";
 
 /** Home: every project you own or were invited to, with what's been spent. */
 export default function Dashboard() {
@@ -22,7 +24,7 @@ export default function Dashboard() {
     return Promise.all(
       accessible.map(async ({ project, role }) => ({ project, role, ledger: computeLedger({ project, ...(await loadCollections(project.id, LEDGER_COLLECTIONS)) }) })),
     );
-  });
+  }, `home`);
 
   // Coming from "Get started" on the welcome screen.
   useEffect(() => {
@@ -42,24 +44,32 @@ export default function Dashboard() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Full-width banner under the status bar. */}
-      <View style={{ backgroundColor: colors.brand, paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 26, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+      <View style={{ backgroundColor: colors.ink, paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28, overflow: "hidden" }}>
+        {/* A warm glow in the corner, like the website hero. */}
+        <Glow />
+        <ConstructionScene size={0.82} style={{ position: "absolute", right: -4, bottom: 0, opacity: 0.9 }} />
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <View style={{ backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 10, padding: 6 }}>
+            <View style={{ backgroundColor: colors.brand, borderRadius: 10, borderCurve: "continuous", padding: 6 }}>
               <Building2 size={18} color="#fff" />
             </View>
-            <Text style={{ color: "#fff", fontSize: 18, fontWeight: "800" }}>BuildLedger</Text>
+            <Text style={{ color: "#fff", fontSize: 21, fontWeight: "800" }}>
+              Build<Text style={{ color: colors.brand, fontWeight: "800" }}>Ledger</Text>
+            </Text>
           </View>
-          <Pressable onPress={() => router.push("/profile")} hitSlop={10} accessibilityLabel="Your profile" style={{ backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 999, padding: 8 }}>
+          <Pressable onPress={() => router.push("/profile")} hitSlop={10} accessibilityLabel="Your profile" style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 999, padding: 9 }}>
             <UserRound size={20} color="#fff" />
           </Pressable>
         </View>
         <FadeIn delay={60}>
-          <Text style={{ color: "rgba(255,255,255,0.85)", marginTop: 18, fontWeight: "600" }}>Dashboard</Text>
-          <Text style={{ fontSize: 28, fontWeight: "800", color: "#fff" }}>Namaste, {first}</Text>
-          <Text style={{ color: "rgba(255,255,255,0.85)" }}>Here’s where your sites stand today.</Text>
+          <View style={{ marginTop: 22, gap: 4 }}>
+            <Eyebrow text="Dashboard" light />
+            <Text style={{ fontSize: 36, fontWeight: "800", color: "#fff", letterSpacing: -0.5 }}>Namaste, {first}</Text>
+            <Text style={{ color: "rgba(255,255,255,0.7)" }}>Here’s where your sites stand today.</Text>
+          </View>
         </FadeIn>
       </View>
+      <HazardTape />
 
       {!data ? (
         error ? (
@@ -101,11 +111,11 @@ function ProjectCard({ project, role, spent, budget }: { project: Project; role:
   return (
     <PressableScale onPress={() => router.push(`/projects/${project.id}`)} accessibilityRole="button" style={[styles.card, { gap: 12 }]}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-        <View style={{ backgroundColor: colors.brandSoft, borderRadius: 12, padding: 10 }}>
+        <View style={{ backgroundColor: colors.brandSoft, borderRadius: 14, borderCurve: "continuous", padding: 11 }}>
           <Building2 size={22} color={colors.brand} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={{ fontWeight: "700", fontSize: 17, color: colors.text }} numberOfLines={1}>
+          <Text style={{ fontWeight: "800", fontSize: 21, color: colors.text }} numberOfLines={1}>
             {project.name}
           </Text>
           <Text style={{ color: colors.muted, fontSize: 13 }} numberOfLines={1}>
@@ -117,16 +127,16 @@ function ProjectCard({ project, role, spent, budget }: { project: Project; role:
 
       <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between" }}>
         <View>
-          <Text style={{ fontSize: 12, color: colors.muted }}>Spent</Text>
-          <Text style={{ fontSize: 20, fontWeight: "800", color: colors.text }}>{formatINR(spent)}</Text>
+          <Text style={{ fontSize: 10.5, color: colors.muted, fontFamily: fonts.mono, letterSpacing: 0.8, textTransform: "uppercase" }}>Spent</Text>
+          <Text style={{ fontSize: 27, fontWeight: "800", color: colors.text, fontVariant: ["tabular-nums"] }}>{formatINR(spent)}</Text>
         </View>
         <View style={{ alignItems: "flex-end" }}>
-          <Text style={{ fontSize: 12, color: colors.muted }}>Budget</Text>
+          <Text style={{ fontSize: 10.5, color: colors.muted, fontFamily: fonts.mono, letterSpacing: 0.8, textTransform: "uppercase" }}>Budget</Text>
           <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>{budget > 0 ? formatINRCompact(budget) : "Not set"}</Text>
         </View>
       </View>
       {budget > 0 ? (
-        <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.border, overflow: "hidden" }}>
+        <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.field, overflow: "hidden" }}>
           <View style={{ width: `${Math.max(used * 100, 2)}%`, height: 8, borderRadius: 4, backgroundColor: spent > budget ? colors.critical : colors.brand }} />
         </View>
       ) : null}

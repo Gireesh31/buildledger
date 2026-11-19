@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "../../../src/text";
 import { formatDate, formatINR, formatNumber } from "@/lib/format";
 import { projectStatuses, projectTypes } from "@/lib/validation";
 import { computeLedger, LEDGER_COLLECTIONS, outstandingBills } from "@/lib/ledger";
@@ -12,7 +13,7 @@ export default function Overview() {
   const { data, error, refreshing, onRefresh } = useLoad(async () => {
     const [project, records] = await Promise.all([loadProject(id), loadCollections(id, LEDGER_COLLECTIONS)]);
     return { project, records, ledger: computeLedger({ project, ...records }) };
-  });
+  }, `overview:${id}`);
   if (!data) return error ? <Screen onRefresh={onRefresh}><Message text={error} /></Screen> : <Loading />;
   const { project, ledger, records } = data;
   const bills = outstandingBills([...records.materials, ...records.transport]);

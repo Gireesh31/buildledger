@@ -37,7 +37,8 @@
           "cameraPermission": "BuildLedger uses the camera to photograph bills."
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-font"
     ],
     "extra": {
       "router": {

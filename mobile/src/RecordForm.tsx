@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "./text";
 import { catalogs, type Catalog, type CatalogName } from "@/lib/catalogs";
 import { computeField, getCollection, isFieldVisible, type CollectionName, type FieldDef, type Option } from "@/lib/collections";
 import { formatINR, todayISO } from "@/lib/format";
@@ -23,7 +24,7 @@ function initialValues(fields: readonly FieldDef[], record?: LedgerRecord, blank
     else if (blank.includes(field.name)) values[field.name] = "";
     else if (field.defaultValue !== undefined) values[field.name] = field.defaultValue;
     else if (field.kind === "date") values[field.name] = todayISO();
-    else if ((field.kind === "select" || field.kind === "radio") && field.required) values[field.name] = field.options?.[0]?.value ?? "";
+    // Like the website: nothing is chosen for you (only a field's own default, e.g. "Paid").
     else values[field.name] = "";
   }
   return values;
@@ -106,7 +107,15 @@ export function RecordForm({
     setActive((current) => (current === index ? Math.max(0, index - 1) : current > index ? current - 1 : current));
   }
 
-  const totalOf = (item: Values) => def.fields.filter((f) => f.computed).reduce((s, f) => s + computeField(def, f, item), 0);
+  /** A picked item double-tapped: drop its entry, or clear the form when it's the only one. */
+  function unpickItem(index: number) {
+    if (many && items.length > 1) return removeItem(index);
+    const cleared = initialValues(def.fields, undefined, blank);
+    if (def.dateField && items[index]?.[def.dateField]) cleared[def.dateField] = items[index][def.dateField];
+    setItems((list) => list.map((item, i) => (i === index ? cleared : item)));
+  }
+
+  const totalOf =(item: Values) => def.fields.filter((f) => f.computed).reduce((s, f) => s + computeField(def, f, item), 0);
 
   async function save() {
     setPending(true);
@@ -142,6 +151,7 @@ export function RecordForm({
           onChange={(index, changes) => Object.entries(changes).forEach(([name, value]) => set(index, name, value))}
           onPick={pickItem}
           onRemove={many && items.length > 1 ? removeItem : undefined}
+          onUnpick={unpickItem}
         />
       ) : null}
 

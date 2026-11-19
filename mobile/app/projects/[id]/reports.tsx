@@ -1,7 +1,8 @@
 import { FileDown } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import type { CollectionName } from "@/lib/collections";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
+import { Text } from "../../../src/text";
 import { formatDate, formatINR, formatNumber, todayISO } from "@/lib/format";
 import { LEDGER_COLLECTIONS } from "@/lib/ledger";
 import { buildPeriodReport, periodRange, type PeriodMode } from "@/lib/period-report";
@@ -40,7 +41,7 @@ export default function Reports() {
   const { data: loaded, error, refreshing, onRefresh } = useLoad(async () => {
     const [project, records] = await Promise.all([loadProject(id), loadCollections(id, LEDGER_COLLECTIONS)]);
     return { project, data: buildReportData(project, records) };
-  });
+  }, `reports:${id}`);
   const [mode, setMode] = useState<PeriodMode>("total");
   const [date, setDate] = useState(todayISO());
   const [endDate, setEndDate] = useState(todayISO());

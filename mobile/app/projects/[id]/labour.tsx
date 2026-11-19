@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, View } from "react-native";
+import { Text } from "../../../src/text";
 import { isTeam, optionLabel, trades } from "@/lib/collections";
 import { formatINR, formatNumber, todayISO } from "@/lib/format";
 import { computeLedger } from "@/lib/ledger";
@@ -17,7 +18,7 @@ const duesOf = (workers: LedgerRecord[], attendance: LedgerRecord[]) =>
 
 export default function Labour() {
   const id = useProjectId();
-  const attendance = useLoad(() => loadRecords(id, "attendance"));
+  const attendance = useLoad(() => loadRecords(id, "attendance"), `attendance:${id}`);
 
   return (
     <EntryPage

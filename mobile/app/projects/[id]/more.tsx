@@ -1,7 +1,8 @@
 import { router, useNavigation } from "expo-router";
 import { BarChart3, ChevronRight, NotebookPen, Receipt, Settings, UserRound, Users } from "lucide-react-native";
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "../../../src/text";
 import { colors } from "../../../src/theme";
 import { PressableScale, Screen, SectionTitle, styles } from "../../../src/ui";
 

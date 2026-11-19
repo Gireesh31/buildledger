@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { loadProject, ProjectIdContext, useRouteProjectId } from "../../../src/data";
-import { colors } from "../../../src/theme";
+import { HeaderBackground, headerTitleStyle } from "../../../src/header";
+import { colors, fonts } from "../../../src/theme";
 
 /** Kept out of the tab bar but still reachable (`href: null` would make them redirect to Overview). */
 const HIDDEN = { tabBarButton: () => null, tabBarItemStyle: { display: "none" } } as const;
@@ -31,11 +32,11 @@ export default function ProjectTabs() {
       screenOptions={({ route, navigation }) => ({
         tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, height: 66 + insets.bottom, paddingTop: 6, paddingBottom: insets.bottom + 8 },
-        headerStyle: { backgroundColor: colors.brand },
+        tabBarLabelStyle: { fontSize: 11, fontFamily: fonts.semibold },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopWidth: 0, boxShadow: "0 -6px 20px -12px rgba(22, 22, 26, 0.25)", height: 68 + insets.bottom, paddingTop: 8, paddingBottom: insets.bottom + 8 },
+        headerBackground: HeaderBackground,
         headerTintColor: "#fff",
-        headerTitleStyle: { fontWeight: "700", color: "#fff" },
+        headerTitleStyle: { ...headerTitleStyle, fontSize: 18 },
         headerTitleAlign: "center",
         headerShadowVisible: false,
         animation: "shift",

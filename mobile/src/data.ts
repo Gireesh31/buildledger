@@ -25,12 +25,19 @@ export function useProjectId() {
 
 export type ProjectWithRole = Project & { role: ProjectRole };
 
+/** Last data each screen showed, so coming back to it is instant (cleared on sign-out). */
+const loadCache = new Map<string, unknown>();
+export const clearLoadCache = () => loadCache.clear();
+
 /**
  * Loads data when a screen opens and again each time you come back to it, so it's never stale.
+ * With a `cacheKey`, the screen first shows what it showed last time and refreshes in the background.
  * `reload` also drives pull-to-refresh.
  */
-export function useLoad<T>(load: () => Promise<T>) {
-  const [data, setData] = useState<T | undefined>(undefined);
+export function useLoad<T>(load: () => Promise<T>, cacheKey?: string) {
+  const [data, setData] = useState<T | undefined>(() => (cacheKey ? (loadCache.get(cacheKey) as T | undefined) : undefined));
+  const keyRef = useRef(cacheKey);
+  keyRef.current = cacheKey;
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const loadRef = useRef(load);
@@ -39,7 +46,9 @@ export function useLoad<T>(load: () => Promise<T>) {
   const reload = useCallback(async (pull = false) => {
     if (pull) setRefreshing(true);
     try {
-      setData(await loadRef.current());
+      const fresh = await loadRef.current();
+      if (keyRef.current) loadCache.set(keyRef.current, fresh);
+      setData(fresh);
       setError(null);
     } catch (e) {
       setError(errorMessage(e));

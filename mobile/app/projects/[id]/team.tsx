@@ -1,6 +1,7 @@
 import { Mail, Trash2, UserPlus } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, Platform, Pressable, Text, View } from "react-native";
+import { Alert, Platform, Pressable, View } from "react-native";
+import { Text } from "../../../src/text";
 import { formatDate } from "@/lib/format";
 import type { Invite } from "@/lib/types";
 import { api, errorMessage } from "../../../src/api";
@@ -21,7 +22,7 @@ export default function Team() {
   const { data, error, refreshing, reload, onRefresh } = useLoad(async () => {
     const [project, invites] = await Promise.all([loadProject(id), api<Invite[]>(`/api/projects/${id}/invites`)]);
     return { project, invites };
-  });
+  }, `team:${id}`);
   const [emails, setEmails] = useState("");
   const [role, setRole] = useState<"editor" | "viewer">("editor");
   const [pending, setPending] = useState(false);

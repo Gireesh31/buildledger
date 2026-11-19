@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "../src/text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api, errorMessage } from "../src/api";
 import { afterWelcome, useAuth } from "../src/auth";

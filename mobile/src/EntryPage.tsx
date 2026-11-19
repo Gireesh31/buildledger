@@ -35,7 +35,7 @@ export function EntryPage({
   const { data, error, refreshing, reload, onRefresh } = useLoad(async () => {
     const [project, records] = await Promise.all([loadProject(id), loadRecords(id, collection)]);
     return { project, records };
-  });
+  }, `entry:${collection}:${id}`);
   const [showSaved, setShowSaved] = useState(false);
   const [savedNote, setSavedNote] = useState<string | null>(null);
 

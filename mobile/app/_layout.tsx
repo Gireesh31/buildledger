@@ -1,11 +1,27 @@
+import { AnekLatin_700Bold, AnekLatin_800ExtraBold } from "@expo-google-fonts/anek-latin";
+import { IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono";
+import { IBMPlexSans_400Regular, IBMPlexSans_500Medium, IBMPlexSans_600SemiBold, IBMPlexSans_700Bold } from "@expo-google-fonts/ibm-plex-sans";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../src/auth";
+import { HeaderBackground, headerTitleStyle } from "../src/header";
 import { colors } from "../src/theme";
 import { Loading } from "../src/ui";
 
 export default function RootLayout() {
+  // The website's type: IBM Plex Sans for text, Anek Latin for headlines, IBM Plex Mono for labels.
+  const [fontsLoaded, fontError] = useFonts({
+    IBMPlexSans_400Regular,
+    IBMPlexSans_500Medium,
+    IBMPlexSans_600SemiBold,
+    IBMPlexSans_700Bold,
+    AnekLatin_700Bold,
+    AnekLatin_800ExtraBold,
+    IBMPlexMono_500Medium,
+  });
+  if (!fontsLoaded && !fontError) return <Loading />;
   return (
     <SafeAreaProvider>
       <AuthProvider>
@@ -25,9 +41,9 @@ function RootStack() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.brand },
+        headerBackground: HeaderBackground,
         headerTintColor: "#fff",
-        headerTitleStyle: { fontWeight: "700" },
+        headerTitleStyle,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: colors.background },
         animation: "slide_from_right",

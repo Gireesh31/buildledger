@@ -2,7 +2,8 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, FileText, ImagePlus, Trash2, Upload, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Alert, Image, Linking, Modal, Platform, Pressable, ScrollView, Text, View, type ImageStyle, type StyleProp } from "react-native";
+import { Alert, Image, Linking, Modal, Platform, Pressable, ScrollView, View, type ImageStyle, type StyleProp } from "react-native";
+import { Text } from "../../../src/text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatDate } from "@/lib/format";
 import type { Attachment, AttachmentKind } from "@/lib/types";
@@ -27,7 +28,7 @@ export default function Files() {
   const { data, error, refreshing, reload, onRefresh } = useLoad(async () => {
     const [project, files] = await Promise.all([loadProject(id), api<Attachment[]>(`/api/projects/${id}/files`)]);
     return { project, files: [...files].sort((a, b) => b.createdAt.localeCompare(a.createdAt)) };
-  });
+  }, `files:${id}`);
   const [filter, setFilter] = useState<AttachmentKind | "all">("all");
   const [picked, setPicked] = useState<Picked | null>(null);
   const [kind, setKind] = useState<AttachmentKind>("bill");

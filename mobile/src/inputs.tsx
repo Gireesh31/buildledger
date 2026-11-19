@@ -1,7 +1,8 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Calendar, Check, ChevronDown } from "lucide-react-native";
 import { useState } from "react";
-import { FlatList, Modal, Platform, Pressable, Text, View } from "react-native";
+import { FlatList, Modal, Platform, Pressable, View } from "react-native";
+import { Text } from "./text";
 import type { Option } from "@/lib/collections";
 import { formatDate } from "@/lib/format";
 import { colors, radius } from "./theme";

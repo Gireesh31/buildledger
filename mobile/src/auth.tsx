@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { User } from "@/lib/types";
 import { api, loadToken, saveToken, setSignedOutHandler } from "./api";
+import { clearLoadCache } from "./data";
 
 interface AuthState {
   /** undefined while the saved session is being checked. */
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setSignedOutHandler(() => {
       void saveToken(null);
+      clearLoadCache();
       setUser(null);
     });
     // Reopen where the person left off: a saved token that still works means they're signed in.
@@ -51,11 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await refresh();
       },
       async signOut() {
+        clearLoadCache();
         await api("/api/auth/logout", { method: "POST" }).catch(() => {});
         await saveToken(null);
         setUser(null);
       },
       async forget() {
+        clearLoadCache();
         await saveToken(null);
         setUser(null);
       },
