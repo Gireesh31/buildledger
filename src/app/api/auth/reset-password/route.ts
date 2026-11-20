@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { clientIp, limits, rateLimit } from "@/lib/server/rate-limit";
 import { destroyAllSessions } from "@/lib/server/session";
 import { consumeResetToken, updatePassword } from "@/lib/server/user-store";
 import { PASSWORD_MIN_LENGTH, parsePassword } from "@/lib/validation";
 
 export async function POST(request: Request) {
+  const limited = await rateLimit(limits.resetPasswordByIp(clientIp(request)));
+  if (limited) return limited;
   const body = await request.json().catch(() => null);
   const token = typeof body?.token === "string" ? body.token : "";
   const password = parsePassword(body?.password);

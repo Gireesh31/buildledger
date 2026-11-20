@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/server/crypto";
+import { clientIp, limits, rateLimit } from "@/lib/server/rate-limit";
 import { createSession } from "@/lib/server/session";
 import { findUserWithPasswordByEmail } from "@/lib/server/user-store";
 import { parseEmail } from "@/lib/validation";
@@ -8,6 +9,11 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const email = parseEmail(body?.email);
   const password = typeof body?.password === "string" ? body.password : "";
+
+  // Before checking the password, so guesses stop counting once the limit is reached.
+  const ip = clientIp(request);
+  const limited = await rateLimit(limits.loginByIp(ip), ...(email ? [limits.loginByEmail(email)] : []));
+  if (limited) return limited;
 
   const user = email ? await findUserWithPasswordByEmail(email) : undefined;
   // Same message for unknown email and wrong password, so accounts can't be enumerated.

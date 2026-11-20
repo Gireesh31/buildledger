@@ -1,11 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { User } from "@/lib/types";
-import { api, loadToken, saveToken, setSignedOutHandler } from "./api";
+import { api, ApiError, errorMessage, loadToken, saveToken, setSignedOutHandler } from "./api";
 import { clearLoadCache } from "./data";
 
 interface AuthState {
   /** undefined while the saved session is being checked. */
   user: User | null | undefined;
+  /** Set when the saved session couldn't be checked (no internet, server down): still signed in, just not reachable. */
+  startupError: string | null;
+  /** Tries the saved session again after startupError. */
+  retry(): void;
   signIn(email: string, password: string): Promise<void>;
   register(name: string, email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
@@ -21,10 +25,25 @@ export const afterWelcome: { route: "/projects/new" | null } = { route: null };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [startupError, setStartupError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setUser(await api<User>("/api/account"));
   }, []);
+
+  // Reopen where the person left off: a saved token that still works means they're signed in.
+  // Only the server saying "signed out" (401) leads to the sign-in screen; no internet or a server
+  // hiccup keeps the session and offers to try again.
+  const restore = useCallback(() => {
+    setStartupError(null);
+    setUser(undefined);
+    loadToken()
+      .then((token) => (token ? refresh() : setUser(null)))
+      .catch((error) => {
+        if (error instanceof ApiError && error.status === 401) setUser(null);
+        else setStartupError(errorMessage(error));
+      });
+  }, [refresh]);
 
   useEffect(() => {
     setSignedOutHandler(() => {
@@ -32,16 +51,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearLoadCache();
       setUser(null);
     });
-    // Reopen where the person left off: a saved token that still works means they're signed in.
-    loadToken()
-      .then((token) => (token ? refresh() : setUser(null)))
-      .catch(() => setUser(null));
+    restore();
     return () => setSignedOutHandler(null);
-  }, [refresh]);
+  }, [restore]);
 
   const value = useMemo<AuthState>(
     () => ({
       user,
+      startupError,
+      retry: restore,
       async signIn(email, password) {
         const { token } = await api<{ token: string }>("/api/auth/login", { body: { email, password, client: "mobile" } });
         await saveToken(token);
@@ -65,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       refresh,
     }),
-    [user, refresh],
+    [user, startupError, restore, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

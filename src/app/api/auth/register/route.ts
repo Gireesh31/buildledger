@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { sendVerificationEmail } from "@/lib/server/email-verification";
+import { clientIp, limits, rateLimit } from "@/lib/server/rate-limit";
 import { createSession } from "@/lib/server/session";
 import { createUser } from "@/lib/server/user-store";
 import { PASSWORD_MIN_LENGTH, parseEmail, parseName, parsePassword } from "@/lib/validation";
 
 export async function POST(request: Request) {
+  const limited = await rateLimit(limits.registerByIp(clientIp(request)));
+  if (limited) return limited;
   const body = await request.json().catch(() => null);
   const name = parseName(body?.name);
   const email = parseEmail(body?.email);

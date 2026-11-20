@@ -7,8 +7,10 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../src/auth";
 import { HeaderBackground, headerTitleStyle } from "../src/header";
-import { colors } from "../src/theme";
-import { Loading } from "../src/ui";
+import { WifiOff } from "lucide-react-native";
+import { View } from "react-native";
+import { colors, fonts } from "../src/theme";
+import { Button, Loading, Text } from "../src/ui";
 
 export default function RootLayout() {
   // The website's type: IBM Plex Sans for text, Anek Latin for headlines, IBM Plex Mono for labels.
@@ -32,9 +34,28 @@ export default function RootLayout() {
   );
 }
 
+/** Shown when the app opens without internet: the person is still signed in, so offer a retry, not the sign-in page. */
+function CantConnect({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background, alignItems: "center", justifyContent: "center", padding: 28, gap: 14 }}>
+      <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" }}>
+        <WifiOff size={28} color={colors.brand} />
+      </View>
+      <Text style={{ fontFamily: fonts.display, fontSize: 24, color: colors.text, textAlign: "center" }}>Can't connect</Text>
+      <Text style={{ fontSize: 15, color: colors.muted, textAlign: "center", lineHeight: 21 }}>
+        {message} You're still signed in.
+      </Text>
+      <View style={{ alignSelf: "stretch", marginTop: 6 }}>
+        <Button label="Try again" onPress={onRetry} />
+      </View>
+    </View>
+  );
+}
+
 /** Signed-in screens only for signed-in people, and sign-in screens only for everyone else. */
 function RootStack() {
-  const { user } = useAuth();
+  const { user, startupError, retry } = useAuth();
+  if (startupError) return <CantConnect message={startupError} onRetry={retry} />;
   if (user === undefined) return <Loading />;
   // New accounts see the welcome steps once, like the website's onboarding.
   const onboarded = Boolean(user?.onboardedAt);
