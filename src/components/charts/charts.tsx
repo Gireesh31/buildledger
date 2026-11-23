@@ -5,7 +5,7 @@ import { formatINR, formatINRCompact, formatMonth } from "@/lib/format";
  * data end, hairline grid, a hover/focus tooltip on every bar, and a table view for each chart.
  */
 
-function Tooltip({ title, value }: { title: string; value: string }) {
+export function Tooltip({ title, value }: { title: string; value: string }) {
   return (
     <span
       role="tooltip"

@@ -1,10 +1,10 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, Card, inputClass } from "@/components/ui/primitives";
-import { announcementKinds, type Announcement, type AnnouncementKind } from "@/lib/app-config";
+import { ANNOUNCEMENT_MEDIA_TYPES, announcementKinds, MAX_ANNOUNCEMENT_MEDIA, type Announcement, type AnnouncementKind, type AnnouncementMedia } from "@/lib/app-config";
 
 interface Draft {
   kind: AnnouncementKind;
@@ -16,9 +16,22 @@ interface Draft {
   startsAt: string;
   endsAt: string;
   published: boolean;
+  media: AnnouncementMedia[];
 }
 
-const empty: Draft = { kind: "news", title: "", body: "", linkUrl: "", linkLabel: "", startsAt: "", endsAt: "", published: true };
+const empty: Draft = { kind: "news", title: "", body: "", linkUrl: "", linkLabel: "", startsAt: "", endsAt: "", published: true, media: [] };
+
+/** Sends one file straight to storage with the one-time URL the server hands out. */
+async function uploadMedia(file: File): Promise<AnnouncementMedia> {
+  const start = await sendJson<AnnouncementMedia & { uploadUrl: string }>("/api/admin/announcements/media", { contentType: file.type, size: file.size }, "POST");
+  if (!start.ok) throw new Error(start.error);
+  const form = new FormData();
+  form.append("cacheControl", "3600");
+  form.append("", file);
+  const response = await fetch(start.data.uploadUrl, { method: "PUT", body: form, headers: { "x-upsert": "false" } }).catch(() => null);
+  if (!response?.ok) throw new Error(`Couldn't upload ${file.name}. Check your connection and try again.`);
+  return { type: start.data.type, path: start.data.path, url: start.data.url };
+}
 
 const toDay = (isoDate?: string) => {
   if (!isoDate) return "";
@@ -37,6 +50,7 @@ const draftOf = (a: Announcement): Draft => ({
   startsAt: toDay(a.startsAt),
   endsAt: toDay(a.endsAt),
   published: a.published,
+  media: a.media ?? [],
 });
 
 export function statusOf(a: Announcement, now = Date.now()): string {
@@ -52,6 +66,32 @@ export function AnnouncementsEditor({ initial }: { initial: Announcement[] }) {
   const [draft, setDraft] = useState<Draft>(empty);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  async function addFiles(files: FileList | null) {
+    if (!files?.length) return;
+    const room = MAX_ANNOUNCEMENT_MEDIA - draft.media.length;
+    const chosen = [...files].slice(0, room);
+    setMessage(chosen.length < files.length ? { tone: "error", text: `Up to ${MAX_ANNOUNCEMENT_MEDIA} images or videos per announcement.` } : null);
+    for (const file of chosen) {
+      const kind = ANNOUNCEMENT_MEDIA_TYPES[file.type];
+      if (!kind) return setMessage({ tone: "error", text: `${file.name}: use a JPG, PNG, WebP or GIF image, or an MP4, MOV or WebM video.` });
+      if (file.size > kind.maxBytes) return setMessage({ tone: "error", text: `${file.name} is too big: ${kind.type === "video" ? "videos" : "images"} can be up to ${kind.maxBytes / 1024 / 1024} MB.` });
+    }
+    setUploading(true);
+    try {
+      for (const file of chosen) {
+        const media = await uploadMedia(file);
+        setDraft((d) => ({ ...d, media: [...d.media, media] }));
+      }
+    } catch (e) {
+      setMessage({ tone: "error", text: e instanceof Error ? e.message : "Upload failed." });
+    } finally {
+      setUploading(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }
 
   function open(target: Announcement | "new") {
     setMessage(null);
@@ -62,7 +102,7 @@ export function AnnouncementsEditor({ initial }: { initial: Announcement[] }) {
   async function save() {
     setPending(true);
     setMessage(null);
-    const body = { ...draft, startsAt: fromDay(draft.startsAt, false), endsAt: fromDay(draft.endsAt, true) };
+    const body = { ...draft, startsAt: fromDay(draft.startsAt, false), endsAt: fromDay(draft.endsAt, true), media: draft.media.map(({ type, path }) => ({ type, path })) };
     const result =
       editing === "new"
         ? await sendJson<Announcement>("/api/admin/announcements", body, "POST")
@@ -122,6 +162,50 @@ export function AnnouncementsEditor({ initial }: { initial: Announcement[] }) {
               <span className="font-medium text-foreground/80">Message</span>
               <textarea rows={3} maxLength={1000} value={draft.body} onChange={(e) => set("body", e.target.value)} className={inputClass} />
             </label>
+            <div className="flex flex-col gap-2 text-sm sm:col-span-2">
+              <span className="font-medium text-foreground/80">Images & videos (optional, up to {MAX_ANNOUNCEMENT_MEDIA})</span>
+              {draft.media.length > 0 && (
+                <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {draft.media.map((m) => (
+                    <li key={m.path} className="relative overflow-hidden rounded-lg border border-foreground/10 bg-foreground/5">
+                      {m.type === "image" ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.url} alt="" className="aspect-video w-full object-cover" />
+                      ) : (
+                        <video src={m.url} className="aspect-video w-full object-cover" muted playsInline controls preload="metadata" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setDraft((d) => ({ ...d, media: d.media.filter((x) => x.path !== m.path) }))}
+                        className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
+                        aria-label="Remove"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <input
+                ref={fileInput}
+                type="file"
+                multiple
+                accept={Object.keys(ANNOUNCEMENT_MEDIA_TYPES).join(",")}
+                className="hidden"
+                onChange={(e) => addFiles(e.target.files)}
+              />
+              <div>
+                <button
+                  type="button"
+                  onClick={() => fileInput.current?.click()}
+                  disabled={uploading || draft.media.length >= MAX_ANNOUNCEMENT_MEDIA}
+                  className={buttonClass("secondary", "sm")}
+                >
+                  <ImagePlus className="h-4 w-4" aria-hidden /> {uploading ? "Uploading…" : "Add image or video"}
+                </button>
+                <span className="ml-2 text-xs text-foreground/60">Images up to 5 MB, videos up to 50 MB.</span>
+              </div>
+            </div>
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium text-foreground/80">Link (optional)</span>
               <input value={draft.linkUrl} maxLength={500} onChange={(e) => set("linkUrl", e.target.value)} className={inputClass} placeholder="https://… or /projects/new" />
@@ -142,7 +226,7 @@ export function AnnouncementsEditor({ initial }: { initial: Announcement[] }) {
               <input type="checkbox" checked={draft.published} onChange={(e) => set("published", e.target.checked)} /> Published (untick to keep it as a draft)
             </label>
             <div className="flex gap-2 sm:col-span-2">
-              <button type="submit" disabled={pending || !draft.title.trim()} className={buttonClass("primary")}>
+              <button type="submit" disabled={pending || uploading || !draft.title.trim()} className={buttonClass("primary")}>
                 Save
               </button>
               <button type="button" onClick={() => setEditing(null)} className={buttonClass("ghost")}>
@@ -164,6 +248,11 @@ export function AnnouncementsEditor({ initial }: { initial: Announcement[] }) {
                 </span>
               </p>
               {a.body && <p className="line-clamp-2 text-sm text-foreground/60">{a.body}</p>}
+              {a.media.length > 0 && (
+                <p className="text-xs text-foreground/50">
+                  {a.media.filter((m) => m.type === "image").length} images · {a.media.filter((m) => m.type === "video").length} videos
+                </p>
+              )}
             </div>
             <button type="button" onClick={() => open(a)} className={buttonClass("ghost", "sm")}>
               <Pencil className="h-4 w-4" aria-hidden /> Edit

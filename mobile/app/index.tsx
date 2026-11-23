@@ -76,6 +76,8 @@ export default function Dashboard() {
             <Text style={{ color: "rgba(255,255,255,0.7)" }}>Here’s where your sites stand today.</Text>
           </View>
         </FadeIn>
+        {/* The admin's announcements, offers and new features, in the animated header like the website. */}
+        <Announcements />
       </View>
       <HazardTape />
 
@@ -91,7 +93,6 @@ export default function Dashboard() {
         <Screen refreshing={refreshing} onRefresh={onRefresh}>
           {error ? <Message text={error} /> : null}
           {user && !user.emailVerifiedAt ? <VerifyEmailCard email={user.email} /> : null}
-          <Announcements key="announcements" />
           <TileGrid>
             <StatTile label="Projects" value={String(data.length)} hint={`${data.filter((r) => r.project.status === "active").length} in progress`} />
             <StatTile label="Total spent" value={formatINR(totals.spent)} />

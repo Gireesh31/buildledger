@@ -1,4 +1,5 @@
 import { ShieldCheck, UserCheck, Users } from "lucide-react";
+import { SignupChart } from "@/components/admin/SignupChart";
 import { PageHeader, StatTile } from "@/components/ui/primitives";
 import { getAdminStats } from "@/lib/server/admin-store";
 import { requireAdminPage } from "@/lib/server/page-data";
@@ -13,6 +14,9 @@ export default async function AdminOverview() {
       <div className="grid gap-3 sm:grid-cols-2">
         <StatTile index={0} icon={Users} accent="orange" label="Users" value={String(stats.users)} />
         <StatTile index={1} icon={UserCheck} accent="green" label="Verified emails" value={String(stats.verifiedUsers)} />
+      </div>
+      <div className="mt-6">
+        <SignupChart series={stats.signups} />
       </div>
     </>
   );

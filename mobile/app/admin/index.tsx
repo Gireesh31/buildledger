@@ -1,14 +1,17 @@
 import { router } from "expo-router";
 import { ListChecks, Megaphone, ToggleRight, Users } from "lucide-react-native";
+import type { SignupSeries } from "@/lib/signups";
 import { api } from "../../src/api";
 import { NavRow } from "../../src/admin-ui";
 import { useLoad } from "../../src/data";
+import { SignupChart } from "../../src/SignupChart";
 import { colors } from "../../src/theme";
 import { Loading, Message, Screen, SectionTitle, StatTile, TileGrid } from "../../src/ui";
 
 interface Stats {
   users: number;
   verifiedUsers: number;
+  signups: SignupSeries;
 }
 
 /** Admin overview: totals across everyone, and the sections of the panel. */
@@ -25,6 +28,7 @@ export default function AdminHome() {
           <StatTile label="Verified emails" value={String(data.verifiedUsers)} />
         </TileGrid>
       ) : null}
+      {data?.signups ? <SignupChart series={data.signups} /> : null}
       <SectionTitle text="Manage" />
       <NavRow icon={icon(Users)} label="Users" hint="Edit, verify, disable, make admin, delete" onPress={() => router.push("/admin/users")} />
       <NavRow icon={icon(ListChecks)} label="Forms" hint="Dropdown choices and extra fields" onPress={() => router.push("/admin/forms")} />

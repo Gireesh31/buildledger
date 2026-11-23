@@ -38,7 +38,8 @@
         }
       ],
       "expo-sharing",
-      "expo-font"
+      "expo-font",
+      "expo-video"
     ],
     "extra": {
       "router": {

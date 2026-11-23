@@ -1,11 +1,13 @@
-import { Pencil, Plus, Trash2 } from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker";
+import { ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react-native";
 import { useState } from "react";
-import { View } from "react-native";
-import { announcementKinds, type Announcement, type AnnouncementKind } from "@/lib/app-config";
+import { Pressable, View } from "react-native";
+import { ANNOUNCEMENT_MEDIA_TYPES, announcementKinds, MAX_ANNOUNCEMENT_MEDIA, type Announcement, type AnnouncementKind, type AnnouncementMedia } from "@/lib/app-config";
 import { api, errorMessage } from "../../src/api";
 import { confirmAction, SwitchRow } from "../../src/admin-ui";
 import { useLoad } from "../../src/data";
 import { DateInput } from "../../src/inputs";
+import { MediaView } from "../../src/MediaView";
 import { Text } from "../../src/text";
 import { colors } from "../../src/theme";
 import { Badge, Button, Card, Chip, Empty, Field, Input, Loading, Message, Screen } from "../../src/ui";
@@ -19,9 +21,26 @@ interface Draft {
   startsAt: string;
   endsAt: string;
   published: boolean;
+  media: AnnouncementMedia[];
 }
 
-const empty: Draft = { kind: "news", title: "", body: "", linkUrl: "", linkLabel: "", startsAt: "", endsAt: "", published: true };
+const empty: Draft = { kind: "news", title: "", body: "", linkUrl: "", linkLabel: "", startsAt: "", endsAt: "", published: true, media: [] };
+
+/** Sends a picked photo or video straight to storage with the one-time URL the server hands out. */
+async function uploadAsset(asset: ImagePicker.ImagePickerAsset): Promise<AnnouncementMedia> {
+  const contentType = (asset.mimeType ?? (asset.type === "video" ? "video/mp4" : "image/jpeg")).toLowerCase();
+  const kind = ANNOUNCEMENT_MEDIA_TYPES[contentType];
+  if (!kind) throw new Error("Use a JPG, PNG, WebP or GIF image, or an MP4, MOV or WebM video.");
+  if (asset.fileSize && asset.fileSize > kind.maxBytes) throw new Error(`${kind.type === "video" ? "Videos" : "Images"} can be up to ${kind.maxBytes / 1024 / 1024} MB.`);
+  const start = await api<AnnouncementMedia & { uploadUrl: string }>("/api/admin/announcements/media", { body: { contentType, size: asset.fileSize ?? 1 } });
+  const form = new FormData();
+  form.append("cacheControl", "3600");
+  // React Native sends the file from its uri.
+  form.append("", { uri: asset.uri, name: asset.fileName ?? `upload.${kind.ext}`, type: contentType } as unknown as Blob);
+  const response = await fetch(start.uploadUrl, { method: "PUT", body: form, headers: { "x-upsert": "false" } }).catch(() => null);
+  if (!response?.ok) throw new Error("Couldn't upload the file. Check your connection and try again.");
+  return { type: start.type, path: start.path, url: start.url };
+}
 
 const toDay = (iso?: string) => {
   if (!iso) return "";
@@ -45,7 +64,33 @@ export default function AdminAnnouncements() {
   const [draft, setDraft] = useState<Draft>(empty);
   const [pending, setPending] = useState(false);
   const [note, setNote] = useState<{ text: string; tone: "error" | "success" } | null>(null);
+  const [uploading, setUploading] = useState(false);
   if (!data && !error) return <Loading />;
+
+  async function pickMedia() {
+    const room = MAX_ANNOUNCEMENT_MEDIA - draft.media.length;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsMultipleSelection: true,
+      selectionLimit: room,
+      quality: 0.8,
+      // iPhone photos and videos as JPG / MP4 rather than HEIC / HEVC, so every browser can show them.
+      preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+    });
+    if (result.canceled) return;
+    setUploading(true);
+    setNote(null);
+    try {
+      for (const asset of result.assets.slice(0, room)) {
+        const media = await uploadAsset(asset);
+        setDraft((d) => ({ ...d, media: [...d.media, media] }));
+      }
+    } catch (e) {
+      setNote({ text: errorMessage(e), tone: "error" });
+    } finally {
+      setUploading(false);
+    }
+  }
   const set = <K extends keyof Draft>(key: K) => (value: Draft[K]) => setDraft((d) => ({ ...d, [key]: value }));
 
   function open(a: Announcement | "new") {
@@ -54,7 +99,17 @@ export default function AdminAnnouncements() {
     setDraft(
       a === "new"
         ? empty
-        : { kind: a.kind, title: a.title, body: a.body, linkUrl: a.linkUrl ?? "", linkLabel: a.linkLabel ?? "", startsAt: toDay(a.startsAt), endsAt: toDay(a.endsAt), published: a.published },
+        : {
+            kind: a.kind,
+            title: a.title,
+            body: a.body,
+            linkUrl: a.linkUrl ?? "",
+            linkLabel: a.linkLabel ?? "",
+            startsAt: toDay(a.startsAt),
+            endsAt: toDay(a.endsAt),
+            published: a.published,
+            media: a.media ?? [],
+          },
     );
   }
 
@@ -62,7 +117,7 @@ export default function AdminAnnouncements() {
     setPending(true);
     setNote(null);
     try {
-      const body = { ...draft, startsAt: fromDay(draft.startsAt, false), endsAt: fromDay(draft.endsAt, true) };
+      const body = { ...draft, startsAt: fromDay(draft.startsAt, false), endsAt: fromDay(draft.endsAt, true), media: draft.media.map(({ type, path }) => ({ type, path })) };
       if (editing === "new") await api("/api/admin/announcements", { method: "POST", body });
       else await api(`/api/admin/announcements/${editing}`, { method: "PUT", body });
       setEditing(null);
@@ -109,6 +164,31 @@ export default function AdminAnnouncements() {
           <Field label="Message">
             <Input value={draft.body} onChangeText={set("body")} maxLength={1000} multiline />
           </Field>
+          <Field label={`Images & videos (up to ${MAX_ANNOUNCEMENT_MEDIA})`}>
+            {draft.media.map((m) => (
+              <View key={m.path}>
+                <MediaView media={m} />
+                <Pressable
+                  onPress={() => setDraft((d) => ({ ...d, media: d.media.filter((x) => x.path !== m.path) }))}
+                  accessibilityLabel="Remove"
+                  hitSlop={8}
+                  style={{ position: "absolute", top: 8, right: 8, backgroundColor: "rgba(0,0,0,0.6)", borderRadius: 999, padding: 6 }}
+                >
+                  <X size={16} color="#fff" />
+                </Pressable>
+              </View>
+            ))}
+            <Button
+              small
+              tone="secondary"
+              label={uploading ? "Uploading…" : "Add image or video"}
+              icon={<ImagePlus size={15} color={colors.text} />}
+              busy={uploading}
+              disabled={draft.media.length >= MAX_ANNOUNCEMENT_MEDIA}
+              onPress={pickMedia}
+            />
+            <Text style={{ fontSize: 12, color: colors.muted }}>Images up to 5 MB, videos up to 50 MB.</Text>
+          </Field>
           <Field label="Link (optional)">
             <Input value={draft.linkUrl} onChangeText={set("linkUrl")} autoCapitalize="none" autoCorrect={false} placeholder="https://… or /projects/new" />
           </Field>
@@ -126,7 +206,7 @@ export default function AdminAnnouncements() {
           <SwitchRow label="Published" hint="Off keeps it as a draft." value={draft.published} onChange={set("published")} />
           <View style={{ flexDirection: "row", gap: 10 }}>
             <View style={{ flex: 1 }}>
-              <Button label="Save" busy={pending} disabled={!draft.title.trim()} onPress={save} />
+              <Button label="Save" busy={pending} disabled={uploading || !draft.title.trim()} onPress={save} />
             </View>
             <View style={{ flex: 1 }}>
               <Button tone="secondary" label="Cancel" onPress={() => setEditing(null)} />
@@ -142,6 +222,7 @@ export default function AdminAnnouncements() {
             <Badge label={announcementKinds.find((k) => k.value === a.kind)?.label ?? a.kind} bg={colors.brandSoft} fg={colors.brandStrong} />
             <Badge label={statusOf(a)} bg={colors.field} fg={colors.muted} />
           </View>
+          {a.media[0] ? <MediaView media={a.media[0]} /> : null}
           <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text }}>{a.title}</Text>
           {a.body ? (
             <Text style={{ color: colors.muted }} numberOfLines={3}>

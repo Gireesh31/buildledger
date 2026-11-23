@@ -165,6 +165,29 @@ export const announcementKinds: { value: AnnouncementKind; label: string }[] = [
   { value: "offer", label: "Offer" },
 ];
 
+export type AnnouncementMediaType = "image" | "video";
+
+export interface AnnouncementMedia {
+  type: AnnouncementMediaType;
+  /** File name in the announcement-media bucket. */
+  path: string;
+  /** Public address to show it from. */
+  url: string;
+}
+
+/** What admins may upload, and how big. */
+export const ANNOUNCEMENT_MEDIA_TYPES: Record<string, { type: AnnouncementMediaType; ext: string; maxBytes: number }> = {
+  "image/jpeg": { type: "image", ext: "jpg", maxBytes: 5 * 1024 * 1024 },
+  "image/png": { type: "image", ext: "png", maxBytes: 5 * 1024 * 1024 },
+  "image/webp": { type: "image", ext: "webp", maxBytes: 5 * 1024 * 1024 },
+  "image/gif": { type: "image", ext: "gif", maxBytes: 5 * 1024 * 1024 },
+  "video/mp4": { type: "video", ext: "mp4", maxBytes: 50 * 1024 * 1024 },
+  "video/quicktime": { type: "video", ext: "mov", maxBytes: 50 * 1024 * 1024 },
+  "video/webm": { type: "video", ext: "webm", maxBytes: 50 * 1024 * 1024 },
+};
+
+export const MAX_ANNOUNCEMENT_MEDIA = 4;
+
 export interface Announcement {
   id: string;
   kind: AnnouncementKind;
@@ -175,6 +198,8 @@ export interface Announcement {
   startsAt?: string;
   endsAt?: string;
   published: boolean;
+  /** Images and videos shown with it, in order. */
+  media: AnnouncementMedia[];
   createdAt: string;
   updatedAt: string;
 }

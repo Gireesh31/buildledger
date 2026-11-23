@@ -82,7 +82,6 @@ async function Dashboard({ user }: { user: User }) {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-      <AnnouncementBar announcements={announcements} />
       <div className="animate-fade-up relative mb-8 flex flex-wrap items-end justify-between gap-3 overflow-hidden rounded-2xl border border-foreground/[0.08] bg-surface px-5 pb-[165px] pt-6 shadow-card sm:px-7 sm:pb-[170px]">
         <HeroSkyline className="absolute inset-x-0 bottom-0 h-[170px] w-full" phoneClassName="absolute inset-x-0 bottom-0 h-[160px] w-full" />
         {/* Greeting and button sit above the skyline band. */}
@@ -94,6 +93,8 @@ async function Dashboard({ user }: { user: User }) {
         <Link href="/projects/new" className={`${buttonClass("primary")} relative`}>
           <Plus className="h-4 w-4" /> New project
         </Link>
+        {/* The admin's announcements, offers and new features sit in the animated header, above the skyline. */}
+        <AnnouncementBar announcements={announcements} />
       </div>
 
       <div className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

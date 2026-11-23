@@ -18,6 +18,7 @@
     "../src/lib/format.ts",
     "../src/lib/ledger.ts",
     "../src/lib/period-report.ts",
+    "../src/lib/signups.ts",
     "../src/lib/types.ts",
     "../src/lib/validation.ts"
   ]

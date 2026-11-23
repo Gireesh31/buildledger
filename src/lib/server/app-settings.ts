@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
-import { applyAppConfig, defaultAppConfig, featureList, isFeatureOn, type Announcement, type AppConfig, type FeatureKey, type Features } from "@/lib/app-config";
+import {
+  ANNOUNCEMENT_MEDIA_TYPES,
+  applyAppConfig,
+  defaultAppConfig,
+  featureList,
+  isFeatureOn,
+  type Announcement,
+  type AnnouncementMedia,
+  type AppConfig,
+  type FeatureKey,
+  type Features,
+} from "@/lib/app-config";
 import type { FormConfig } from "@/lib/collections";
 import { db, iso, isUuid, must } from "./supabase";
 
@@ -51,8 +62,30 @@ interface AnnouncementRow {
   starts_at: string | null;
   ends_at: string | null;
   published: boolean;
+  media: { type: AnnouncementMedia["type"]; path: string }[] | null;
   created_at: string;
   updated_at: string;
+}
+
+// Images and videos on announcements: a public bucket, written only by the server or with a signed upload URL.
+const MEDIA_BUCKET = "announcement-media";
+
+const mediaUrl = (path: string) => `${(process.env.SUPABASE_URL ?? "").replace(/\/$/, "")}/storage/v1/object/public/${MEDIA_BUCKET}/${path}`;
+
+/** A one-time upload address for a new file, so big videos go straight to storage (not through this server). */
+export async function createMediaUpload(contentType: string): Promise<{ path: string; uploadUrl: string; url: string; type: AnnouncementMedia["type"] } | null> {
+  const kind = ANNOUNCEMENT_MEDIA_TYPES[contentType];
+  if (!kind) return null;
+  const path = `${crypto.randomUUID()}.${kind.ext}`;
+  const { data, error } = await (await db()).storage.from(MEDIA_BUCKET).createSignedUploadUrl(path);
+  if (error || !data) throw new Error(`Storage error: ${error?.message ?? "no upload URL"}`);
+  return { path, uploadUrl: data.signedUrl, url: mediaUrl(path), type: kind.type };
+}
+
+async function removeMediaFiles(paths: string[]) {
+  if (paths.length === 0) return;
+  const { error } = await (await db()).storage.from(MEDIA_BUCKET).remove(paths);
+  if (error) console.error("Couldn't delete announcement media:", error.message);
 }
 
 const fromRow = (r: AnnouncementRow): Announcement => ({
@@ -65,11 +98,12 @@ const fromRow = (r: AnnouncementRow): Announcement => ({
   ...(r.starts_at && { startsAt: iso(r.starts_at) }),
   ...(r.ends_at && { endsAt: iso(r.ends_at) }),
   published: r.published,
+  media: (r.media ?? []).map((m) => ({ type: m.type, path: m.path, url: mediaUrl(m.path) })),
   createdAt: iso(r.created_at)!,
   updatedAt: iso(r.updated_at)!,
 });
 
-export type AnnouncementInput = Omit<Announcement, "id" | "createdAt" | "updatedAt">;
+export type AnnouncementInput = Omit<Announcement, "id" | "createdAt" | "updatedAt" | "media"> & { media: Omit<AnnouncementMedia, "url">[] };
 
 const toColumns = (a: AnnouncementInput) => ({
   kind: a.kind,
@@ -80,6 +114,7 @@ const toColumns = (a: AnnouncementInput) => ({
   starts_at: a.startsAt ?? null,
   ends_at: a.endsAt ?? null,
   published: a.published,
+  media: a.media.map((m) => ({ type: m.type, path: m.path })),
 });
 
 /** What signed-in users see now: published, started and not yet ended. */
@@ -110,6 +145,8 @@ export async function createAnnouncement(input: AnnouncementInput, userId: strin
 
 export async function updateAnnouncement(id: string, input: AnnouncementInput): Promise<Announcement | undefined> {
   if (!isUuid(id)) return undefined;
+  const before = must(await (await db()).from("announcements").select("media").eq("id", id).maybeSingle<Pick<AnnouncementRow, "media">>());
+  if (!before) return undefined;
   const row = must(
     await (await db())
       .from("announcements")
@@ -118,11 +155,15 @@ export async function updateAnnouncement(id: string, input: AnnouncementInput): 
       .select("*")
       .maybeSingle<AnnouncementRow>(),
   );
+  // Files taken off the announcement are deleted from storage.
+  const kept = new Set(input.media.map((m) => m.path));
+  await removeMediaFiles((before.media ?? []).map((m) => m.path).filter((p) => !kept.has(p)));
   return row ? fromRow(row) : undefined;
 }
 
 export async function deleteAnnouncement(id: string): Promise<boolean> {
   if (!isUuid(id)) return false;
-  const rows = must(await (await db()).from("announcements").delete().eq("id", id).select("id")) as { id: string }[];
+  const rows = must(await (await db()).from("announcements").delete().eq("id", id).select("id, media")) as Pick<AnnouncementRow, "id" | "media">[];
+  await removeMediaFiles(rows.flatMap((r) => (r.media ?? []).map((m) => m.path)));
   return rows.length > 0;
 }
