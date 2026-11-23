@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import type { FeatureKey, Features } from "@/lib/app-config";
 
 interface Tab {
   href: string;
@@ -25,27 +26,32 @@ interface Tab {
   short?: string;
   icon: LucideIcon;
   color: string;
+  /** Hidden when an admin switches this feature off. */
+  feature?: FeatureKey;
 }
 
 // The everyday sections are always visible; the rest sit in the "More" menu at the corner.
 // Each section keeps its own colour so it's easy to spot.
-const mainTabs: Tab[] = [
+const allMainTabs: Tab[] = [
   { href: "", label: "Overview", icon: LayoutDashboard, color: "text-orange-500" },
   { href: "/materials", label: "Materials", icon: Package, color: "text-amber-500" },
-  { href: "/labour", label: "Labour", icon: Users, color: "text-emerald-500" },
-  { href: "/transport", label: "Transport", icon: Truck, color: "text-sky-500" },
+  { href: "/labour", label: "Labour", icon: Users, color: "text-emerald-500", feature: "labour" },
+  { href: "/transport", label: "Transport", icon: Truck, color: "text-sky-500", feature: "transport" },
 ];
 
-const moreTabs: Tab[] = [
-  { href: "/daily-log", label: "Daily log", icon: NotebookPen, color: "text-violet-500" },
-  { href: "/files", label: "Bills & photos", icon: Images, color: "text-rose-500" },
-  { href: "/reports", label: "Reports", icon: BarChart3, color: "text-fuchsia-500" },
-  { href: "/team", label: "Team", icon: UsersRound, color: "text-indigo-500" },
+const allMoreTabs: Tab[] = [
+  { href: "/daily-log", label: "Daily log", icon: NotebookPen, color: "text-violet-500", feature: "dailyLog" },
+  { href: "/files", label: "Bills & photos", icon: Images, color: "text-rose-500", feature: "files" },
+  { href: "/reports", label: "Reports", icon: BarChart3, color: "text-fuchsia-500", feature: "reports" },
+  { href: "/team", label: "Team", icon: UsersRound, color: "text-indigo-500", feature: "team" },
   { href: "/settings", label: "Settings", icon: Settings, color: "text-stone-500" },
 ];
 
-export function ProjectTabs({ projectId }: { projectId: string }) {
+export function ProjectTabs({ projectId, features }: { projectId: string; features: Features }) {
   const pathname = usePathname();
+  const on = (tab: Tab) => !tab.feature || features[tab.feature] !== false;
+  const mainTabs = allMainTabs.filter(on);
+  const moreTabs = allMoreTabs.filter(on);
   const base = `/projects/${projectId}`;
   const isActive = (path: string) => (path === "" ? pathname === base : pathname.startsWith(`${base}${path}`));
   const activeMore = moreTabs.find((tab) => isActive(tab.href));
@@ -53,14 +59,14 @@ export function ProjectTabs({ projectId }: { projectId: string }) {
   return (
     <nav aria-label="Project sections" className="no-print">
       {/* Phones: five equal cells, icon over label. Wider screens: pills, with "More" at the right corner. */}
-      <ul className="grid grid-cols-5 gap-1 py-2 sm:flex sm:items-center sm:gap-1">
+      <ul className="grid auto-cols-fr grid-flow-col gap-1 py-2 sm:flex sm:items-center sm:gap-1">
         {mainTabs.map((tab) => (
           <li key={tab.label}>
             <TabLink tab={tab} href={`${base}${tab.href}`} active={isActive(tab.href)} />
           </li>
         ))}
         <li className="sm:ml-auto">
-          <MoreMenu base={base} active={activeMore} isActive={isActive} />
+          <MoreMenu base={base} tabs={moreTabs} active={activeMore} isActive={isActive} />
         </li>
       </ul>
     </nav>
@@ -84,7 +90,7 @@ function TabLink({ tab, href, active }: { tab: Tab; href: string; active: boolea
 }
 
 /** Corner dropdown for the less-used sections. Shows the current section's name when one of them is open. */
-function MoreMenu({ base, active, isActive }: { base: string; active?: Tab; isActive: (path: string) => boolean }) {
+function MoreMenu({ base, tabs: moreTabs, active, isActive }: { base: string; tabs: Tab[]; active?: Tab; isActive: (path: string) => boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 

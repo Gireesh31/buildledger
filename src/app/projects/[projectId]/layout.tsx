@@ -2,9 +2,11 @@ import { Building2, MapPin } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { HeroSkyline } from "@/components/landing/HeroSkyline";
+import { AppConfigSync } from "@/components/layout/AppConfigSync";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { getProjectAccess } from "@/lib/server/access";
+import { loadAppConfig } from "@/lib/server/app-settings";
 import { getCurrentUser } from "@/lib/server/session";
 import { projectStatuses, projectTypes } from "@/lib/validation";
 
@@ -34,11 +36,13 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
   }
 
   const { project, role } = access;
+  const config = await loadAppConfig();
   const type = projectTypes.find((t) => t.value === project.projectType)?.label;
   const status = projectStatuses.find((s) => s.value === project.status)?.label;
 
   return (
     <>
+      <AppConfigSync config={config} />
       <div className="mx-auto w-full max-w-6xl px-4 pt-6">
         <div className="animate-fade-up relative overflow-hidden rounded-xl border border-foreground/[0.08] border-l-4 border-l-brand bg-surface px-5 pb-[104px] pt-5 shadow-sm sm:pb-5">
           {/* Small working skyline: a strip under the name on phones, along the right from sm up. */}
@@ -64,12 +68,13 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
             </div>
             <div className="flex gap-2">
               {status && <span className="rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70 shadow-sm">{status}</span>}
+              {access.asAdmin && <span className="rounded-md border border-brand/30 bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand shadow-sm">Admin view</span>}
               {role === "viewer" && <span className="rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70 shadow-sm">View only</span>}
             </div>
           </div>
         </div>
         <div className="mt-3">
-          <ProjectTabs projectId={project.id} />
+          <ProjectTabs projectId={project.id} features={config.features} />
         </div>
       </div>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>

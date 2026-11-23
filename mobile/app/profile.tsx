@@ -1,4 +1,5 @@
-import { LogOut, Trash2 } from "lucide-react-native";
+import { router } from "expo-router";
+import { LogOut, ShieldCheck, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, Platform, View } from "react-native";
 import { Text } from "../src/text";
@@ -69,6 +70,8 @@ export default function Profile() {
         <Text style={{ color: colors.muted }}>Member since {formatDate(user.createdAt)}</Text>
       </View>
       {note ? <Message text={note.text} tone={note.tone} /> : null}
+      {/* Only admins see this; the admin API checks again on the server. */}
+      {user.isAdmin ? <Button tone="secondary" label="Admin panel" icon={<ShieldCheck size={17} color={colors.brand} />} onPress={() => router.push("/admin")} /> : null}
 
       <Card title="Your details">
         <View style={{ flexDirection: "row", gap: 10 }}>

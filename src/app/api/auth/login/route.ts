@@ -21,6 +21,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
   }
 
+  if (user.disabledAt) {
+    return NextResponse.json({ error: "This account has been disabled. Contact BuildLedger support." }, { status: 403 });
+  }
+
   const token = await createSession(user.id);
   // Only the mobile app asks for the token; the website keeps it in an httpOnly cookie that page scripts can't read.
   return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email }, ...(body?.client === "mobile" && { token }) });

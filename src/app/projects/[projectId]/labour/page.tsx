@@ -4,11 +4,11 @@ import { ExportPdfButton } from "@/components/reports/ExportPdfButtons";
 import { AttendanceSheet } from "@/components/labour/AttendanceSheet";
 import { RecordManager } from "@/components/records/RecordManager";
 import { Card, PageHeader } from "@/components/ui/primitives";
-import { getCollection, isTeam, optionLabel, trades } from "@/lib/collections";
+import { getCollection, isTeam, optionLabel } from "@/lib/collections";
 import { formatINR, formatNumber } from "@/lib/format";
 import { computeLedger, LEDGER_COLLECTIONS } from "@/lib/ledger";
 import { canWrite } from "@/lib/server/access";
-import { requirePageAccess } from "@/lib/server/page-data";
+import { requireFeature, requirePageAccess } from "@/lib/server/page-data";
 import { loadRecords } from "@/lib/server/record-store";
 
 export const metadata: Metadata = { title: "Labour" };
@@ -16,6 +16,7 @@ export const metadata: Metadata = { title: "Labour" };
 export default async function LabourPage({ params }: PageProps<"/projects/[projectId]/labour">) {
   const { projectId } = await params;
   const { project, role } = await requirePageAccess(projectId);
+  await requireFeature("labour");
   const records = await loadRecords(projectId, LEDGER_COLLECTIONS);
   const { workerDues, labourCost } = computeLedger({ project, ...records });
   const tradeField = getCollection("workers").fields.find((f) => f.name === "trade")!;
@@ -95,7 +96,7 @@ export default async function LabourPage({ params }: PageProps<"/projects/[proje
                       {w.name}{" "}
                       <span className="text-xs text-foreground/50">
                         {w.isTeam ? "Team · " : ""}
-                        {trades.find((t) => t.value === w.trade)?.label}
+                        {optionLabel(tradeField, w.trade)}
                       </span>
                     </td>
                     <td className="py-2 text-right tabular-nums">{w.isTeam ? "—" : formatNumber(w.days)}</td>

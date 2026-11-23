@@ -7,7 +7,7 @@ import { choiceLabel, getCollection, isTeam, optionLabel } from "@/lib/collectio
 import { formatINR } from "@/lib/format";
 import { balanceDue, computeLedger, LEDGER_COLLECTIONS } from "@/lib/ledger";
 import type { ReportData } from "@/lib/period-report";
-import { requirePageAccess } from "@/lib/server/page-data";
+import { requireFeature, requirePageAccess } from "@/lib/server/page-data";
 import { loadRecords } from "@/lib/server/record-store";
 
 export const metadata: Metadata = { title: "Reports" };
@@ -15,6 +15,7 @@ export const metadata: Metadata = { title: "Reports" };
 export default async function ReportsPage({ params }: PageProps<"/projects/[projectId]/reports">) {
   const { projectId } = await params;
   const { project } = await requirePageAccess(projectId);
+  await requireFeature("reports");
   const records = await loadRecords(projectId, LEDGER_COLLECTIONS);
   const ledger = computeLedger({ project, ...records });
   const lastMonths = ledger.byMonth.slice(-12);

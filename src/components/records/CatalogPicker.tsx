@@ -2,7 +2,7 @@
 
 import { Minus, Plus } from "lucide-react";
 import { stagger } from "@/components/ui/primitives";
-import { stepCount, type Catalog, type CatalogItem } from "@/lib/catalogs";
+import { catalogCards, catalogOptions, stepCount, type Catalog, type CatalogItem } from "@/lib/catalogs";
 
 interface CatalogPickerProps {
   catalog: Catalog;
@@ -21,7 +21,7 @@ interface CatalogPickerProps {
  * Each picked item has its own entry in the form, so several can be picked at once.
  */
 export function CatalogPicker({ catalog, items, onChange, onPick, onRemove }: CatalogPickerProps) {
-  const name = (value: string) => catalog.options.find((o) => o.value === value)?.label ?? value;
+  const name = (value: string) => catalogOptions(catalog).find((o) => o.value === value)?.label ?? value;
   const indexOf = (item: CatalogItem) => items.findIndex((values) => values[catalog.choiceField] === item.value);
   const picked = (item: CatalogItem, count?: number) => ({
     [catalog.choiceField]: item.value,
@@ -51,7 +51,7 @@ export function CatalogPicker({ catalog, items, onChange, onPick, onRemove }: Ca
     <section aria-label={catalog.prompt}>
       <p className="mb-2 text-sm font-medium text-foreground/80">{catalog.prompt}</p>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {catalog.items.map((item, i) => {
+        {catalogCards(catalog).map((item, i) => {
           const index = indexOf(item);
           const isChosen = index !== -1;
           const count = isChosen ? Number(items[index][catalog.countField]) || 0 : 0;

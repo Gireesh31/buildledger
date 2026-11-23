@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { featureOff } from "@/lib/server/app-settings";
 import { isTeam } from "@/lib/collections";
 import { requireProjectAccess } from "@/lib/server/access";
 import { updateProject } from "@/lib/server/project-store";
@@ -11,6 +12,8 @@ export async function PUT(request: Request, { params }: RouteContext<"/api/proje
   const { projectId } = await params;
   const result = await requireProjectAccess(projectId, "write");
   if (!result.ok) return result.response;
+  const off = await featureOff("labour");
+  if (off) return off;
 
   const body = await request.json().catch(() => null);
   const date = body?.date;

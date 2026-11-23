@@ -12,11 +12,13 @@ import { Suspense } from "react";
 import { HeroSkyline } from "@/components/landing/HeroSkyline";
 import { Landing } from "@/components/landing/Landing";
 import { SiteLoader } from "@/components/ui/SiteLoader";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { BudgetMeter, buttonClass, EmptyState, IconChip, stagger, StatTile, type Accent } from "@/components/ui/primitives";
 import { formatINR, formatINRCompact } from "@/lib/format";
 import { computeLedger, LEDGER_COLLECTIONS } from "@/lib/ledger";
 import { listAccessibleProjects } from "@/lib/server/access";
+import { listLiveAnnouncements, loadAppConfig } from "@/lib/server/app-settings";
 import { loadRecords } from "@/lib/server/record-store";
 import { getCurrentUser } from "@/lib/server/session";
 import type { User } from "@/lib/types";
@@ -60,7 +62,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 async function Dashboard({ user }: { user: User }) {
-  const accessible = await listAccessibleProjects(user);
+  // The admin's form choices too, so category names in the totals match.
+  const [accessible, announcements] = await Promise.all([listAccessibleProjects(user), listLiveAnnouncements(), loadAppConfig()]);
   const rows = await Promise.all(
     accessible.map(async ({ project, role }) => {
       const records = await loadRecords(project.id, LEDGER_COLLECTIONS);
@@ -79,6 +82,7 @@ async function Dashboard({ user }: { user: User }) {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <AnnouncementBar announcements={announcements} />
       <div className="animate-fade-up relative mb-8 flex flex-wrap items-end justify-between gap-3 overflow-hidden rounded-2xl border border-foreground/[0.08] bg-surface px-5 pb-[165px] pt-6 shadow-card sm:px-7 sm:pb-[170px]">
         <HeroSkyline className="absolute inset-x-0 bottom-0 h-[170px] w-full" phoneClassName="absolute inset-x-0 bottom-0 h-[160px] w-full" />
         {/* Greeting and button sit above the skyline band. */}

@@ -1,3 +1,4 @@
+import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { buttonClass } from "@/components/ui/primitives";
 import { getCurrentUser } from "@/lib/server/session";
@@ -31,6 +32,14 @@ export async function UserMenu() {
       {!user.onboardedAt && (
         <Link href="/onboarding" className={buttonClass("primary", "sm")}>
           Finish setup
+        </Link>
+      )}
+      {/* Only admins get the link; the panel and its API check again on the server. */}
+      {user.isAdmin && (
+        <Link href="/admin" className={buttonClass("secondary", "sm")} title="Admin panel">
+          <ShieldCheck className="h-4 w-4 text-brand" aria-hidden />
+          <span className="hidden sm:inline">Admin</span>
+          <span className="sr-only sm:hidden">Admin panel</span>
         </Link>
       )}
       <Link href="/profile" className="group flex items-center gap-2 rounded-full pr-2 transition-colors hover:bg-brand-soft" title="Your profile">

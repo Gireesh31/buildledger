@@ -35,6 +35,10 @@ export interface FieldDef {
    * of those isn't shown, the value of `fallback` (e.g. a full amount). Computed again on the server.
    */
   computed?: { product: readonly [string, string]; fallback?: string };
+  /** Choices an admin has hidden: no longer offered, but older entries that use them still show their label. */
+  retiredOptions?: readonly Option[];
+  /** Added by an admin in the admin panel (not part of the built-in form). */
+  custom?: boolean;
 }
 
 export interface CollectionDef {
@@ -266,13 +270,123 @@ export function isCollectionName(value: unknown): value is CollectionName {
   return typeof value === "string" && Object.hasOwn(collections, value);
 }
 
-export function getCollection(name: CollectionName): CollectionDef {
+/**
+ * Admin changes to the forms, edited in the admin panel and stored in the database.
+ * Built-in choices can be renamed or hidden (never removed, older entries use them); new choices
+ * and extra fields can be added. Applied with `setFormConfig` on the server, the website and the app.
+ */
+export interface ChoiceOverride {
+  /** New labels for built-in choices, by value. */
+  labels?: Record<string, string>;
+  /** Built-in or added choices that are no longer offered. */
+  hidden?: string[];
+  /** Choices added by an admin. */
+  added?: Option[];
+}
+
+export type CustomFieldKind = "text" | "textarea" | "number" | "money" | "date" | "select";
+
+export interface CustomField {
+  /** Stored key in the entry, always starting with "custom_". */
+  name: string;
+  label: string;
+  kind: CustomFieldKind;
+  required?: boolean;
+  options?: Option[];
+  /** Removed from the form; values already saved stay in the data. */
+  archived?: boolean;
+}
+
+export type FormConfig = Partial<Record<CollectionName, { choices?: Record<string, ChoiceOverride>; customFields?: CustomField[] }>>;
+
+/** Which choice lists admins may edit, and the values the app relies on (they can be renamed, not hidden). */
+export const editableChoiceFields: { collection: CollectionName; field: string; locked: readonly string[] }[] = [
+  { collection: "materials", field: "category", locked: ["other"] },
+  { collection: "materials", field: "unit", locked: [] },
+  { collection: "workers", field: "trade", locked: ["other"] },
+  { collection: "transport", field: "vehicle", locked: ["other"] },
+  { collection: "dailyLogs", field: "weather", locked: [] },
+];
+
+/** Forms that admins can add their own fields to. */
+export const customFieldCollections: CollectionName[] = ["materials", "workers", "transport", "dailyLogs"];
+
+let formConfig: FormConfig = {};
+let formConfigKey = "{}";
+const merged = new Map<CollectionName, CollectionDef>();
+
+/** Installs the admin's form changes (idempotent; cheap when nothing changed). */
+export function setFormConfig(config: FormConfig | undefined) {
+  const key = JSON.stringify(config ?? {});
+  if (key === formConfigKey) return;
+  formConfig = config ?? {};
+  formConfigKey = key;
+  merged.clear();
+}
+
+/** The built-in form definition, without admin changes (for the admin panel). */
+export function getBaseCollection(name: CollectionName): CollectionDef {
   return collections[name] as unknown as CollectionDef;
 }
 
-export function optionLabel(field: FieldDef, value: unknown): string {
-  return field.options?.find((option) => option.value === value)?.label ?? String(value ?? "");
+function applyChoices(options: readonly Option[], override: ChoiceOverride | undefined, locked: readonly string[]) {
+  if (!override) return { options, retired: [] as Option[] };
+  const hidden = new Set((override.hidden ?? []).filter((v) => !locked.includes(v)));
+  const all = options.map((o) => ({ value: o.value, label: override.labels?.[o.value]?.trim() || o.label }));
+  // Added choices go before "Other", which stays last.
+  const otherAt = all.findIndex((o) => o.value === "other");
+  all.splice(otherAt === -1 ? all.length : otherAt, 0, ...(override.added ?? []).filter((o) => !all.some((x) => x.value === o.value)));
+  return { options: all.filter((o) => !hidden.has(o.value)), retired: all.filter((o) => hidden.has(o.value)) };
 }
+
+/** A form definition with the admin's changes applied. */
+export function getCollection(name: CollectionName): CollectionDef {
+  const cached = merged.get(name);
+  if (cached) return cached;
+  const base = getBaseCollection(name);
+  const config = formConfig[name];
+  if (!config) {
+    merged.set(name, base);
+    return base;
+  }
+  const fields: FieldDef[] = base.fields.map((field) => {
+    const editable = editableChoiceFields.find((e) => e.collection === name && e.field === field.name);
+    const override = config.choices?.[field.name];
+    if (!editable || !override || !field.options) return field;
+    const { options, retired } = applyChoices(field.options, override, editable.locked);
+    return { ...field, options, retiredOptions: retired };
+  });
+  for (const custom of config.customFields ?? []) {
+    if (custom.archived || !custom.name.startsWith("custom_") || fields.some((f) => f.name === custom.name)) continue;
+    fields.push({
+      name: custom.name,
+      label: custom.label,
+      kind: custom.kind,
+      ...(custom.required && { required: true }),
+      ...(custom.kind === "select" && { options: custom.options ?? [] }),
+      group: "More details",
+      hideInTable: true,
+      custom: true,
+    });
+  }
+  const def = { ...base, fields };
+  merged.set(name, def);
+  return def;
+}
+
+export function optionLabel(field: FieldDef, value: unknown): string {
+  return (
+    field.options?.find((option) => option.value === value)?.label ??
+    field.retiredOptions?.find((option) => option.value === value)?.label ??
+    String(value ?? "")
+  );
+}
+
+/** Every choice of a field the user can see now, plus hidden ones older entries may still use. */
+export const allChoices = (collection: CollectionName, field: string): Option[] => {
+  const f = getCollection(collection).fields.find((x) => x.name === field);
+  return [...(f?.options ?? []), ...(f?.retiredOptions ?? [])];
+};
 
 export function isFieldVisible(field: FieldDef, values: Record<string, unknown>): boolean {
   return !field.showIf || field.showIf.in.includes(String(values[field.showIf.field] ?? ""));

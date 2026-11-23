@@ -42,8 +42,11 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
     await (await db()).from("sessions").select("user_id, expires_at").eq("token_hash", hashToken(token)).maybeSingle<{ user_id: string; expires_at: string }>(),
   );
   if (!session || Date.parse(session.expires_at) <= Date.now()) return null;
+  const user = await findUserById(session.user_id);
+  // An admin has blocked this account: its sessions no longer count.
+  if (!user || user.disabledAt) return null;
   await keepAlive(token, Date.parse(session.expires_at));
-  return (await findUserById(session.user_id)) ?? null;
+  return user;
 });
 
 /**

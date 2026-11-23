@@ -64,6 +64,14 @@ export async function listProjectsFor(ownerId: string, invitedIds: string[] = []
   return (must(await (await db()).from("projects").select("*").or(filter)) as ProjectRow[]).map(fromRow);
 }
 
+/** For the admin panel: every project (optionally matching a search), most recently active first. */
+export async function listAllProjectsRaw(search = ""): Promise<Project[]> {
+  let query = (await db()).from("projects").select("*").order("updated_at", { ascending: false }).limit(500);
+  const term = search.trim().replace(/[^\p{L}\p{N}@.\s_-]/gu, " ").trim();
+  if (term) query = query.or(`name.ilike.%${term}%,location.ilike.%${term}%`);
+  return (must(await query) as ProjectRow[]).map(fromRow);
+}
+
 export async function getProject(id: string): Promise<Project | undefined> {
   if (!isUuid(id)) return undefined;
   const row = must(await (await db()).from("projects").select("*").eq("id", id).maybeSingle<ProjectRow>());

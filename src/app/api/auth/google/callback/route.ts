@@ -28,6 +28,8 @@ export async function GET(request: Request) {
   const existing = await findUserWithPasswordByEmail(profile.email);
   let userId = existing?.id;
   let isNew = false;
+  // Blocked by an admin.
+  if (existing?.disabledAt) return fail();
   if (existing && !existing.emailVerifiedAt) {
     // Google just proved who owns this email, but whoever registered it never did. They may not be
     // the same person, so their password and sessions stop working before the owner is let in.

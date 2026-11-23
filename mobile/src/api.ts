@@ -20,6 +20,25 @@ const store = {
   remove: () => (web ? Promise.resolve(globalThis.localStorage?.removeItem(TOKEN_KEY)) : SecureStore.deleteItemAsync(TOKEN_KEY)),
 };
 
+/** Small settings kept on the phone (e.g. which announcements were closed). */
+export const prefs = {
+  async get(key: string): Promise<string | null> {
+    try {
+      return web ? (globalThis.localStorage?.getItem(key) ?? null) : await SecureStore.getItemAsync(key);
+    } catch {
+      return null;
+    }
+  },
+  async set(key: string, value: string) {
+    try {
+      if (web) globalThis.localStorage?.setItem(key, value);
+      else await SecureStore.setItemAsync(key, value);
+    } catch {
+      // Not saved: it just shows again next time.
+    }
+  },
+};
+
 export async function loadToken(): Promise<string | null> {
   token = await store.get();
   return token;
@@ -47,7 +66,7 @@ export class ApiError extends Error {
 
 export async function api<T = unknown>(
   path: string,
-  options: { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: unknown; form?: FormData } = {},
+  options: { method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"; body?: unknown; form?: FormData } = {},
 ): Promise<T> {
   let response: Response;
   const json = options.body !== undefined;

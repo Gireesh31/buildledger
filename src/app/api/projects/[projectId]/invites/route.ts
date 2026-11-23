@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { featureOff } from "@/lib/server/app-settings";
 import { requireProjectAccess } from "@/lib/server/access";
 import { createInvites, listInvites } from "@/lib/server/invite-store";
 import { parseEmail, parseInviteRole } from "@/lib/validation";
@@ -18,6 +19,8 @@ export async function POST(request: Request, { params }: Context) {
   const { projectId } = await params;
   const result = await requireProjectAccess(projectId, "owner");
   if (!result.ok) return result.response;
+  const off = await featureOff("team");
+  if (off) return off;
   const { user, project } = result.access;
 
   const body = await request.json().catch(() => null);

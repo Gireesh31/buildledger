@@ -2,7 +2,7 @@
  * Shop-style pickers shown above a form: picture cards with − / + that fill the form.
  * Each catalog says which form fields the card choice and the count go into.
  */
-import { materialCategories, vehicleTypes, type Option } from "@/lib/collections";
+import { getCollection, type CollectionName, type Option } from "@/lib/collections";
 
 export interface CatalogItem {
   value: string;
@@ -25,7 +25,8 @@ export interface Catalog {
   unitField?: string;
   /** Extra values to set when + is tapped, e.g. switch to hourly charging. */
   onAdd?: Record<string, string>;
-  options: readonly Option[];
+  /** The form whose choice field the cards fill. */
+  collection: CollectionName;
   items: CatalogItem[];
 }
 
@@ -35,7 +36,7 @@ export const catalogs = {
     choiceField: "category",
     countField: "quantity",
     unitField: "unit",
-    options: materialCategories,
+    collection: "materials",
     items: [
       { value: "cement", unit: "bag", step: 1, caption: "per bag", image: "/photos/materials/cement.webp" },
       { value: "steel", unit: "ton", step: 0.1, caption: "per ton", image: "/photos/materials/steel.webp" },
@@ -55,7 +56,7 @@ export const catalogs = {
     choiceField: "vehicle",
     countField: "hours",
     onAdd: { chargeType: "hourly" },
-    options: vehicleTypes,
+    collection: "transport",
     items: [
       { value: "jcb", step: 1, caption: "hours", image: "/photos/vehicles/jcb.webp" },
       { value: "hitachi", step: 1, caption: "hours", image: "/photos/vehicles/hitachi.webp" },
@@ -71,6 +72,20 @@ export const catalogs = {
 } satisfies Record<string, Catalog>;
 
 export type CatalogName = keyof typeof catalogs;
+
+/** The choices the cards stand for, as the admin has named them; hidden choices get no card. */
+export function catalogOptions(catalog: Catalog): readonly Option[] {
+  return getCollection(catalog.collection).fields.find((f) => f.name === catalog.choiceField)?.options ?? [];
+}
+
+/** Cards for the choices still offered, with their current names. */
+export function catalogCards(catalog: Catalog): (CatalogItem & { label: string })[] {
+  const options = catalogOptions(catalog);
+  return catalog.items.flatMap((item) => {
+    const option = options.find((o) => o.value === item.value);
+    return option ? [{ ...item, label: option.label }] : [];
+  });
+}
 
 /** Adds one tap's step to a count, without floating-point noise or going below zero. */
 export function stepCount(current: number, item: CatalogItem, direction: 1 | -1): number {

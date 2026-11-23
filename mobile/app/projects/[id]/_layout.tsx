@@ -3,6 +3,7 @@ import { ArrowLeft, Ellipsis, LayoutGrid, Package, Truck, Users } from "lucide-r
 import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppConfig } from "../../../src/config";
 import { loadProject, ProjectIdContext, useRouteProjectId } from "../../../src/data";
 import { HeaderBackground, headerTitleStyle } from "../../../src/header";
 import { colors, fonts } from "../../../src/theme";
@@ -26,6 +27,9 @@ export default function ProjectTabs() {
   }, [id]);
 
   const title = (tab: string) => (name ? `${tab} · ${name}` : tab);
+  // Sections an admin switched off leave the tab bar.
+  const { features } = useAppConfig().config;
+  const off = (on: boolean) => (on ? {} : HIDDEN);
   return (
     <ProjectIdContext.Provider value={id}>
     <Tabs
@@ -58,8 +62,8 @@ export default function ProjectTabs() {
     >
       <Tabs.Screen name="index" options={{ title: "Overview", headerTitle: title("Overview"), tabBarIcon: ({ color }) => <LayoutGrid size={22} color={color} /> }} />
       <Tabs.Screen name="materials" options={{ title: "Materials", headerTitle: title("Materials"), tabBarIcon: ({ color }) => <Package size={22} color={color} /> }} />
-      <Tabs.Screen name="labour" options={{ title: "Labour", headerTitle: title("Labour"), tabBarIcon: ({ color }) => <Users size={22} color={color} /> }} />
-      <Tabs.Screen name="transport" options={{ title: "Transport", headerTitle: title("Transport"), tabBarIcon: ({ color }) => <Truck size={22} color={color} /> }} />
+      <Tabs.Screen name="labour" options={{ ...off(features.labour), title: "Labour", headerTitle: title("Labour"), tabBarIcon: ({ color }) => <Users size={22} color={color} /> }} />
+      <Tabs.Screen name="transport" options={{ ...off(features.transport), title: "Transport", headerTitle: title("Transport"), tabBarIcon: ({ color }) => <Truck size={22} color={color} /> }} />
       <Tabs.Screen name="more" options={{ title: "More", headerTitle: title("More"), tabBarIcon: ({ color }) => <Ellipsis size={22} color={color} /> }} />
       {/* Opened from "More". */}
       <Tabs.Screen name="daily-log" options={{ ...HIDDEN, headerTitle: title("Daily log") }} />

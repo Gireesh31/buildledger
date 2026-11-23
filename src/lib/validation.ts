@@ -181,7 +181,8 @@ async function parseFieldValue(
       return typeof raw === "string" && isValidDate(raw) ? raw : null;
     case "select":
     case "radio":
-      return typeof raw === "string" && field.options?.some((o) => o.value === raw) ? raw : null;
+      // Hidden (retired) choices stay valid so older entries can still be edited and saved.
+      return typeof raw === "string" && [...(field.options ?? []), ...(field.retiredOptions ?? [])].some((o) => o.value === raw) ? raw : null;
     case "ref":
       return typeof raw === "string" && field.ref && (await refExists(field.ref, raw)) ? raw : null;
     case "phone":

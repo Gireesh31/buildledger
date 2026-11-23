@@ -5,7 +5,7 @@ import { RecordManager } from "@/components/records/RecordManager";
 import { PageHeader } from "@/components/ui/primitives";
 import { canWrite } from "@/lib/server/access";
 import { listAttachments } from "@/lib/server/attachment-store";
-import { requirePageAccess } from "@/lib/server/page-data";
+import { requireFeature, requirePageAccess } from "@/lib/server/page-data";
 import { listRecords } from "@/lib/server/record-store";
 
 export const metadata: Metadata = { title: "Daily log" };
@@ -13,6 +13,7 @@ export const metadata: Metadata = { title: "Daily log" };
 export default async function DailyLogPage({ params }: PageProps<"/projects/[projectId]/daily-log">) {
   const { projectId } = await params;
   const { project, role } = await requirePageAccess(projectId);
+  await requireFeature("dailyLog");
   const [logs, attachments] = await Promise.all([listRecords("dailyLogs", projectId), listAttachments(projectId)]);
 
   return (

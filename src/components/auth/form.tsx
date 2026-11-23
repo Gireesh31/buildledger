@@ -5,7 +5,7 @@ import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "rea
 export async function sendJson<T = Record<string, unknown>>(
   url: string,
   body: unknown,
-  method: "POST" | "PUT" | "DELETE" = "POST",
+  method: "POST" | "PUT" | "PATCH" | "DELETE" = "POST",
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   try {
     const response = await fetch(url, {

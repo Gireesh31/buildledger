@@ -2,7 +2,7 @@ import { Minus, Plus } from "lucide-react-native";
 import { useRef } from "react";
 import { Image, Pressable, View } from "react-native";
 import { Text } from "./text";
-import { stepCount, type Catalog, type CatalogItem } from "@/lib/catalogs";
+import { catalogCards, catalogOptions, stepCount, type Catalog, type CatalogItem } from "@/lib/catalogs";
 import { catalogImages } from "./catalog-images";
 import { colors, radius, shadow } from "./theme";
 
@@ -43,7 +43,7 @@ export function CatalogPicker({
     } else lastTap.current = { value: item.value, at: now };
   }
 
-  const name = (value: string) => catalog.options.find((o) => o.value === value)?.label ?? value;
+  const name = (value: string) => catalogOptions(catalog).find((o) => o.value === value)?.label ?? value;
   const indexOf = (item: CatalogItem) => items.findIndex((values) => values[catalog.choiceField] === item.value);
   const picked = (item: CatalogItem, count?: number) => ({
     [catalog.choiceField]: item.value,
@@ -68,7 +68,7 @@ export function CatalogPicker({
       <Text style={{ fontSize: 13, fontWeight: "600", color: colors.text }}>{catalog.prompt}</Text>
       <Text style={{ fontSize: 12, color: colors.muted, marginTop: -4 }}>Double-tap a picked item to remove it.</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        {catalog.items.map((item) => {
+        {catalogCards(catalog).map((item) => {
           const index = indexOf(item);
           const chosen = index !== -1;
           const count = chosen ? Number(items[index][catalog.countField]) || 0 : 0;

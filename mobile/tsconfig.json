@@ -11,8 +11,10 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "../src/lib/app-config.ts",
     "../src/lib/collections.ts",
     "../src/lib/catalogs.ts",
+    "../src/lib/form-editor.ts",
     "../src/lib/format.ts",
     "../src/lib/ledger.ts",
     "../src/lib/period-report.ts",

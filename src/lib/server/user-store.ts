@@ -20,6 +20,8 @@ interface UserRow {
   created_at: string;
   onboarded_at: string | null;
   email_verified_at: string | null;
+  is_admin: boolean;
+  disabled_at: string | null;
 }
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
@@ -47,6 +49,8 @@ function fromRow(row: UserRow): StoredUser {
     createdAt: iso(row.created_at)!,
     ...(row.onboarded_at && { onboardedAt: iso(row.onboarded_at) }),
     ...(row.email_verified_at && { emailVerifiedAt: iso(row.email_verified_at) }),
+    ...(row.is_admin && { isAdmin: true }),
+    ...(row.disabled_at && { disabledAt: iso(row.disabled_at) }),
     passwordHash: row.password_hash,
   };
 }
@@ -202,4 +206,45 @@ export async function findUserPhotoType(userId: string): Promise<string | undefi
 /** Removes the account; its sessions and password-reset links go with it (foreign keys cascade). */
 export async function deleteUser(userId: string) {
   must(await (await db()).from("users").delete().eq("id", userId));
+}
+
+// --- Admin panel ---------------------------------------------------------------------------------
+
+export interface AdminUserRow extends User {
+  projectCount: number;
+}
+
+/** Every account, newest first, with how many projects each owns. Optional search by name or email. */
+export async function listAllUsers(search = ""): Promise<AdminUserRow[]> {
+  const client = await db();
+  let query = client.from("users").select("*").order("created_at", { ascending: false }).limit(500);
+  const term = search.trim().replace(/[^\p{L}\p{N}@.\s_-]/gu, " ").trim();
+  if (term) query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%`);
+  const rows = must(await query) as UserRow[];
+  const owners = must(await client.from("projects").select("owner_id")) as { owner_id: string }[];
+  const counts = new Map<string, number>();
+  for (const { owner_id } of owners) counts.set(owner_id, (counts.get(owner_id) ?? 0) + 1);
+  return rows.map((row) => ({ ...toPublic(fromRow(row)), projectCount: counts.get(row.id) ?? 0 }));
+}
+
+/** Names of these users by id (for showing project owners). */
+export async function findUsersByIds(ids: string[]): Promise<User[]> {
+  const valid = [...new Set(ids.filter(isUuid))];
+  if (valid.length === 0) return [];
+  const rows = must(await (await db()).from("users").select("*").in("id", valid)) as UserRow[];
+  return rows.map((row) => toPublic(fromRow(row)));
+}
+
+export async function setUserDisabled(userId: string, disabled: boolean) {
+  must(await (await db()).from("users").update({ disabled_at: disabled ? new Date().toISOString() : null }).eq("id", userId));
+}
+
+export async function setUserAdmin(userId: string, admin: boolean) {
+  must(await (await db()).from("users").update({ is_admin: admin }).eq("id", userId));
+}
+
+export async function countAdmins(): Promise<number> {
+  const { count, error } = await (await db()).from("users").select("id", { count: "exact", head: true }).eq("is_admin", true).is("disabled_at", null);
+  must({ data: null, error });
+  return count ?? 0;
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 import { Text } from "../../../src/text";
-import { isTeam, optionLabel, trades } from "@/lib/collections";
+import { getCollection, isTeam, optionLabel } from "@/lib/collections";
 import { formatINR, formatNumber, todayISO } from "@/lib/format";
 import { computeLedger } from "@/lib/ledger";
 import type { LedgerRecord, Project } from "@/lib/types";
@@ -90,7 +90,7 @@ function AttendanceSheet({ projectId, workers, attendance, onSaved }: { projectI
           {workers.map((w) => (
             <View key={w.id} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10 }}>
               <Text style={{ fontWeight: "600", color: colors.text }}>
-                {String(w.name)} <Text style={{ color: colors.muted, fontWeight: "400" }}>· {optionLabel({ name: "trade", label: "Trade", kind: "select", options: trades }, w.trade)} · {formatINR(Number(w.dailyWage) || 0)}/day</Text>
+                {String(w.name)} <Text style={{ color: colors.muted, fontWeight: "400" }}>· {optionLabel(getCollection("workers").fields.find((f) => f.name === "trade")!, w.trade)} · {formatINR(Number(w.dailyWage) || 0)}/day</Text>
               </Text>
               <View style={{ flexDirection: "row", gap: 8 }}>
                 {STATUSES.map((s) => (

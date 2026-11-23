@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { featureForCollection } from "@/lib/app-config";
+import { featureOff } from "@/lib/server/app-settings";
 import { isCollectionName } from "@/lib/collections";
 import { requireProjectAccess } from "@/lib/server/access";
 import { updateProject } from "@/lib/server/project-store";
@@ -22,6 +24,8 @@ export async function POST(request: Request, { params }: Context) {
   if (!isCollectionName(collection)) return unknownCollection();
   const result = await requireProjectAccess(projectId, "write");
   if (!result.ok) return result.response;
+  const off = await featureOff(featureForCollection(collection));
+  if (off) return off;
 
   const body = await request.json().catch(() => null);
   const parsed = await parseRecord(collection, body, (ref, id) => recordExists(ref, projectId, id));

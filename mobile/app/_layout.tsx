@@ -6,6 +6,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../src/auth";
+import { AppConfigProvider, useAppConfig } from "../src/config";
 import { HeaderBackground, headerTitleStyle } from "../src/header";
 import { WifiOff } from "lucide-react-native";
 import { View } from "react-native";
@@ -57,6 +58,17 @@ function RootStack() {
   const { user, startupError, retry } = useAuth();
   if (startupError) return <CantConnect message={startupError} onRetry={retry} />;
   if (user === undefined) return <Loading />;
+  return (
+    <AppConfigProvider signedIn={Boolean(user)}>
+      <Screens />
+    </AppConfigProvider>
+  );
+}
+
+function Screens() {
+  const { user } = useAuth();
+  // Forms need the admin's choices and fields before they open.
+  if (!useAppConfig().ready) return <Loading />;
   // New accounts see the welcome steps once, like the website's onboarding.
   const onboarded = Boolean(user?.onboardedAt);
   return (
@@ -78,6 +90,10 @@ function RootStack() {
         <Stack.Screen name="projects/new" options={{ title: "New project" }} />
         <Stack.Screen name="projects/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ title: "Your profile" }} />
+      </Stack.Protected>
+      {/* Only admins can reach the admin screens; the server refuses everyone else too. */}
+      <Stack.Protected guard={Boolean(user?.isAdmin) && onboarded}>
+        <Stack.Screen name="admin" options={{ headerShown: false }} />
       </Stack.Protected>
       <Stack.Protected guard={!user}>
         <Stack.Screen name="login" options={{ headerShown: false, animation: "fade" }} />

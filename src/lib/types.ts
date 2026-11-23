@@ -36,6 +36,10 @@ export interface User {
   onboardedAt?: string;
   /** Set once the person proves they own the email (link in an email, or Google sign-in). Project invites need it. */
   emailVerifiedAt?: string;
+  /** Can open the admin panel. Only set for admins. */
+  isAdmin?: boolean;
+  /** Set when an admin has blocked the account: it can't sign in. */
+  disabledAt?: string;
 }
 
 export type InviteRole = "editor" | "viewer";

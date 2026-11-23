@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { featureOff } from "@/lib/server/app-settings";
 import { isCollectionName } from "@/lib/collections";
 import { requireProjectAccess } from "@/lib/server/access";
 import { ALLOWED_MIME_TYPES, listAttachments, MAX_UPLOAD_BYTES, saveAttachment } from "@/lib/server/attachment-store";
@@ -21,6 +22,8 @@ export async function POST(request: Request, { params }: Context) {
   const { projectId } = await params;
   const result = await requireProjectAccess(projectId, "write");
   if (!result.ok) return result.response;
+  const off = await featureOff("files");
+  if (off) return off;
 
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");

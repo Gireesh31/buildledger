@@ -7,7 +7,7 @@ import { formatINR, formatNumber } from "@/lib/format";
 import { balanceDue, outstandingBills } from "@/lib/ledger";
 import { canWrite } from "@/lib/server/access";
 import { listAttachments } from "@/lib/server/attachment-store";
-import { requirePageAccess } from "@/lib/server/page-data";
+import { requireFeature, requirePageAccess } from "@/lib/server/page-data";
 import { listRecords } from "@/lib/server/record-store";
 
 export const metadata: Metadata = { title: "Transport" };
@@ -15,6 +15,7 @@ export const metadata: Metadata = { title: "Transport" };
 export default async function TransportPage({ params }: PageProps<"/projects/[projectId]/transport">) {
   const { projectId } = await params;
   const { project, role } = await requirePageAccess(projectId);
+  await requireFeature("transport");
   const [vehicles, attachments] = await Promise.all([listRecords("transport", projectId), listAttachments(projectId)]);
   const total = vehicles.reduce((s, v) => s + (typeof v.amount === "number" ? v.amount : 0), 0);
   const due = outstandingBills(vehicles);

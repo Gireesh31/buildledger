@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Building2, ChevronRight, Plus, UserRound } from "lucide-react-native";
+import { Building2, ChevronRight, Plus, ShieldCheck, UserRound } from "lucide-react-native";
 import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { Text } from "../src/text";
@@ -13,6 +13,7 @@ import { afterWelcome, useAuth } from "../src/auth";
 import { loadCollections, useLoad } from "../src/data";
 import { colors, fonts } from "../src/theme";
 import { VerifyEmailCard } from "../src/VerifyEmailCard";
+import { Announcements } from "../src/Announcements";
 import { ConstructionScene } from "../src/construction-scene";
 import { Badge, Button, Empty, Eyebrow, FadeIn, Glow, HazardTape, Loading, Message, PressableScale, Screen, SectionTitle, StatTile, styles, TileGrid } from "../src/ui";
 
@@ -57,9 +58,16 @@ export default function Dashboard() {
               Build<Text style={{ color: colors.brand, fontWeight: "800" }}>Ledger</Text>
             </Text>
           </View>
-          <Pressable onPress={() => router.push("/profile")} hitSlop={10} accessibilityLabel="Your profile" style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 999, padding: 9 }}>
-            <UserRound size={20} color="#fff" />
-          </Pressable>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            {user?.isAdmin ? (
+              <Pressable onPress={() => router.push("/admin")} hitSlop={10} accessibilityLabel="Admin panel" style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 999, padding: 9 }}>
+                <ShieldCheck size={20} color="#FDBA8C" />
+              </Pressable>
+            ) : null}
+            <Pressable onPress={() => router.push("/profile")} hitSlop={10} accessibilityLabel="Your profile" style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 999, padding: 9 }}>
+              <UserRound size={20} color="#fff" />
+            </Pressable>
+          </View>
         </View>
         <FadeIn delay={60}>
           <View style={{ marginTop: 22, gap: 4 }}>
@@ -83,6 +91,7 @@ export default function Dashboard() {
         <Screen refreshing={refreshing} onRefresh={onRefresh}>
           {error ? <Message text={error} /> : null}
           {user && !user.emailVerifiedAt ? <VerifyEmailCard email={user.email} /> : null}
+          <Announcements key="announcements" />
           <TileGrid>
             <StatTile label="Projects" value={String(data.length)} hint={`${data.filter((r) => r.project.status === "active").length} in progress`} />
             <StatTile label="Total spent" value={formatINR(totals.spent)} />

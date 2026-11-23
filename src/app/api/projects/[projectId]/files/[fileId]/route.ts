@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { featureOff } from "@/lib/server/app-settings";
 import { requireProjectAccess } from "@/lib/server/access";
 import { deleteAttachment, getAttachment, readAttachmentFile } from "@/lib/server/attachment-store";
 
@@ -28,6 +29,8 @@ export async function DELETE(_request: Request, { params }: Context) {
   const { projectId, fileId } = await params;
   const result = await requireProjectAccess(projectId, "write");
   if (!result.ok) return result.response;
+  const off = await featureOff("files");
+  if (off) return off;
   return (await deleteAttachment(projectId, fileId))
     ? new NextResponse(null, { status: 204 })
     : NextResponse.json({ error: "File not found." }, { status: 404 });

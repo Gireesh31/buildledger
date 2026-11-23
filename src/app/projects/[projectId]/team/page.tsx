@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { TeamInvites } from "@/components/team/TeamInvites";
 import { Card, PageHeader } from "@/components/ui/primitives";
 import { listInvites } from "@/lib/server/invite-store";
-import { requirePageAccess } from "@/lib/server/page-data";
+import { requireFeature, requirePageAccess } from "@/lib/server/page-data";
 import { findRegisteredEmails, findUserById } from "@/lib/server/user-store";
 
 export const metadata: Metadata = { title: "Team" };
@@ -11,6 +11,7 @@ export const metadata: Metadata = { title: "Team" };
 export default async function TeamPage({ params }: PageProps<"/projects/[projectId]/team">) {
   const { projectId } = await params;
   const { project, role } = await requirePageAccess(projectId);
+  await requireFeature("team");
   const [owner, invites] = await Promise.all([findUserById(project.ownerId), listInvites(projectId)]);
   const joinedEmails = await findRegisteredEmails(invites.map((i) => i.email));
 

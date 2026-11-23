@@ -1,4 +1,4 @@
-import { isTeam, materialCategories } from "@/lib/collections";
+import { allChoices, isTeam } from "@/lib/collections";
 import type { LedgerRecord, Project } from "@/lib/types";
 
 export interface LedgerInput {
@@ -55,7 +55,7 @@ export function computeLedger(input: LedgerInput) {
 
   const byCategory = [
     // Each material type (cement, steel, sand, …) from the Materials page, plus labour and transport.
-    ...materialCategories.map((c) => ({
+    ...allChoices("materials", "category").map((c) => ({
       key: c.value,
       label: c.label,
       amount: sum(materials.filter((m) => m.category === c.value)),
