@@ -21,7 +21,6 @@ export default function AdminLayout() {
       <Stack.Screen name="index" options={{ title: "Admin panel" }} />
       <Stack.Screen name="users/index" options={{ title: "Users" }} />
       <Stack.Screen name="users/[id]" options={{ title: "User" }} />
-      <Stack.Screen name="projects" options={{ title: "Projects" }} />
       <Stack.Screen name="forms" options={{ title: "Forms" }} />
       <Stack.Screen name="features" options={{ title: "Features" }} />
       <Stack.Screen name="announcements" options={{ title: "Announcements" }} />

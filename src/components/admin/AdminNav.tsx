@@ -1,13 +1,12 @@
 "use client";
 
-import { FolderKanban, LayoutDashboard, ListChecks, Megaphone, ToggleRight, Users, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, ListChecks, Megaphone, ToggleRight, Users, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/projects", label: "Projects", icon: FolderKanban },
   { href: "/admin/forms", label: "Forms", icon: ListChecks },
   { href: "/admin/features", label: "Features", icon: ToggleRight },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },

@@ -68,7 +68,6 @@ async function ProjectShell({ params, children }: { params: Promise<{ projectId:
             </div>
             <div className="flex gap-2">
               {status && <span className="rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70 shadow-sm">{status}</span>}
-              {access.asAdmin && <span className="rounded-md border border-brand/30 bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand shadow-sm">Admin view</span>}
               {role === "viewer" && <span className="rounded-md border border-foreground/10 bg-surface px-2.5 py-1 text-xs font-medium text-foreground/70 shadow-sm">View only</span>}
             </div>
           </div>

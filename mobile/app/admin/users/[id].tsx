@@ -2,9 +2,9 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Save, Trash2 } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import type { Project, User } from "@/lib/types";
+import type { User } from "@/lib/types";
 import { api, errorMessage } from "../../../src/api";
-import { confirmAction, NavRow, SwitchRow } from "../../../src/admin-ui";
+import { confirmAction, SwitchRow } from "../../../src/admin-ui";
 import { useAuth } from "../../../src/auth";
 import { useLoad } from "../../../src/data";
 import { Text } from "../../../src/text";
@@ -15,7 +15,7 @@ import { Button, Card, Field, Input, Loading, Message, Screen } from "../../../s
 export default function AdminUser() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user: me } = useAuth();
-  const { data, error, reload } = useLoad(() => api<{ user: User; projects: Project[] }>(`/api/admin/users/${id}`), `admin-user-${id}`);
+  const { data, error, reload } = useLoad(() => api<{ user: User; ownedProjects: number }>(`/api/admin/users/${id}`), `admin-user-${id}`);
   const [values, setValues] = useState({ firstName: "", lastName: "", email: "", phone: "", location: "" });
   const [pending, setPending] = useState(false);
   const [confirm, setConfirm] = useState("");
@@ -112,16 +112,10 @@ export default function AdminUser() {
         </View>
       </Card>
 
-      <Card title={`Projects they own (${data.projects.length})`}>
-        {data.projects.length === 0 ? <Text style={{ color: colors.muted }}>None.</Text> : null}
-        {data.projects.map((p) => (
-          <NavRow key={p.id} label={p.name} hint={p.location || "No location"} onPress={() => router.push(`/projects/${p.id}`)} />
-        ))}
-      </Card>
 
       {!self ? (
         <Card title="Delete account">
-          <Text style={{ color: colors.muted }}>Deletes the account and every project it owns, with all entries, bills and photos. This can't be undone.</Text>
+          <Text style={{ color: colors.muted }}>Deletes the account and the {data.ownedProjects === 1 ? "project" : `${data.ownedProjects} projects`} it owns, with all entries, bills and photos. This can't be undone.</Text>
           <Field label="Type DELETE to confirm" required>
             <Input value={confirm} onChangeText={setConfirm} autoCapitalize="characters" autoCorrect={false} />
           </Field>

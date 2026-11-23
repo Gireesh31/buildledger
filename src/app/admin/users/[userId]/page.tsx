@@ -12,7 +12,7 @@ export default async function AdminUserPage({ params }: PageProps<"/admin/users/
   const admin = await requireAdminPage(`/admin/users/${userId}`);
   const user = await findUserById(userId);
   if (!user) notFound();
-  const projects = await listProjectsFor(user.id);
+  const ownedProjects = (await listProjectsFor(user.id)).length;
 
   return (
     <>
@@ -20,7 +20,7 @@ export default async function AdminUserPage({ params }: PageProps<"/admin/users/
         <ArrowLeft className="h-4 w-4" aria-hidden /> All users
       </Link>
       <PageHeader title={user.name} description={user.email} icon={UserCog} accent="green" />
-      <AdminUserEditor user={user} isSelf={user.id === admin.id} projects={projects.map((p) => ({ id: p.id, name: p.name, status: p.status }))} />
+      <AdminUserEditor user={user} isSelf={user.id === admin.id} ownedProjects={ownedProjects} />
     </>
   );
 }

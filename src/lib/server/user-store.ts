@@ -210,28 +210,13 @@ export async function deleteUser(userId: string) {
 
 // --- Admin panel ---------------------------------------------------------------------------------
 
-export interface AdminUserRow extends User {
-  projectCount: number;
-}
-
-/** Every account, newest first, with how many projects each owns. Optional search by name or email. */
-export async function listAllUsers(search = ""): Promise<AdminUserRow[]> {
+/** Every account, newest first. Optional search by name or email. */
+export async function listAllUsers(search = ""): Promise<User[]> {
   const client = await db();
   let query = client.from("users").select("*").order("created_at", { ascending: false }).limit(500);
   const term = search.trim().replace(/[^\p{L}\p{N}@.\s_-]/gu, " ").trim();
   if (term) query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%`);
   const rows = must(await query) as UserRow[];
-  const owners = must(await client.from("projects").select("owner_id")) as { owner_id: string }[];
-  const counts = new Map<string, number>();
-  for (const { owner_id } of owners) counts.set(owner_id, (counts.get(owner_id) ?? 0) + 1);
-  return rows.map((row) => ({ ...toPublic(fromRow(row)), projectCount: counts.get(row.id) ?? 0 }));
-}
-
-/** Names of these users by id (for showing project owners). */
-export async function findUsersByIds(ids: string[]): Promise<User[]> {
-  const valid = [...new Set(ids.filter(isUuid))];
-  if (valid.length === 0) return [];
-  const rows = must(await (await db()).from("users").select("*").in("id", valid)) as UserRow[];
   return rows.map((row) => toPublic(fromRow(row)));
 }
 

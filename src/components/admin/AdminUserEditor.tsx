@@ -1,23 +1,23 @@
 "use client";
 
-import { ExternalLink, Save, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Save, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, Card, inputClass } from "@/components/ui/primitives";
-import type { Project, User } from "@/lib/types";
+import type { User } from "@/lib/types";
 
 type Message = { tone: "error" | "success"; text: string } | null;
 
 export function AdminUserEditor({
   user,
   isSelf,
-  projects,
+  ownedProjects,
 }: {
   user: User;
   isSelf: boolean;
-  projects: Pick<Project, "id" | "name" | "status">[];
+  /** Deleting the account deletes these too. */
+  ownedProjects: number;
 }) {
   const router = useRouter();
   const [profile, setProfile] = useState({
@@ -81,22 +81,6 @@ export function AdminUserEditor({
           </form>
         </Card>
 
-        <Card title={`Projects they own (${projects.length})`}>
-          {projects.length === 0 ? (
-            <p className="text-sm text-foreground/60">None.</p>
-          ) : (
-            <ul className="divide-y divide-foreground/10 text-sm">
-              {projects.map((p) => (
-                <li key={p.id} className="flex items-center justify-between py-2">
-                  <span>{p.name}</span>
-                  <Link href={`/projects/${p.id}`} className="inline-flex items-center gap-1 text-brand hover:underline">
-                    Open <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -129,7 +113,7 @@ export function AdminUserEditor({
         {!isSelf && (
           <Card title="Delete account">
             <p className="mb-3 text-sm text-foreground/70">
-              Deletes the account and the {projects.length === 1 ? "project" : `${projects.length} projects`} it owns, with every entry and file. This can’t be undone.
+              Deletes the account and the {ownedProjects === 1 ? "project" : `${ownedProjects} projects`} it owns, with every entry and file. This can’t be undone.
             </p>
             <input value={confirmText} onChange={(e) => setConfirmText(e.target.value)} placeholder="Type DELETE" className={inputClass} aria-label="Type DELETE to confirm" />
             <button type="button" onClick={remove} disabled={pending || confirmText !== "DELETE"} className={`${buttonClass("danger")} mt-3 w-full`}>

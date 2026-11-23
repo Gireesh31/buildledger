@@ -13,14 +13,14 @@ const bad = (error: string, status = 400) => NextResponse.json({ error }, { stat
 const notFound = () => bad("User not found.", 404);
 const text = (value: unknown, max: number) => (typeof value === "string" && value.trim().length <= max ? value.trim() : null);
 
-/** One account with the projects it owns. */
+/** One account, with how many projects it owns (deleting it deletes those). */
 export async function GET(_request: Request, { params }: Context) {
   const admin = await requireAdmin();
   if (!admin.ok) return admin.response;
   const { userId } = await params;
   const user = await findUserById(userId);
   if (!user) return notFound();
-  return NextResponse.json({ user, projects: await listProjectsFor(user.id) });
+  return NextResponse.json({ user, ownedProjects: (await listProjectsFor(user.id)).length });
 }
 
 /**

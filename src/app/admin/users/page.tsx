@@ -34,7 +34,6 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
                 <p className="truncate text-sm text-foreground/60">{u.email}</p>
               </div>
               <div className="hidden text-right text-xs text-foreground/60 sm:block">
-                <p>{u.projectCount === 1 ? "1 project" : `${u.projectCount} projects`}</p>
                 <p>Joined {new Date(u.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
               </div>
               <ChevronRight className="h-4 w-4 text-foreground/40" aria-hidden />

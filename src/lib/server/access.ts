@@ -10,12 +10,10 @@ export interface ProjectAccess {
   user: User;
   project: Project;
   role: ProjectRole;
-  /** An admin opening someone else's project: full owner access, through the admin panel. */
-  asAdmin?: boolean;
 }
 
 /**
- * Owners have full access; anyone invited by email gets the invite's role; admins can open every project.
+ * Owners have full access; anyone invited by email gets the invite's role.
  * Cached per request, so a layout and its page can both call it.
  */
 export const getProjectAccess = cache(async (projectId: string): Promise<ProjectAccess | null> => {
@@ -25,7 +23,6 @@ export const getProjectAccess = cache(async (projectId: string): Promise<Project
   const [project] = await Promise.all([getProject(projectId), loadAppConfig()]);
   if (!project) return null;
   if (project.ownerId === user.id) return { user, project, role: "owner" };
-  if (user.isAdmin) return { user, project, role: "owner", asAdmin: true };
   // Invites are by email, so they only count once the person has proven they own that email.
   if (!user.emailVerifiedAt) return null;
   const invite = (await listInvitesForEmail(user.email)).find((i) => i.projectId === projectId);

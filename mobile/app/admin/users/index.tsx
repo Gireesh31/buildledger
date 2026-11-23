@@ -8,11 +8,9 @@ import { useLoad } from "../../../src/data";
 import { colors } from "../../../src/theme";
 import { Badge, Empty, Input, Loading, Message, Screen } from "../../../src/ui";
 
-type Row = User & { projectCount: number };
-
 export default function AdminUsers() {
   const [search, setSearch] = useState("");
-  const { data, error, refreshing, onRefresh } = useLoad(() => api<Row[]>("/api/admin/users"), "admin-users");
+  const { data, error, refreshing, onRefresh } = useLoad(() => api<User[]>("/api/admin/users"), "admin-users");
   if (!data && !error) return <Loading />;
   const term = search.trim().toLowerCase();
   const rows = (data ?? []).filter((u) => !term || u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term));
@@ -25,7 +23,7 @@ export default function AdminUsers() {
         <NavRow
           key={u.id}
           label={u.name}
-          hint={`${u.email} · ${u.projectCount === 1 ? "1 project" : `${u.projectCount} projects`}`}
+          hint={u.email}
           onPress={() => router.push(`/admin/users/${u.id}`)}
           right={
             <View style={{ gap: 4, alignItems: "flex-end" }}>
