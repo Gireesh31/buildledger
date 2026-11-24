@@ -16,6 +16,7 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from "react-native";
+import { tidyNumberText } from "@/lib/spoken-number";
 import { Text } from "./text";
 import { colors, fonts, radius, shadow } from "./theme";
 
@@ -131,18 +132,51 @@ export function Label({ text, required }: { text: string; required?: boolean }) 
   );
 }
 
-export function Input(props: TextInputProps & { prefix?: string }) {
-  const { prefix, style, onFocus, onBlur, ...rest } = props;
+/**
+ * A text box. It isn't "controlled" while you type: pushing `value` back into the native box on every
+ * keystroke cancels the keyboard's voice typing (dictation) on iPhone, so the box keeps its own text
+ * and only takes `value` when it changes from outside (a reset, a picked item, a scanned bill).
+ * With `numeric`, dictated numbers ("five hundred", "2 lakh") become digits when you leave the box.
+ */
+export function Input(props: TextInputProps & { prefix?: string; numeric?: boolean }) {
+  const { prefix, style, onFocus, onBlur, value, onChangeText, numeric, keyboardType, ...rest } = props;
   const [focused, setFocused] = useState(false);
+  const typed = useRef(value ?? "");
+  const [resetCount, setResetCount] = useState(0);
+  useEffect(() => {
+    if ((value ?? "") !== typed.current) {
+      typed.current = value ?? "";
+      setResetCount((n) => n + 1); // new native box with the new text
+    }
+  }, [value]);
+  const change = (text: string) => {
+    typed.current = text;
+    onChangeText?.(text);
+  };
   return (
     <View style={[styles.inputBox, focused && styles.inputFocused]}>
       {prefix ? <Text style={styles.prefix}>{prefix}</Text> : null}
       <TextInput
+        key={resetCount}
+        defaultValue={typed.current}
+        onChangeText={change}
         placeholderTextColor={colors.faint}
         selectionColor={colors.brand}
+        // iPhone's decimal pad has no microphone; this keypad has numbers and voice typing.
+        keyboardType={numeric ? (Platform.OS === "ios" ? "numbers-and-punctuation" : "decimal-pad") : keyboardType}
         style={[styles.input, rest.multiline && { minHeight: 88, textAlignVertical: "top" }, style]}
         onFocus={(e) => (setFocused(true), onFocus?.(e))}
-        onBlur={(e) => (setFocused(false), onBlur?.(e))}
+        onBlur={(e) => {
+          setFocused(false);
+          if (numeric) {
+            const tidy = tidyNumberText(typed.current);
+            if (tidy !== typed.current) {
+              change(tidy);
+              setResetCount((n) => n + 1);
+            }
+          }
+          onBlur?.(e);
+        }}
         {...rest}
       />
     </View>

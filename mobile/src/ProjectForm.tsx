@@ -68,10 +68,10 @@ export function ProjectForm({ project, submitLabel, onSubmit }: { project?: Proj
         <ChoiceInput value={values.status} options={projectStatuses} onChange={set("status")} />
       </Field>
       <Field label="Budget">
-        <Input prefix="₹" value={values.budget} onChangeText={set("budget")} keyboardType="decimal-pad" placeholder="0" />
+        <Input prefix="₹" value={values.budget} onChangeText={set("budget")} numeric placeholder="0" />
       </Field>
       <Field label="Built-up area (sq ft)">
-        <Input value={values.areaSqft} onChangeText={set("areaSqft")} keyboardType="decimal-pad" placeholder="e.g. 2400" />
+        <Input value={values.areaSqft} onChangeText={set("areaSqft")} numeric placeholder="e.g. 2400" />
       </Field>
       <Field label="Start date">
         <DateInput value={values.startDate} onChange={set("startDate")} />

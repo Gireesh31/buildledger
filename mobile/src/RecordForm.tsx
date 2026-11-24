@@ -260,9 +260,9 @@ function FieldInput({ field, value, onChange, options }: { field: FieldDef; valu
     case "ref":
       return <SelectInput title={field.label} value={value} options={(field.kind === "ref" ? options : field.options) ?? []} onChange={onChange} />;
     case "money":
-      return <Input prefix="₹" value={value} onChangeText={onChange} keyboardType="decimal-pad" placeholder="0" />;
+      return <Input prefix="₹" value={value} onChangeText={onChange} numeric placeholder="0" />;
     case "number":
-      return <Input value={value} onChangeText={onChange} keyboardType="decimal-pad" placeholder="0" />;
+      return <Input value={value} onChangeText={onChange} numeric placeholder="0" />;
     case "phone":
       return <Input value={value} onChangeText={onChange} keyboardType="phone-pad" placeholder="98765 43210" />;
     case "textarea":

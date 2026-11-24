@@ -46,7 +46,8 @@ export function Announcements() {
   }, [load]);
 
   if (!dismissed) return null;
-  const visible = items.filter((a) => !dismissed.includes(a.id));
+  // An unexpected reply hides the banner instead of blanking the whole home screen.
+  const visible = (Array.isArray(items) ? items : []).filter((a) => !dismissed.includes(a.id));
   if (visible.length === 0) return null;
 
   function close(id: string) {

@@ -2,6 +2,7 @@
  * Definitions for every project ledger. One definition drives the form, the table,
  * server-side validation and PDF export, so adding a field only happens here.
  */
+import { readNumber } from "./spoken-number";
 
 /** "radio" is a select shown as a row of choice buttons. */
 export type FieldKind = "text" | "textarea" | "number" | "money" | "date" | "select" | "radio" | "ref" | "phone";
@@ -407,11 +408,13 @@ export function computeField(def: CollectionDef, field: FieldDef, values: Record
     return f ? isFieldVisible(f, values) : true;
   };
   const [a, b] = field.computed.product;
+  // readNumber, so totals already work while a dictated "five hundred" is still in the box.
+  const num = (name: string) => readNumber(values[name] as string | number | undefined) ?? 0;
   const value =
     shown(a) && shown(b)
-      ? (Number(values[a]) || 0) * (Number(values[b]) || 0)
+      ? num(a) * num(b)
       : field.computed.fallback && shown(field.computed.fallback)
-        ? Number(values[field.computed.fallback]) || 0
+        ? num(field.computed.fallback)
         : 0;
   return Math.round(value * 100) / 100;
 }

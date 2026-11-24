@@ -4,8 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { FormMessage, sendJson } from "@/components/auth/form";
 import { buttonClass, inputClass } from "@/components/ui/primitives";
+import { tidyNumberText } from "@/lib/spoken-number";
 import type { Project } from "@/lib/types";
 import { projectStatuses, projectTypes } from "@/lib/validation";
+
+/** Turns dictated numbers ("45 lakh") into digits when you leave the box. */
+const tidyOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  e.currentTarget.value = tidyNumberText(e.currentTarget.value);
+};
 
 export type ProjectFieldName =
   | "name"
@@ -121,13 +127,14 @@ export function ProjectForm({ project, fields = ALL_PROJECT_FIELDS, submitLabel 
         {show("budget") && (
           <label className="flex flex-col gap-1 text-sm">
             {label("Total budget (₹)")}
-            <input name="budget" type="number" inputMode="decimal" min={0} step="1" defaultValue={project?.budget} placeholder="e.g. 4500000" className={inputClass} />
+            {/* Text with a number keypad, so voice typing ("45 lakh") isn't thrown away; tidied on leaving the box. */}
+            <input name="budget" inputMode="decimal" autoComplete="off" defaultValue={project?.budget} placeholder="e.g. 4500000" onBlur={tidyOnBlur} className={inputClass} />
           </label>
         )}
         {show("areaSqft") && (
           <label className="flex flex-col gap-1 text-sm">
             {label("Built-up area (sq ft)")}
-            <input name="areaSqft" type="number" inputMode="decimal" min={0} step="any" defaultValue={project?.areaSqft} placeholder="e.g. 2400" className={inputClass} />
+            <input name="areaSqft" inputMode="decimal" autoComplete="off" defaultValue={project?.areaSqft} placeholder="e.g. 2400" onBlur={tidyOnBlur} className={inputClass} />
           </label>
         )}
         {show("startDate") && (

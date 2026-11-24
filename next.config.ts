@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
     ];
   },
   partialPrefetching: true,
+  experimental: {
+    // Going back to a project tab you saw in the last 30 s shows it at once instead of rendering it
+    // again on the server. Saving anything calls router.refresh(), which clears this, so your own
+    // changes always show straight away.
+    staleTimes: { dynamic: 30 },
+    // The stylesheet (~16 KB) goes inside the page instead of a separate request that holds up the first paint.
+    inlineCss: true,
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -1,5 +1,6 @@
 import { computeField, getCollection, isFieldVisible, type CollectionName, type FieldDef } from "@/lib/collections";
 import type { InviteRole, Project, ProjectStatus, ProjectType } from "@/lib/types";
+import { readNumber } from "@/lib/spoken-number";
 
 export function parseName(value: unknown): string | null {
   if (typeof value !== "string") return null;
@@ -37,8 +38,9 @@ function isValidDate(value: string) {
 }
 
 function parseAmount(value: unknown): number | null {
-  const num = typeof value === "number" ? value : typeof value === "string" ? Number(value.replace(/[,₹\s]/g, "")) : NaN;
-  return Number.isFinite(num) && num >= 0 && num < 1e12 ? Math.round(num * 100) / 100 : null;
+  // Also reads dictated numbers ("five hundred", "2 lakh", "450 rupees") from phone keyboards.
+  const num = typeof value === "number" || typeof value === "string" ? readNumber(value) : null;
+  return num !== null && Number.isFinite(num) && num >= 0 && num < 1e12 ? Math.round(num * 100) / 100 : null;
 }
 
 export const projectStatuses: { value: ProjectStatus; label: string }[] = [

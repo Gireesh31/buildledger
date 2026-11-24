@@ -9,6 +9,7 @@ import { catalogs, type Catalog, type CatalogName } from "@/lib/catalogs";
 import { formatINR, todayISO } from "@/lib/format";
 import { parseMaterialBill, type MaterialValues } from "@/lib/material-parse";
 import { scanBill } from "@/lib/ocr";
+import { tidyNumberText } from "@/lib/spoken-number";
 import type { AttachmentKind, LedgerRecord } from "@/lib/types";
 import { AttachmentPicker } from "./AttachmentPicker";
 import { CatalogPicker } from "./CatalogPicker";
@@ -399,15 +400,33 @@ function FieldInput({
         </select>
       );
     }
+    // Text boxes with a number keypad, not type="number": a phone's voice typing enters things like
+    // "500 rupees" or "five hundred", which a number box silently throws away. They're turned into
+    // digits when you leave the box (and read the same way by the server).
     case "money":
       return (
         <div className="relative">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground/50">₹</span>
-          <input {...common} type="number" inputMode="decimal" min={0} step="0.01" onChange={(e) => onChange(e.target.value)} className={`${inputClass} pl-7`} />
+          <input
+            {...common}
+            inputMode="decimal"
+            autoComplete="off"
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={(e) => onChange(tidyNumberText(e.target.value))}
+            className={`${inputClass} pl-7`}
+          />
         </div>
       );
     case "number":
-      return <input {...common} type="number" inputMode="decimal" min={0} step="any" onChange={(e) => onChange(e.target.value)} />;
+      return (
+        <input
+          {...common}
+          inputMode="decimal"
+          autoComplete="off"
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={(e) => onChange(tidyNumberText(e.target.value))}
+        />
+      );
     case "date":
       return <input {...common} type="date" onChange={(e) => onChange(e.target.value)} />;
     case "phone":
