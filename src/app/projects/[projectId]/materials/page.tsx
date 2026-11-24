@@ -14,8 +14,12 @@ export const metadata: Metadata = { title: "Materials" };
 
 export default async function MaterialsPage({ params }: PageProps<"/projects/[projectId]/materials">) {
   const { projectId } = await params;
-  const { project, role } = await requirePageAccess(projectId);
-  const [materials, attachments] = await Promise.all([listRecords("materials", projectId), listAttachments(projectId)]);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ project, role }, materials, attachments] = await Promise.all([
+    requirePageAccess(projectId),
+    listRecords("materials", projectId),
+    listAttachments(projectId),
+  ]);
   const spent = materials.reduce((s, m) => s + (typeof m.amount === "number" ? m.amount : 0), 0);
   const due = outstandingBills(materials);
 

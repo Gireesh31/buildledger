@@ -17,8 +17,12 @@ const QUICK_ADD: { href: string; label: string; icon: LucideIcon; accent: Accent
 
 export default async function ProjectOverviewPage({ params }: PageProps<"/projects/[projectId]">) {
   const { projectId } = await params;
-  const { project } = await requirePageAccess(projectId);
-  const [records, logs] = await Promise.all([loadRecords(projectId, LEDGER_COLLECTIONS), listRecords("dailyLogs", projectId)]);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ project }, records, logs] = await Promise.all([
+    requirePageAccess(projectId),
+    loadRecords(projectId, LEDGER_COLLECTIONS),
+    listRecords("dailyLogs", projectId),
+  ]);
   const ledger = computeLedger({ project, ...records });
 
   const recentMaterials = [...records.materials].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 5);

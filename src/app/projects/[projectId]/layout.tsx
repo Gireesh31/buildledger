@@ -23,8 +23,9 @@ export default function ProjectLayout({ children, params }: LayoutProps<"/projec
 
 async function ProjectShell({ params, children }: { params: Promise<{ projectId: string }>; children: React.ReactNode }) {
   const { projectId } = await params;
-  if (!(await getCurrentUser())) redirect(`/login?next=/projects/${projectId}`);
-  const access = await getProjectAccess(projectId);
+  // One round of lookups (user and project together); getCurrentUser is cached, so this costs nothing extra.
+  const [user, access] = await Promise.all([getCurrentUser(), getProjectAccess(projectId)]);
+  if (!user) redirect(`/login?next=/projects/${projectId}`);
 
   if (!access) {
     return (

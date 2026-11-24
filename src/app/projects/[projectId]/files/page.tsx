@@ -10,9 +10,9 @@ export const metadata: Metadata = { title: "Bills & photos" };
 
 export default async function FilesPage({ params }: PageProps<"/projects/[projectId]/files">) {
   const { projectId } = await params;
-  const { role } = await requirePageAccess(projectId);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ role }, files] = await Promise.all([requirePageAccess(projectId), listAttachments(projectId)]);
   await requireFeature("files");
-  const files = await listAttachments(projectId);
 
   return (
     <>

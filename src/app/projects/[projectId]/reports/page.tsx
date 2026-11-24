@@ -14,9 +14,9 @@ export const metadata: Metadata = { title: "Reports" };
 
 export default async function ReportsPage({ params }: PageProps<"/projects/[projectId]/reports">) {
   const { projectId } = await params;
-  const { project } = await requirePageAccess(projectId);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ project }, records] = await Promise.all([requirePageAccess(projectId), loadRecords(projectId, LEDGER_COLLECTIONS)]);
   await requireFeature("reports");
-  const records = await loadRecords(projectId, LEDGER_COLLECTIONS);
   const ledger = computeLedger({ project, ...records });
   const lastMonths = ledger.byMonth.slice(-12);
 

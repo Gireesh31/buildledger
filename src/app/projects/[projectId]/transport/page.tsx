@@ -14,9 +14,13 @@ export const metadata: Metadata = { title: "Transport" };
 
 export default async function TransportPage({ params }: PageProps<"/projects/[projectId]/transport">) {
   const { projectId } = await params;
-  const { project, role } = await requirePageAccess(projectId);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ project, role }, vehicles, attachments] = await Promise.all([
+    requirePageAccess(projectId),
+    listRecords("transport", projectId),
+    listAttachments(projectId),
+  ]);
   await requireFeature("transport");
-  const [vehicles, attachments] = await Promise.all([listRecords("transport", projectId), listAttachments(projectId)]);
   const total = vehicles.reduce((s, v) => s + (typeof v.amount === "number" ? v.amount : 0), 0);
   const due = outstandingBills(vehicles);
   const hours = vehicles.reduce((s, v) => s + (v.chargeType === "hourly" && typeof v.hours === "number" ? v.hours : 0), 0);

@@ -3,7 +3,7 @@ import { cache } from "react";
 import type { User } from "@/lib/types";
 import { generateToken, hashToken } from "./crypto";
 import { db, must } from "./supabase";
-import { findUserById } from "./user-store";
+import { publicUserFromRow } from "./user-store";
 
 const SESSION_COOKIE = "builder_session";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -15,9 +15,13 @@ export async function createSession(userId: string): Promise<string> {
   const token = generateToken();
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
   const client = await db();
-  // Clear out expired sessions along the way.
-  must(await client.from("sessions").delete().lt("expires_at", new Date().toISOString()));
-  must(await client.from("sessions").insert({ token_hash: hashToken(token), user_id: userId, expires_at: expiresAt.toISOString() }));
+  // Clear out expired sessions along the way (alongside the insert, not before it).
+  const [cleared, inserted] = await Promise.all([
+    client.from("sessions").delete().lt("expires_at", new Date().toISOString()),
+    client.from("sessions").insert({ token_hash: hashToken(token), user_id: userId, expires_at: expiresAt.toISOString() }),
+  ]);
+  must(inserted);
+  if (cleared.error) console.error("Couldn't clear expired sessions:", cleared.error.message);
 
   (await cookies()).set(SESSION_COOKIE, token, cookieOptions(expiresAt));
   return token;
@@ -38,11 +42,12 @@ async function sessionToken(): Promise<string | undefined> {
 export const getCurrentUser = cache(async (): Promise<User | null> => {
   const token = await sessionToken();
   if (!token) return null;
+  // The session and its user in one round trip (sessions.user_id references users).
   const session = must(
-    await (await db()).from("sessions").select("user_id, expires_at").eq("token_hash", hashToken(token)).maybeSingle<{ user_id: string; expires_at: string }>(),
+    await (await db()).from("sessions").select("expires_at, users(*)").eq("token_hash", hashToken(token)).maybeSingle<{ expires_at: string; users: unknown }>(),
   );
   if (!session || Date.parse(session.expires_at) <= Date.now()) return null;
-  const user = await findUserById(session.user_id);
+  const user = session.users ? publicUserFromRow(session.users) : undefined;
   // An admin has blocked this account: its sessions no longer count.
   if (!user || user.disabledAt) return null;
   await keepAlive(token, Date.parse(session.expires_at));

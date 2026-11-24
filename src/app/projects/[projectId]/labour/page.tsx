@@ -15,9 +15,9 @@ export const metadata: Metadata = { title: "Labour" };
 
 export default async function LabourPage({ params }: PageProps<"/projects/[projectId]/labour">) {
   const { projectId } = await params;
-  const { project, role } = await requirePageAccess(projectId);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ project, role }, records] = await Promise.all([requirePageAccess(projectId), loadRecords(projectId, LEDGER_COLLECTIONS)]);
   await requireFeature("labour");
-  const records = await loadRecords(projectId, LEDGER_COLLECTIONS);
   const { workerDues, labourCost } = computeLedger({ project, ...records });
   const tradeField = getCollection("workers").fields.find((f) => f.name === "trade")!;
   const editable = canWrite(role);

@@ -61,6 +61,9 @@ function toPublic(user: StoredUser): User {
   return rest;
 }
 
+/** A users row fetched elsewhere (e.g. embedded in a sessions query), as the public User. */
+export const publicUserFromRow = (row: unknown): User => toPublic(fromRow(row as UserRow));
+
 async function findRow(column: "id" | "email", value: string): Promise<StoredUser | undefined> {
   if (column === "id" && !isUuid(value)) return undefined;
   const row = must(await (await db()).from("users").select("*").eq(column, value).maybeSingle<UserRow>());

@@ -17,11 +17,10 @@ export interface ProjectAccess {
  * Cached per request, so a layout and its page can both call it.
  */
 export const getProjectAccess = cache(async (projectId: string): Promise<ProjectAccess | null> => {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  // Form choices, extra fields and feature switches the admin set, for this request's pages and checks.
-  const [project] = await Promise.all([getProject(projectId), loadAppConfig()]);
-  if (!project) return null;
+  // All at once rather than one after another: the project is only returned once the user checks
+  // out below. Also the form choices, extra fields and feature switches the admin set.
+  const [user, project] = await Promise.all([getCurrentUser(), getProject(projectId), loadAppConfig()]);
+  if (!user || !project) return null;
   if (project.ownerId === user.id) return { user, project, role: "owner" };
   // Invites are by email, so they only count once the person has proven they own that email.
   if (!user.emailVerifiedAt) return null;
@@ -51,9 +50,8 @@ export async function requireProjectAccess(
   projectId: string,
   need: Need,
 ): Promise<{ ok: true; access: ProjectAccess } | { ok: false; response: NextResponse }> {
-  const user = await getCurrentUser();
+  const [user, access] = await Promise.all([getCurrentUser(), getProjectAccess(projectId)]);
   if (!user) return { ok: false, response: NextResponse.json({ error: "Please sign in." }, { status: 401 }) };
-  const access = await getProjectAccess(projectId);
   // 404 rather than 403, so project ids can't be probed.
   if (!access) return { ok: false, response: NextResponse.json({ error: "Project not found." }, { status: 404 }) };
   const allowed = need === "read" || (need === "write" ? canWrite(access.role) : access.role === "owner");

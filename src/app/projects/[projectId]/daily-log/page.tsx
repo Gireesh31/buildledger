@@ -12,9 +12,13 @@ export const metadata: Metadata = { title: "Daily log" };
 
 export default async function DailyLogPage({ params }: PageProps<"/projects/[projectId]/daily-log">) {
   const { projectId } = await params;
-  const { project, role } = await requirePageAccess(projectId);
+  // The data loads alongside the access check (it's only shown once that passes), not after it.
+  const [{ project, role }, logs, attachments] = await Promise.all([
+    requirePageAccess(projectId),
+    listRecords("dailyLogs", projectId),
+    listAttachments(projectId),
+  ]);
   await requireFeature("dailyLog");
-  const [logs, attachments] = await Promise.all([listRecords("dailyLogs", projectId), listAttachments(projectId)]);
 
   return (
     <>
