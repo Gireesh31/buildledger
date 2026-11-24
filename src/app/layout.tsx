@@ -7,23 +7,27 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import "./globals.css";
 
 // IBM Plex Sans for body text and figures, Anek Latin (an Indian-made grotesque with a width axis)
-// for headings, IBM Plex Mono for labels, measurements and scanned bill text. latin-ext carries ₹.
+// for headings, IBM Plex Mono for labels, measurements and scanned bill text.
+// Only the latin files are preloaded: latin-ext (which carries ₹) is still declared and the browser
+// fetches it only when a page shows such a character. Body text stays at normal width, so it skips
+// the width axis (a much smaller file); headings keep it for their condensed cut.
 const plexSans = IBM_Plex_Sans({
   variable: "--font-body",
-  subsets: ["latin", "latin-ext"],
-  axes: ["wdth"],
+  subsets: ["latin"],
 });
 
 const anek = Anek_Latin({
   variable: "--font-heading",
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   axes: ["wdth"],
 });
 
+// Labels and figures only, mostly below the fold: not worth holding up the first paint.
 const plexMono = IBM_Plex_Mono({
   variable: "--font-code",
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   weight: ["400", "500", "600"],
+  preload: false,
 });
 
 export const metadata: Metadata = {

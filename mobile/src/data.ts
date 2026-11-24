@@ -1,3 +1,4 @@
+import { File, Paths } from "expo-file-system";
 import { useFocusEffect, useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import type { CollectionName } from "@/lib/collections";
@@ -25,9 +26,58 @@ export function useProjectId() {
 
 export type ProjectWithRole = Project & { role: ProjectRole };
 
-/** Last data each screen showed, so coming back to it is instant (cleared on sign-out). */
+/**
+ * Last data each screen showed, so coming back to it is instant, and saved in the app's own storage
+ * so the next launch opens straight onto it too (then refreshes). Cleared on sign-out.
+ */
 const loadCache = new Map<string, unknown>();
-export const clearLoadCache = () => loadCache.clear();
+const CACHE_VERSION = 1;
+
+const cacheFile = (() => {
+  try {
+    return new File(Paths.document, "buildledger-cache.json");
+  } catch {
+    return null; // e.g. the web preview: in-memory only
+  }
+})();
+
+// Read once at startup, before the first screen draws.
+try {
+  if (cacheFile?.exists) {
+    const saved = JSON.parse(cacheFile.textSync()) as { v?: number; entries?: Record<string, unknown> };
+    if (saved.v === CACHE_VERSION && saved.entries) for (const [key, value] of Object.entries(saved.entries)) loadCache.set(key, value);
+  }
+} catch {
+  // A damaged cache only costs one normal load.
+}
+
+let saveTimer: ReturnType<typeof setTimeout> | undefined;
+function saveSoon() {
+  if (!cacheFile) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    cacheFile.write(JSON.stringify({ v: CACHE_VERSION, entries: Object.fromEntries(loadCache) })).catch(() => {});
+  }, 400);
+}
+
+export function getCached<T>(key: string): T | undefined {
+  return loadCache.get(key) as T | undefined;
+}
+
+export function setCached(key: string, value: unknown) {
+  loadCache.set(key, value);
+  saveSoon();
+}
+
+export function clearLoadCache() {
+  loadCache.clear();
+  clearTimeout(saveTimer);
+  try {
+    if (cacheFile?.exists) cacheFile.delete();
+  } catch {
+    // Nothing saved, or already gone.
+  }
+}
 
 /**
  * Loads data when a screen opens and again each time you come back to it, so it's never stale.
@@ -47,7 +97,7 @@ export function useLoad<T>(load: () => Promise<T>, cacheKey?: string) {
     if (pull) setRefreshing(true);
     try {
       const fresh = await loadRef.current();
-      if (keyRef.current) loadCache.set(keyRef.current, fresh);
+      if (keyRef.current) setCached(keyRef.current, fresh);
       setData(fresh);
       setError(null);
     } catch (e) {

@@ -1,7 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { User } from "@/lib/types";
 import { api, ApiError, errorMessage, loadToken, saveToken, setSignedOutHandler } from "./api";
-import { clearLoadCache } from "./data";
+import { clearLoadCache, getCached, setCached } from "./data";
+
+/** The signed-in account, saved with the screens' data so the app can open without waiting on the server. */
+const ACCOUNT_KEY = "account";
 
 interface AuthState {
   /** undefined while the saved session is being checked. */
@@ -28,17 +31,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [startupError, setStartupError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    setUser(await api<User>("/api/account"));
+    const account = await api<User>("/api/account");
+    setCached(ACCOUNT_KEY, account);
+    setUser(account);
   }, []);
 
   // Reopen where the person left off: a saved token that still works means they're signed in.
-  // Only the server saying "signed out" (401) leads to the sign-in screen; no internet or a server
-  // hiccup keeps the session and offers to try again.
+  // With the account saved from last time, the app opens on it straight away and checks with the
+  // server in the background. Only the server saying "signed out" (401) leads to the sign-in screen;
+  // no internet or a server hiccup keeps the session (and, without saved data, offers to try again).
   const restore = useCallback(() => {
     setStartupError(null);
-    setUser(undefined);
     loadToken()
-      .then((token) => (token ? refresh() : setUser(null)))
+      .then((token) => {
+        if (!token) return setUser(null);
+        const saved = getCached<User>(ACCOUNT_KEY);
+        setUser(saved);
+        return refresh().catch((error) => {
+          if (error instanceof ApiError && error.status === 401) return setUser(null);
+          if (!saved) throw error;
+        });
+      })
       .catch((error) => {
         if (error instanceof ApiError && error.status === 401) setUser(null);
         else setStartupError(errorMessage(error));

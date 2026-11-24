@@ -51,7 +51,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  font-variation-settings: "wdth" 100;
 }
 
 /* Headings and the logo in Anek Latin, slightly condensed like site signage. */
