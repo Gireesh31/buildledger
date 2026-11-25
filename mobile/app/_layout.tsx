@@ -1,6 +1,6 @@
-import { AnekLatin_700Bold, AnekLatin_800ExtraBold } from "@expo-google-fonts/anek-latin";
+import { Fraunces_600SemiBold, Fraunces_700Bold } from "@expo-google-fonts/fraunces";
 import { IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono";
-import { IBMPlexSans_400Regular, IBMPlexSans_500Medium, IBMPlexSans_600SemiBold, IBMPlexSans_700Bold } from "@expo-google-fonts/ibm-plex-sans";
+import { SourceSans3_400Regular, SourceSans3_500Medium, SourceSans3_600SemiBold, SourceSans3_700Bold } from "@expo-google-fonts/source-sans-3";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -14,14 +14,14 @@ import { colors, fonts } from "../src/theme";
 import { Button, Loading, Text } from "../src/ui";
 
 export default function RootLayout() {
-  // The website's type: IBM Plex Sans for text, Anek Latin for headlines, IBM Plex Mono for labels.
+  // The website's type: Source Sans 3 for text, Fraunces for headlines, IBM Plex Mono for codes.
   const [fontsLoaded, fontError] = useFonts({
-    IBMPlexSans_400Regular,
-    IBMPlexSans_500Medium,
-    IBMPlexSans_600SemiBold,
-    IBMPlexSans_700Bold,
-    AnekLatin_700Bold,
-    AnekLatin_800ExtraBold,
+    SourceSans3_400Regular,
+    SourceSans3_500Medium,
+    SourceSans3_600SemiBold,
+    SourceSans3_700Bold,
+    Fraunces_600SemiBold,
+    Fraunces_700Bold,
     IBMPlexMono_500Medium,
   });
   if (!fontsLoaded && !fontError) return <Loading />;

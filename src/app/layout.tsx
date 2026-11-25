@@ -1,25 +1,25 @@
 import type { Metadata } from "next";
-import { Anek_Latin, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import { Suspense } from "react";
 import { BackgroundFX } from "@/components/layout/BackgroundFX";
 import { PageMotion } from "@/components/layout/PageMotion";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import "./globals.css";
 
-// IBM Plex Sans for body text and figures, Anek Latin (an Indian-made grotesque with a width axis)
-// for headings, IBM Plex Mono for labels, measurements and scanned bill text.
+// Source Sans 3 for body text and figures (clear at small sizes, carries ₹), Fraunces (a classic
+// old-style serif) for headings, IBM Plex Mono only for scanned bill text and codes.
 // Only the latin files are preloaded: latin-ext (which carries ₹) is still declared and the browser
-// fetches it only when a page shows such a character. Body text stays at normal width, so it skips
-// the width axis (a much smaller file); headings keep it for their condensed cut.
-const plexSans = IBM_Plex_Sans({
+// fetches it only when a page shows such a character.
+const sourceSans = Source_Sans_3({
   variable: "--font-body",
   subsets: ["latin"],
 });
 
-const anek = Anek_Latin({
+// Headings only. The optical-size axis gives big titles finer detail and small ones sturdier strokes.
+const fraunces = Fraunces({
   variable: "--font-heading",
   subsets: ["latin"],
-  axes: ["wdth"],
+  axes: ["opsz"],
 });
 
 // Labels and figures only, mostly below the fold: not worth holding up the first paint.
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${anek.variable} ${plexMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${sourceSans.variable} ${fraunces.variable} ${plexMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <BackgroundFX />
         {/* PageMotion uses no request-time data; the boundary just keeps it off the critical path. */}

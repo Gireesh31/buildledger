@@ -224,7 +224,7 @@ function MixerTruck() {
         <g clipPath="url(#drumClip)">
           <g>
             {Array.from({ length: 9 }, (_, i) => (
-              <path key={i} d={`M${-110 + i * 26},-90 l18,0 l-30,64 l-18,0 Z`} fill="#e8590c" opacity="0.85" />
+              <path key={i} d={`M${-110 + i * 26},-90 l18,0 l-30,64 l-18,0 Z`} fill="#b8860b" opacity="0.85" />
             ))}
             <animateTransform attributeName="transform" type="translate" values="0 0;26 0" dur="1.2s" repeatCount="indefinite" />
           </g>
@@ -276,7 +276,7 @@ function DistantCrane() {
         </g>
         <animateTransform attributeName="transform" type="translate" values={`${mx + 200} 0;${mx + 200} 0;${mx + 60} 0;${mx + 60} 0;${mx + 200} 0`} keyTimes="0;0.3;0.6;0.85;1" dur="20s" repeatCount="indefinite" calcMode="spline" keySplines="0 0 1 1;0.45 0 0.55 1;0 0 1 1;0.45 0 0.55 1" />
       </g>
-      <circle cx={mx + 5} cy={top - 27} r="2" fill="#e8590c" stroke="none">
+      <circle cx={mx + 5} cy={top - 27} r="2" fill="#b8860b" stroke="none">
         <animate attributeName="opacity" values="1;0.15;1" dur="1.6s" repeatCount="indefinite" />
       </circle>
     </g>

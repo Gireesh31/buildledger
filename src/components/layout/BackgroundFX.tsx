@@ -1,7 +1,6 @@
 /**
- * Background behind every page: clean site-office paper with a fine dot grid (like a setting-out
- * sheet) and a soft warm wash at the top. Deliberately quiet; the construction motion lives in
- * the hero skyline, the How it works build and the footer site.
+ * Background behind every page: plain concrete grey (the page colour). The wash and dot grid are
+ * switched off in globals.css; the construction drawings live in the hero, How it works and the footer.
  */
 export function BackgroundFX() {
   return (

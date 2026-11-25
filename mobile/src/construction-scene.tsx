@@ -68,7 +68,7 @@ export function ConstructionScene({ size = 1, style }: { size?: number; style?: 
         <Animated.View style={{ marginLeft: u(4.5), width: u(1), height: u(46), backgroundColor: "rgba(255,255,255,0.7)", transformOrigin: "top", transform: [{ scaleY: cableScale }] }} />
         <Animated.View style={{ position: "absolute", top: u(4), left: 0, transform: [{ translateY: drop }] }}>
           <View style={{ marginLeft: u(1), width: u(8), height: u(3), backgroundColor: "#fff", opacity: 0.85 }} />
-          <View style={{ marginLeft: -u(3), marginTop: u(1), width: u(16), height: u(7), backgroundColor: "#FDBA8C", borderRadius: u(1) }} />
+          <View style={{ marginLeft: -u(3), marginTop: u(1), width: u(16), height: u(7), backgroundColor: "#E2CF9E", borderRadius: u(1) }} />
         </Animated.View>
       </Animated.View>
     </View>

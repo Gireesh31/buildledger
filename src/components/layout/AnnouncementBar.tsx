@@ -93,7 +93,7 @@ export function AnnouncementBar({ announcements }: { announcements: Announcement
         key={current.id}
         aria-roledescription="slide"
         aria-label={`${Math.min(index, count - 1) + 1} of ${count}`}
-        className="animate-fade-up flex flex-col gap-4 rounded-xl border border-foreground/10 bg-surface/85 p-4 shadow-card backdrop-blur-sm md:flex-row"
+        className="animate-fade-up flex flex-col gap-4 rounded-xl border border-foreground/10 bg-surface p-4 shadow-card md:flex-row"
       >
         {current.media.length > 0 && <MediaGallery key={current.id} media={current.media} />}
         <div className="flex min-w-0 flex-1 flex-col">

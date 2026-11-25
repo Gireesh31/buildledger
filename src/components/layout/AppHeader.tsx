@@ -23,7 +23,7 @@ export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
 
 export function AppHeader() {
   return (
-    <header className="no-print sticky top-0 z-30 bg-surface/90 backdrop-blur-md">
+    <header className="no-print sticky top-0 z-30 bg-surface">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Logo />
         <Suspense fallback={<span className="skeleton h-8 w-28 rounded-lg" />}>

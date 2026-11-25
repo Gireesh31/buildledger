@@ -148,8 +148,8 @@ function Hero() {
           <p className="eyebrow animate-fade-up inline-flex items-center gap-2.5 text-brand">
             <span className="h-px w-6 bg-brand" aria-hidden /> Site accounts for Indian builders
           </p>
-          <h1 className="animate-fade-up mt-5 text-[2.6rem] font-bold sm:text-6xl lg:text-[4.4rem]" style={stagger(1, 90)}>
-            Every rupee on site, <span className="relative inline-block text-brand">
+          <h1 className="animate-fade-up mt-5 text-[2.5rem] font-bold text-balance sm:text-6xl lg:text-[4rem]" style={stagger(1, 90)}>
+            Every rupee on&nbsp;site, <span className="relative inline-block text-brand">
               accounted&nbsp;for.
               {/* Hand-drawn marker stroke under the words */}
               <svg aria-hidden viewBox="0 0 300 14" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.22em] w-full overflow-visible">
@@ -394,7 +394,7 @@ function ClosingCta() {
       <div data-reveal className="cta-panel relative overflow-hidden rounded-3xl px-6 py-14 text-white sm:px-14 sm:py-16">
         <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
           <div className="max-w-xl">
-            <p className="eyebrow text-orange-300">Free to start</p>
+            <p className="eyebrow text-[#e2cf9e]">Free to start</p>
             <h2 className="mt-3 text-3xl font-bold text-white sm:text-5xl">Put your next site on one ledger.</h2>
             <p className="mt-4 text-white/65">Set up a project in a minute and invite your site engineer or the owner to follow along.</p>
           </div>

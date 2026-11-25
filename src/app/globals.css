@@ -1,28 +1,32 @@
 @import "tailwindcss";
+/* Not app code: design screenshots and measurement data, and the mobile app (React Native styles). */
+@source not "../../design-system";
+@source not "../../mobile";
 
 /* Light theme only: dark: utilities apply only under a .dark class, which nothing sets. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
-  /* Warm site-office paper, ink-black text, safety orange. */
-  --background: #f5f3ee;
+  /* Concrete grey pages, green-black ink, forest green for actions, brass for highlights. */
+  --background: #f4f4f2;
   --surface: #ffffff;
-  --foreground: #16161a;
-  --brand: #e8590c;
-  --brand-strong: #c44a08;
-  --brand-soft: #fff0e5;
-  --accent: #0f766e;
-  --accent-soft: #e3f4f1;
+  --foreground: #1b1f1c;
+  --brand: #1f5135;
+  --brand-strong: #163d27;
+  --brand-soft: #e8f0ea;
+  --accent: #8a6410;
+  --accent-soft: #f6eedb;
+  --brass: #b8860b;
   /* Chart tokens (single-series blue, hairline grid, reserved status colors). */
-  --series-1: #2a78d6;
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
-  --status-good: #0ca30c;
-  --status-warning: #fab219;
-  --status-critical: #d03b3b;
-  --elev-card: 0 1px 2px rgb(22 22 26 / 0.04), 0 4px 12px -4px rgb(22 22 26 / 0.06);
-  --elev-raised: 0 1px 2px rgb(22 22 26 / 0.05), 0 24px 48px -16px rgb(22 22 26 / 0.18);
+  --series-1: #2f6b4a;
+  --grid: #e2e3df;
+  --axis: #c3c6bf;
+  --status-good: #1e7a46;
+  --status-warning: #c08a12;
+  --status-critical: #b42318;
+  --elev-card: 0 1px 2px rgb(27 31 28 / 0.05);
+  --elev-raised: 0 1px 2px rgb(27 31 28 / 0.06), 0 16px 32px -16px rgb(27 31 28 / 0.2);
 }
 
 @theme inline {
@@ -34,6 +38,7 @@
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-brass: var(--brass);
   --color-series-1: var(--series-1);
   --color-grid: var(--grid);
   --color-axis: var(--axis);
@@ -53,53 +58,48 @@ body {
   font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* Headings and the logo in Anek Latin, slightly condensed like site signage. */
+/* Headings and the logo in Fraunces. ₹ and other symbols it lacks fall back to Source Sans 3.
+   Bold Tailwind weights on headings read as 600 so the serif stays calm, not heavy. */
 h1,
 h2,
 h3,
 h4,
 .font-display {
-  font-family: var(--font-heading), var(--font-body), system-ui, sans-serif;
-  font-variation-settings: "wdth" 92;
+  font-family: var(--font-heading), var(--font-body), Georgia, serif;
   letter-spacing: -0.01em;
-  line-height: 1.1;
+  line-height: 1.15;
+}
+:is(h1, h2, h3, h4, .font-display):is(.font-bold, .font-extrabold, .font-black) {
+  font-weight: 600;
 }
 
-/* Small uppercase label, e.g. section eyebrows and table heads. */
+/* Amounts line up in columns. */
+.tabular,
+td,
+.font-display {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Small label above a section or a number, in plain sentence case. */
 .eyebrow {
-  font-family: var(--font-code), ui-monospace, monospace;
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 /* ---------- Background: clean site paper ---------- */
 
-/* Soft warm light from the top, fading into plain paper. */
-.site-wash {
-  background:
-    radial-gradient(ellipse 70% 45% at 85% -5%, rgb(232 89 12 / 0.07), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 0% 0%, rgb(250 178 25 / 0.06), transparent 70%);
-}
-/* Setting-out dot grid, fading out toward the bottom of the screen. */
+/* Plain concrete: no glow, no dot grid. */
+.site-wash,
 .site-dots {
-  background-image: radial-gradient(circle, rgb(60 45 30 / 0.13) 1px, transparent 1.4px);
-  background-size: 24px 24px;
-  mask-image: linear-gradient(to bottom, black, rgb(0 0 0 / 0.35) 70%, transparent);
+  display: none;
 }
 
-/* Hazard tape along the bottom of the header, creeping sideways very slowly. */
+/* A plain hairline under the header. */
 .hazard-tape {
-  height: 6px;
-  background: repeating-linear-gradient(-45deg, var(--brand) 0 10px, #1d1b18 10px 20px);
-  background-size: 28.28px 6px;
-  animation: tape-creep 6s linear infinite;
-}
-@keyframes tape-creep {
-  to {
-    background-position: 28.28px 0;
-  }
+  height: 1px;
+  background: var(--grid);
 }
 
 /* ---------- Motion ---------- */
@@ -187,8 +187,9 @@ h4,
     border-color 0.2s ease;
 }
 .lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--brand) 35%, transparent);
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--foreground) 18%, transparent);
+  box-shadow: 0 6px 16px -10px rgb(27 31 28 / 0.25);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -331,13 +332,9 @@ body:has([data-hide-footer]) .site-footer {
   }
 }
 
-/* Closing call to action: ink panel with a faint drawing grid and a warm glow at the corner. */
+/* Closing call to action: a plain deep-green panel. */
 .cta-panel {
-  background:
-    radial-gradient(ellipse 60% 80% at 100% 100%, rgb(232 89 12 / 0.35), transparent 70%),
-    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
-    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
-    #16161a;
+  background: var(--brand-strong);
 }
 
 .bar-rise {
@@ -371,8 +368,9 @@ body:has([data-hide-footer]) .site-footer {
   transform: scaleX(0);
 }
 
-/* Marker stroke under the hero headline. */
+/* Marker stroke under the hero headline: switched off for a cleaner, printed look. */
 .marker-draw {
+  display: none;
   fill: none;
   stroke: currentColor;
   stroke-width: 5;
@@ -394,18 +392,18 @@ body:has([data-hide-footer]) .site-footer {
   mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
 }
 .hero-skyline .sky-line {
-  stroke: #9c8a72;
+  stroke: #8f958f;
   stroke-width: 1.6;
 }
 .hero-skyline .sky-thin {
   stroke-width: 1.2;
 }
 .hero-skyline .sky-hair {
-  stroke: #c9b9a3;
+  stroke: #c9ccc6;
   stroke-width: 0.9;
 }
 .hero-skyline .sky-dash {
-  stroke: #b8a68e;
+  stroke: #b3b8b1;
   stroke-dasharray: 10 8;
   animation: tape-dash 3s linear infinite;
 }
@@ -415,23 +413,23 @@ body:has([data-hide-footer]) .site-footer {
   }
 }
 .hero-skyline .sky-fill {
-  fill: #fbf8f3;
+  fill: #fafaf8;
 }
 .hero-skyline .sky-window {
-  fill: #dfd1bd;
+  fill: #dde0da;
 }
 .hero-skyline .sky-weight {
-  fill: #b3a28b;
+  fill: #a9aea7;
 }
 .hero-skyline .sky-accent {
   fill: var(--brand);
 }
 .hero-skyline .sky-sun {
-  fill: #fde7cf;
-  stroke: #f6c89c;
+  fill: #f4ecd6;
+  stroke: #e2cf9e;
 }
 .hero-skyline .sky-beacon {
-  fill: #e8590c;
+  fill: #b8860b;
   animation: beacon 1.6s steps(1, end) infinite;
 }
 @keyframes beacon {
@@ -484,7 +482,7 @@ body:has([data-hide-footer]) .site-footer {
 
 /* Stage chips light up in step with the build. */
 .hb .hb-chip {
-  border-color: rgb(232 89 12 / 0.35);
+  border-color: color-mix(in srgb, var(--brand) 30%, transparent);
   background: var(--brand-soft);
   color: var(--brand-strong);
   transition:
@@ -496,9 +494,9 @@ body:has([data-hide-footer]) .site-footer {
 .hb .hb-chip-2 { transition-delay: 1s; }
 .hb .hb-chip-3 { transition-delay: 2.5s; }
 .reveal-ready [data-reveal]:not(.is-revealed) .hb-chip {
-  border-color: rgb(22 22 26 / 0.1);
+  border-color: rgb(27 31 28 / 0.1);
   background: transparent;
-  color: rgb(22 22 26 / 0.45);
+  color: rgb(27 31 28 / 0.5);
 }
 
 /* ---------- Loader: a wall laying itself ---------- */
@@ -548,8 +546,8 @@ body:has([data-hide-footer]) .site-footer {
   left: 0;
   width: calc(var(--scroll-p, 0) * 100%);
   background:
-    repeating-linear-gradient(to right, #1d1b18 0 1px, transparent 1px 30px) 0 0 / 100% 100% no-repeat,
-    repeating-linear-gradient(to right, #1d1b18 0 1px, transparent 1px 6px) 0 0 / 100% 45% no-repeat,
+    repeating-linear-gradient(to right, #1b1f1c 0 1px, transparent 1px 30px) 0 0 / 100% 100% no-repeat,
+    repeating-linear-gradient(to right, #1b1f1c 0 1px, transparent 1px 6px) 0 0 / 100% 45% no-repeat,
     #f5c518;
   box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.15);
 }
@@ -582,34 +580,34 @@ body:has([data-hide-footer]) .site-footer {
   }
 }
 .landing-backdrop .bd-line {
-  stroke: #a8967e;
+  stroke: #9aa09a;
   stroke-width: 1.5;
 }
 .landing-backdrop .bd-thin {
   stroke-width: 1.15;
 }
 .landing-backdrop .bd-hair {
-  stroke: #c9b9a3;
+  stroke: #c9ccc6;
   stroke-width: 0.9;
 }
 .landing-backdrop .bd-fill {
-  fill: #faf7f2;
+  fill: #fafaf8;
 }
 .landing-backdrop .bd-weight {
-  fill: #b9a890;
+  fill: #aeb3ac;
 }
 .landing-backdrop .bd-accent {
-  fill: #ef8a4f;
+  fill: #c9a24a;
 }
 .landing-backdrop .bd-accent-line {
-  stroke: #ef8a4f;
+  stroke: #c9a24a;
   stroke-width: 2;
 }
 .landing-backdrop .bd-band {
-  fill: #f2b48c;
+  fill: #e6d6a8;
 }
 .landing-backdrop .bd-beacon {
-  fill: #e8590c;
+  fill: #b8860b;
   animation: beacon 1.6s steps(1, end) infinite;
 }
 /* Steel hanging from a sling: a slow bob and sway. */

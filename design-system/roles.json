@@ -1,0 +1,364 @@
+{
+  "$comment": "Measured from https://buildledger-sable.vercel.app on 2026-11-25. Edit names or values here, then run extract.mjs --rebuild to regenerate tokens.css, theme.css, tokens.json and preview.html.",
+  "name": "BuildLedger",
+  "source": "https://buildledger-sable.vercel.app",
+  "colors": {
+    "background": "#f4f4f2",
+    "text": "#1b1f1ca6",
+    "heading": "#1b1f1c",
+    "text-muted": "#1b1f1c99",
+    "text-subtle": "#1b1f1c73",
+    "border": "#1b1f1c14",
+    "surface": "#ffffff",
+    "surface-inverse": "#163d27",
+    "text-inverse": "#ffffffb3",
+    "primary": "#1f5135",
+    "primary-foreground": "#ffffff",
+    "primary-hover": "#163d27",
+    "link": "#1f5135",
+    "primary-soft": "#e8f0ea",
+    "ink": "#1a2420",
+    "accent": "#8a6410",
+    "accent-soft": "#f6eedb",
+    "success": "#1e7a46",
+    "warning": "#c08a12",
+    "critical": "#b42318",
+    "brass": "#b8860b"
+  },
+  "chart": [
+    "#2f6b4a",
+    "#b8860b",
+    "#5f655f"
+  ],
+  "dark": null,
+  "palette": {
+    "white": "#ffffff",
+    "neutral-950-a65": "#16161aa6",
+    "white-a70": "#ffffffb2",
+    "neutral-950": "#16161a",
+    "neutral-950-a70": "#15151ab3",
+    "neutral-950-a8": "#1a1a1a14",
+    "neutral-950-a60": "#16161b99",
+    "neutral-950-a40": "#16161966",
+    "neutral-950-a55": "#16161a8c",
+    "white-a85": "#ffffffd9",
+    "sand-900-a13": "#3c2d1e21",
+    "orange-500": "#e8590c",
+    "neutral-950-a45": "#16161b73",
+    "orange-500-a7": "#e8590c12",
+    "yellow-300-a6": "#fab2190f",
+    "neutral-950-a10": "#14141d1a",
+    "neutral-950-a15": "#14141b26",
+    "blue-700": "#0069a8",
+    "black-a6": "#0000000f",
+    "white-a65": "#ffffffa6",
+    "neutral-950-a75": "#151519bf",
+    "white-a90": "#ffffffe6",
+    "slate-950-a6": "#1111220f",
+    "orange-600": "#c44a08",
+    "orange-500-a35": "#e8590c59",
+    "neutral-950-a80": "#16161acc",
+    "neutral-950-a4": "#16161a0a",
+    "neutral-950-a50": "#16161a80",
+    "neutral-100": "#f5f3ee",
+    "white-a5": "#ffffff0d",
+    "neutral-100-2": "#fff0e5",
+    "black-a15": "#00000026",
+    "orange-300": "#ffb86a",
+    "neutral-950-a35": "#17171a59",
+    "neutral-950-a18": "#16161a2e",
+    "white-a20": "#ffffff33",
+    "green-500-a50": "#00bb7c80",
+    "orange-500-a16": "#e6570c29",
+    "neutral-950-2": "#1d1b18",
+    "green-500": "#00bc7d"
+  },
+  "fonts": {
+    "sans": {
+      "family": "Source Sans 3",
+      "measured": "Source Sans 3",
+      "free": true,
+      "source": "Google Fonts",
+      "load": "Source Sans 3",
+      "stack": "\"Source Sans 3\", ui-sans-serif, system-ui, sans-serif",
+      "note": "Source Sans 3 is free (SIL Open Font License). It carries ₹."
+    },
+    "display": {
+      "family": "Fraunces",
+      "measured": "Fraunces",
+      "free": true,
+      "source": "Google Fonts",
+      "load": "Fraunces",
+      "stack": "\"Fraunces\", \"Source Sans 3\", Georgia, serif",
+      "note": "Fraunces is free (SIL Open Font License). Headings use weight 600 with the optical-size axis. It carries ₹."
+    },
+    "mono": {
+      "family": "IBM Plex Mono",
+      "measured": "IBM Plex Mono",
+      "free": true,
+      "stack": "\"IBM Plex Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+      "load": "IBM Plex Mono",
+      "source": "Self-hosted",
+      "note": "IBM Plex Mono is free (open licence)."
+    }
+  },
+  "text": {
+    "display": {
+      "size": 70.5,
+      "lh": 1.1,
+      "ls": -0.01,
+      "weight": "600",
+      "font": "display",
+      "phone": 41.6
+    },
+    "h1": {
+      "size": 48,
+      "lh": 1.1,
+      "ls": -0.01,
+      "weight": "600",
+      "font": "display",
+      "phone": 30
+    },
+    "h2": {
+      "size": 27,
+      "lh": 1.1,
+      "ls": -0.01,
+      "weight": "600",
+      "font": "display",
+      "phone": 24
+    },
+    "h3": {
+      "size": 24,
+      "lh": 1.1,
+      "ls": -0.01,
+      "weight": "600",
+      "font": "display"
+    },
+    "h4": {
+      "size": 20,
+      "lh": 1.1,
+      "ls": -0.01,
+      "weight": "600",
+      "font": "display"
+    },
+    "body-lg": {
+      "size": 16,
+      "lh": 1.5,
+      "ls": 0,
+      "weight": "400",
+      "font": "sans"
+    },
+    "body": {
+      "size": 14,
+      "lh": 1.625,
+      "ls": 0,
+      "weight": "400",
+      "font": "sans"
+    },
+    "body-sm": {
+      "size": 12,
+      "lh": 1.333,
+      "ls": 0,
+      "weight": "400",
+      "font": "sans"
+    },
+    "overline": {
+      "size": 13,
+      "lh": 1.5,
+      "ls": 0,
+      "weight": "600",
+      "font": "sans",
+      "upper": false
+    },
+    "code": {
+      "size": 11.5,
+      "lh": 1.5,
+      "ls": 0.12,
+      "weight": "500",
+      "font": "mono"
+    },
+    "caption": {
+      "size": 11,
+      "lh": 1.5,
+      "ls": 0,
+      "weight": "400",
+      "font": "sans"
+    }
+  },
+  "space": {
+    "base": 4,
+    "scale": [
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      28,
+      32,
+      40,
+      64
+    ],
+    "section": [
+      64
+    ],
+    "sectionPhone": 80
+  },
+  "radius": {
+    "sm": 4,
+    "md": 6,
+    "lg": 8,
+    "xl": 12,
+    "2xl": 16,
+    "full": 9999
+  },
+  "shadow": {
+    "sm": "rgba(27, 31, 28, 0.05) 0px 1px 2px 0px",
+    "md": "rgba(0, 0, 0, 0.04) 0px 1px 2px 0px, rgba(0, 0, 0, 0.12) 0px 12px 32px -12px",
+    "lg": "rgba(27, 31, 28, 0.06) 0px 1px 2px 0px, rgba(27, 31, 28, 0.2) 0px 16px 32px -16px",
+    "ring": "rgba(0, 0, 0, 0.06) 0px 0px 0px 1px inset"
+  },
+  "border": {
+    "width": 1
+  },
+  "container": {
+    "page": 1152,
+    "wide": 672,
+    "narrow": 1120
+  },
+  "breakpoint": {},
+  "duration": {
+    "fast": 150,
+    "base": 500,
+    "slow": 800
+  },
+  "ease": {
+    "standard": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "alt-1": "cubic-bezier(0.2, 0.7, 0.2, 1)"
+  },
+  "components": {
+    "$comment": "Measured recipes. A colour is a role name from colors (so it follows your edits) or a hex where no role matched. Radius in px or \"full\"; padding [vertical, horizontal].",
+    "buttons": [
+      {
+        "variant": "primary",
+        "label": "Sign in",
+        "bg": "primary",
+        "fg": "primary-foreground",
+        "border": null,
+        "radius": 8,
+        "padding": [
+          12,
+          24
+        ],
+        "height": 48,
+        "font": {
+          "size": 14,
+          "weight": 500
+        },
+        "shadow": "rgba(0, 0, 0, 0.15) 0px -1px 0px 0px inset",
+        "hover": {
+          "bg": "primary-hover"
+        }
+      },
+      {
+        "variant": "secondary",
+        "label": "Sign in",
+        "bg": "surface",
+        "fg": "heading",
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "color": "#14141b26"
+        },
+        "radius": 8,
+        "padding": [
+          8,
+          25
+        ],
+        "height": 48,
+        "font": {
+          "size": 14,
+          "weight": 500
+        },
+        "hover": {
+          "bg": "#fff0e5"
+        }
+      },
+      {
+        "variant": "outline",
+        "label": "Sign in",
+        "bg": null,
+        "fg": "primary-foreground",
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "color": "#ffffff33"
+        },
+        "radius": 8,
+        "padding": [
+          0,
+          25
+        ],
+        "height": 48,
+        "font": {
+          "size": 16,
+          "weight": 500
+        }
+      }
+    ],
+    "card": {
+      "bg": "surface",
+      "on": "background",
+      "border": {
+        "width": 1,
+        "style": "solid",
+        "color": "border"
+      },
+      "radius": 16,
+      "padding": 28,
+      "shadow": "rgba(27, 31, 28, 0.05) 0px 1px 2px 0px"
+    },
+    "input": {
+      "bg": "surface",
+      "fg": "heading",
+      "placeholder": "heading",
+      "border": {
+        "width": 1,
+        "style": "solid",
+        "color": "#14141b26"
+      },
+      "radius": 8,
+      "padding": [
+        8,
+        12
+      ],
+      "height": 38,
+      "font": {
+        "size": 14,
+        "weight": 400
+      }
+    },
+    "badge": {
+      "label": "Active",
+      "bg": "#ecfdf5",
+      "fg": "#007a55",
+      "border": null,
+      "radius": 6,
+      "padding": [
+        4,
+        8
+      ],
+      "font": {
+        "size": 11,
+        "weight": 500
+      }
+    },
+    "nav": {
+      "bg": "#ffffffe6",
+      "height": 70,
+      "position": "sticky",
+      "backdrop": "blur(12px)",
+      "border": null
+    }
+  }
+}

@@ -55,13 +55,13 @@ export default function Dashboard() {
               <Building2 size={18} color="#fff" />
             </View>
             <Text style={{ color: "#fff", fontSize: 21, fontWeight: "800" }}>
-              Build<Text style={{ color: colors.brand, fontWeight: "800" }}>Ledger</Text>
+              Build<Text style={{ color: colors.brassLight, fontWeight: "800" }}>Ledger</Text>
             </Text>
           </View>
           <View style={{ flexDirection: "row", gap: 8 }}>
             {user?.isAdmin ? (
               <Pressable onPress={() => router.push("/admin")} hitSlop={10} accessibilityLabel="Admin panel" style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 999, padding: 9 }}>
-                <ShieldCheck size={20} color="#FDBA8C" />
+                <ShieldCheck size={20} color={colors.brassLight} />
               </Pressable>
             ) : null}
             <Pressable onPress={() => router.push("/profile")} hitSlop={10} accessibilityLabel="Your profile" style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 999, padding: 9 }}>

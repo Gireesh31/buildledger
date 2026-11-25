@@ -1,0 +1,162 @@
+/* BuildLedger design tokens as a Tailwind CSS v4 theme (measured from https://buildledger-sable.vercel.app on 2026-11-25).
+   In your main CSS file, after Tailwind:
+     @import "tailwindcss";
+     @import "./design-system/theme.css";   (adjust the path)
+   Then use bg-primary, text-heading, text-text-muted, font-sans, text-h1, rounded-md, shadow-md, max-w-page…
+   "static" keeps every variable in the CSS, so var(--color-primary) works anywhere, used by a class or not.
+   To allow only these colours (no bg-blue-500 by accident), add  --color-*: initial;  as the first line inside @theme. */
+
+@theme static {
+  /* Colour roles: use these in components */
+  --color-background: #f4f4f2;
+  --color-text: #1b1f1ca6;
+  --color-heading: #1b1f1c;
+  --color-text-muted: #1b1f1c99;
+  --color-text-subtle: #1b1f1c73;
+  --color-border: #1b1f1c14;
+  --color-surface: #ffffff;
+  --color-surface-inverse: #163d27;
+  --color-text-inverse: #ffffffb3;
+  --color-primary: #1f5135;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover: #163d27;
+  --color-link: #1f5135;
+  --color-primary-soft: #e8f0ea;
+  --color-ink: #1a2420;
+  --color-accent: #8a6410;
+  --color-accent-soft: #f6eedb;
+  --color-success: #1e7a46;
+  --color-warning: #c08a12;
+  --color-critical: #b42318;
+  --color-brass: #b8860b;
+
+  /* Chart series, in order: the first is the highlight */
+  --color-chart-1: #2f6b4a;
+  --color-chart-2: #b8860b;
+  --color-chart-3: #5f655f;
+
+  /* Palette: every colour measured on the site, by hue and lightness */
+  --color-white: #ffffff;
+  --color-neutral-950-a65: #16161aa6;
+  --color-white-a70: #ffffffb2;
+  --color-neutral-950: #16161a;
+  --color-neutral-950-a70: #15151ab3;
+  --color-neutral-950-a8: #1a1a1a14;
+  --color-neutral-950-a60: #16161b99;
+  --color-neutral-950-a40: #16161966;
+  --color-neutral-950-a55: #16161a8c;
+  --color-white-a85: #ffffffd9;
+  --color-sand-900-a13: #3c2d1e21;
+  --color-orange-500: #e8590c;
+  --color-neutral-950-a45: #16161b73;
+  --color-orange-500-a7: #e8590c12;
+  --color-yellow-300-a6: #fab2190f;
+  --color-neutral-950-a10: #14141d1a;
+  --color-neutral-950-a15: #14141b26;
+  --color-blue-700: #0069a8;
+  --color-black-a6: #0000000f;
+  --color-white-a65: #ffffffa6;
+  --color-neutral-950-a75: #151519bf;
+  --color-white-a90: #ffffffe6;
+  --color-slate-950-a6: #1111220f;
+  --color-orange-600: #c44a08;
+  --color-orange-500-a35: #e8590c59;
+  --color-neutral-950-a80: #16161acc;
+  --color-neutral-950-a4: #16161a0a;
+  --color-neutral-950-a50: #16161a80;
+  --color-neutral-100: #f5f3ee;
+  --color-white-a5: #ffffff0d;
+  --color-neutral-100-2: #fff0e5;
+  --color-black-a15: #00000026;
+  --color-orange-300: #ffb86a;
+  --color-neutral-950-a35: #17171a59;
+  --color-neutral-950-a18: #16161a2e;
+  --color-white-a20: #ffffff33;
+  --color-green-500-a50: #00bb7c80;
+  --color-orange-500-a16: #e6570c29;
+  --color-neutral-950-2: #1d1b18;
+  --color-green-500: #00bc7d;
+
+  /* Type */
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Source Sans 3", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --text-display: 70.5px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.01em;
+  --text-display--font-weight: 600;
+  --text-h1: 48px;
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h1--font-weight: 600;
+  --text-h2: 27px;
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h2--font-weight: 600;
+  --text-h3: 24px;
+  --text-h3--line-height: 1.1;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h3--font-weight: 600;
+  --text-h4: 20px;
+  --text-h4--line-height: 1.1;
+  --text-h4--letter-spacing: -0.01em;
+  --text-h4--font-weight: 600;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.5;
+  --text-body-lg--font-weight: 400;
+  --text-body: 14px;
+  --text-body--line-height: 1.625;
+  --text-body--font-weight: 400;
+  --text-body-sm: 12px;
+  --text-body-sm--line-height: 1.333;
+  --text-body-sm--font-weight: 400;
+  --text-overline: 13px;
+  --text-overline--line-height: 1.5;
+  --text-overline--font-weight: 600;
+  --text-code: 11.5px;
+  --text-code--line-height: 1.5;
+  --text-code--letter-spacing: 0.12em;
+  --text-code--font-weight: 500;
+  --text-caption: 11px;
+  --text-caption--line-height: 1.5;
+  --text-caption--font-weight: 400;
+
+  /* Space: a 4px grid. --space-<n> is n × 4px; Tailwind's own --spacing stays 4px, so p-4 is 16px */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-16: 64px;
+  --space-section: 64px;
+  --space-section-phone: 80px;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: rgba(27, 31, 28, 0.05) 0px 1px 2px 0px;
+  --shadow-md: rgba(0, 0, 0, 0.04) 0px 1px 2px 0px, rgba(0, 0, 0, 0.12) 0px 12px 32px -12px;
+  --shadow-lg: rgba(27, 31, 28, 0.06) 0px 1px 2px 0px, rgba(27, 31, 28, 0.2) 0px 16px 32px -16px;
+  --shadow-ring: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px inset;
+  --border-width: 1px;
+
+  /* Layout */
+  --container-page: 1152px;
+  --container-wide: 672px;
+  --container-narrow: 1120px;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 500ms;
+  --duration-slow: 800ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-alt-1: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

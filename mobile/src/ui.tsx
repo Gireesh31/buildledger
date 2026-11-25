@@ -277,21 +277,12 @@ export function SectionTitle({ text }: { text: string }) {
 
 /** Small uppercase label above a heading, like the website's section tags. */
 export function Eyebrow({ text, light }: { text: string; light?: boolean }) {
-  return <Text style={[styles.eyebrow, light && { color: "#FDBA8C" }]}>{text}</Text>;
+  return <Text style={[styles.eyebrow, light && { color: colors.brassLight }]}>{text}</Text>;
 }
 
-/** A soft orange light in a dark header corner, like the website hero. */
-export function Glow({ top = -40, right = -40 }: { top?: number; right?: number }) {
-  // Breathes slowly, like a site light.
-  const pulse = useLoop(4200);
-  const opacity = pulse.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.75, 1, 0.75] });
-  const scale = pulse.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.92, 1.08, 0.92] });
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={{ position: "absolute", top, right, width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(232, 89, 12, 0.3)", boxShadow: "0 0 110px 90px rgba(232, 89, 12, 0.3)", opacity, transform: [{ scale }] }}
-    />
-  );
+/** Kept so existing screens still compile: the corner glow was dropped for a plainer, printed look. */
+export function Glow(_props: { top?: number; right?: number }) {
+  return null;
 }
 
 /** A 0 → 1 value that repeats forever (or stays still when the phone asks for reduced motion). */
@@ -315,20 +306,9 @@ export function useLoop(duration: number) {
   return value;
 }
 
-/** The orange-and-black hazard stripe used along the bottom of dark headers. */
-export function HazardTape({ height = 6 }: { height?: number }) {
-  // Slides one orange-and-black pair (28px) per loop, so it looks like tape moving along the site.
-  const slide = useLoop(1600);
-  const translateX = slide.interpolate({ inputRange: [0, 1], outputRange: [-28, 0] });
-  return (
-    <View style={{ height, overflow: "hidden", backgroundColor: colors.ink }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Animated.View style={{ flexDirection: "row", transform: [{ translateX }] }}>
-        {Array.from({ length: 64 }, (_, i) => (
-          <View key={i} style={{ width: 14, height: height * 3, marginTop: -height, backgroundColor: i % 2 ? colors.ink : colors.brand, transform: [{ skewX: "-35deg" }] }} />
-        ))}
-      </Animated.View>
-    </View>
-  );
+/** A thin brass line along the bottom of dark headers (it was a moving hazard stripe). */
+export function HazardTape({ height: _height }: { height?: number }) {
+  return <View style={{ height: 2, backgroundColor: colors.brass }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" />;
 }
 
 export const styles = StyleSheet.create({
@@ -364,7 +344,7 @@ export const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderCurve: "continuous",
   },
-  inputFocused: { borderColor: colors.brand, backgroundColor: colors.surface, boxShadow: "0 0 0 3px rgba(232, 89, 12, 0.15)" },
+  inputFocused: { borderColor: colors.brand, backgroundColor: colors.surface, boxShadow: "0 0 0 3px rgba(31, 81, 53, 0.15)" },
   prefix: { paddingLeft: 14, color: colors.muted, fontSize: 15, fontWeight: "500" },
   input: { flex: 1, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: colors.text, fontFamily: fonts.regular },
   chip: { borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
@@ -386,5 +366,5 @@ export const styles = StyleSheet.create({
   empty: { borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.border, borderRadius: radius.lg, padding: 24, backgroundColor: "rgba(255,255,255,0.55)" },
   message: { borderRadius: radius.md, borderCurve: "continuous", padding: 12 },
   sectionTitle: { fontSize: 21, fontWeight: "800", color: colors.text, marginTop: 6, letterSpacing: -0.2 },
-  eyebrow: { fontFamily: fonts.mono, fontSize: 11, letterSpacing: 1.6, textTransform: "uppercase", color: colors.brand },
+  eyebrow: { fontFamily: fonts.semibold, fontSize: 13, color: colors.brand },
 });

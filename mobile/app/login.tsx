@@ -84,7 +84,7 @@ export function Brand({ light }: { light?: boolean }) {
         <HardHat size={28} color="#fff" />
       </View>
       <Text style={{ fontSize: 34, fontWeight: "800", color: light ? "#fff" : colors.text }}>
-        Build<Text style={{ color: colors.brand, fontWeight: "800" }}>Ledger</Text>
+        Build<Text style={{ color: colors.brassLight, fontWeight: "800" }}>Ledger</Text>
       </Text>
     </View>
   );

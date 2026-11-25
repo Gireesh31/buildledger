@@ -51,6 +51,10 @@
         "projectId": "ec843f22-22e2-40c1-b734-5638a549bb72"
       }
     },
-    "owner": "gireeshtp"
+    "owner": "gireeshtp",
+    "runtimeVersion": "exposdk:58.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/ec843f22-22e2-40c1-b734-5638a549bb72"
+    }
   }
 }

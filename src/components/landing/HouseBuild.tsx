@@ -91,7 +91,7 @@ export function HouseBuild() {
           {/* Handover: a flag on the parapet */}
           <g className="hb-flag">
             <path d="M462,94 V58" stroke="#6b6259" strokeWidth="2" />
-            <path d="M463,58 L488,64 L463,70 Z" fill="#e8590c">
+            <path d="M463,58 L488,64 L463,70 Z" fill="#b8860b">
               <animate attributeName="d" values="M463,58 L488,64 L463,70 Z;M463,58 Q476,58 488,66 Q474,66 463,70 Z;M463,58 L488,64 L463,70 Z" dur="1.6s" repeatCount="indefinite" />
             </path>
           </g>

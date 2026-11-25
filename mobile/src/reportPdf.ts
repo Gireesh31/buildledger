@@ -111,11 +111,11 @@ async function printAndShare(title: string, sub: string, body: string, dialogTit
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     @page { size: A4 landscape; margin: 14mm; }
     body { font-family: -apple-system, Roboto, Helvetica, Arial, sans-serif; color: #1c1917; font-size: 10px; }
-    .bar { height: 5px; background: #ea580c; margin-bottom: 10px; }
+    .bar { height: 5px; background: #1f5135; margin-bottom: 10px; }
     h1 { font-size: 18px; margin: 0; } .sub { color: #666; margin: 4px 0 14px; }
     h2 { color: #c2410c; font-size: 13px; margin: 16px 0 6px; }
     table { width: 100%; border-collapse: collapse; }
-    th { background: #ea580c; color: #fff; text-align: left; padding: 5px; }
+    th { background: #1f5135; color: #fff; text-align: left; padding: 5px; }
     td { padding: 5px; border-bottom: 1px solid #eee; }
     tfoot td { background: #fff1e6; font-weight: bold; }
     .r { text-align: right; } .note { color: #777; }

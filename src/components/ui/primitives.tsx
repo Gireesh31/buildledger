@@ -34,14 +34,15 @@ export function Card({ title, action, children, className = "" }: { title?: stri
   );
 }
 
-// Literal class strings so Tailwind can see them.
+// Literal class strings so Tailwind can see them. A calm set: green, slate, stone and brass,
+// with rose kept for things that need attention.
 const ACCENTS = {
-  orange: { chip: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300" },
-  blue: { chip: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300" },
-  green: { chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300" },
-  violet: { chip: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300" },
-  rose: { chip: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300" },
-  amber: { chip: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300" },
+  orange: { chip: "bg-brand-soft text-brand" },
+  blue: { chip: "bg-slate-100 text-slate-700" },
+  green: { chip: "bg-brand-soft text-brand" },
+  violet: { chip: "bg-stone-100 text-stone-700" },
+  rose: { chip: "bg-rose-50 text-rose-700" },
+  amber: { chip: "bg-accent-soft text-accent" },
 } as const;
 
 export type Accent = keyof typeof ACCENTS;

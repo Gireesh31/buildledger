@@ -1,0 +1,3082 @@
+{
+  "site": {
+    "url": "https://buildledger-sable.vercel.app",
+    "host": "buildledger-sable.vercel.app",
+    "name": "Buildledger-sable",
+    "title": "BuildLedger",
+    "measured": "2026-11-25",
+    "pages": [
+      {
+        "url": "https://buildledger-sable.vercel.app/",
+        "label": "desktop",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "BuildLedger",
+        "elements": 408
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/projects/new",
+        "label": "desktop",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "Sign in · BuildLedger",
+        "elements": 77
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/profile",
+        "label": "desktop",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "Sign in · BuildLedger",
+        "elements": 77
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/onboarding",
+        "label": "desktop",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "Sign in · BuildLedger",
+        "elements": 77
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/forgot-password",
+        "label": "desktop",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "Forgot password · BuildLedger",
+        "elements": 71
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/",
+        "label": "phone",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "BuildLedger",
+        "elements": 355
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/projects/new",
+        "label": "phone",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "Sign in · BuildLedger",
+        "elements": 76
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/profile",
+        "label": "phone",
+        "scheme": "light",
+        "ok": true,
+        "status": 200,
+        "title": "Sign in · BuildLedger",
+        "elements": 76
+      },
+      {
+        "url": "https://buildledger-sable.vercel.app/",
+        "label": "dark",
+        "scheme": "dark",
+        "ok": true,
+        "status": 200,
+        "title": "BuildLedger",
+        "elements": 408
+      }
+    ],
+    "frameworks": [
+      "Next.js",
+      "Tailwind classes"
+    ],
+    "themeColor": null
+  },
+  "colors": {
+    "roles": {
+      "background": "#f5f3ee",
+      "text": "#16161aa6",
+      "heading": "#16161a",
+      "text-muted": "#16161b99",
+      "text-subtle": "#16161b73",
+      "border": "#1a1a1a14",
+      "surface": "#ffffff",
+      "surface-inverse": "#16161a",
+      "text-inverse": "#ffffffa6",
+      "primary": "#e8590c",
+      "primary-foreground": "#ffffff",
+      "primary-hover": "#c44a08",
+      "link": "#e8590c"
+    },
+    "evidence": {
+      "background": "the page background on most pages",
+      "text": "body copy (paragraphs and lists)",
+      "heading": "headings (h1–h6)",
+      "text-muted": "13% of text: secondary copy",
+      "text-subtle": "6% of text: the quietest copy",
+      "border": "the most used border colour (by length)",
+      "surface": "panels and sections a step off the background",
+      "surface-inverse": "the contrasting band (dark sections on a light site, or the reverse)",
+      "text-inverse": "text on the contrasting band",
+      "primary": "the main buttons, and the site's own --brand token",
+      "primary-foreground": "text on primary buttons",
+      "primary-hover": "primary buttons on :hover",
+      "link": "links in running text"
+    },
+    "chart": [
+      {
+        "hex": "#e8590c",
+        "evidence": "the primary"
+      },
+      {
+        "hex": "#0069a8",
+        "evidence": "blue, 0.9% of colour use"
+      },
+      {
+        "hex": "#00bc7d",
+        "evidence": "green, 0% of colour use, mostly in gradients"
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "hex": "#e8590c",
+        "onStart": 0.65,
+        "acrossPages": 0.93,
+        "inLinks": 0.29,
+        "token": "--brand",
+        "score": 1.068
+      },
+      {
+        "hex": "#0069a8",
+        "onStart": 0,
+        "acrossPages": 0,
+        "inLinks": 0,
+        "score": 0.047
+      },
+      {
+        "hex": "#c44a08",
+        "onStart": 0,
+        "acrossPages": 0,
+        "inLinks": 0,
+        "score": 0.021
+      },
+      {
+        "hex": "#ffb86a",
+        "onStart": 0,
+        "acrossPages": 0,
+        "inLinks": 0,
+        "score": 0.006
+      }
+    ],
+    "dark": null,
+    "palette": [
+      {
+        "hex": "#ffffff",
+        "name": "white",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.2992,
+        "usage": {
+          "bg": 0.96,
+          "text": 0.04
+        },
+        "pages": 5
+      },
+      {
+        "hex": "#16161aa6",
+        "name": "neutral-950-a65",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0979,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.65)"
+      },
+      {
+        "hex": "#ffffffb2",
+        "name": "white-a70",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.0813,
+        "usage": {
+          "bg": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.999994 0.0000455677 0.0000200868 / 0.7)"
+      },
+      {
+        "hex": "#16161a",
+        "name": "neutral-950",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0712,
+        "usage": {
+          "text": 0.65,
+          "bg": 0.35
+        },
+        "pages": 5
+      },
+      {
+        "hex": "#15151ab3",
+        "name": "neutral-950-a70",
+        "oklch": "oklch(19.8% 0.010 285.5)",
+        "share": 0.0598,
+        "usage": {
+          "text": 1
+        },
+        "pages": 5,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.7)"
+      },
+      {
+        "hex": "#1a1a1a14",
+        "name": "neutral-950-a8",
+        "oklch": "oklch(21.8% 0.000 0)",
+        "share": 0.0764,
+        "usage": {
+          "border": 0.96,
+          "bg": 0.04
+        },
+        "pages": 5,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.08)",
+        "merged": [
+          "#1c1c1c12"
+        ]
+      },
+      {
+        "hex": "#16161b99",
+        "name": "neutral-950-a60",
+        "oklch": "oklch(20.2% 0.010 285.5)",
+        "share": 0.0395,
+        "usage": {
+          "text": 1
+        },
+        "pages": 5,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.6)"
+      },
+      {
+        "hex": "#16161966",
+        "name": "neutral-950-a40",
+        "oklch": "oklch(20.2% 0.006 285.9)",
+        "share": 0.0318,
+        "usage": {
+          "icon": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#16161a8c",
+        "name": "neutral-950-a55",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0283,
+        "usage": {
+          "text": 0.63,
+          "icon": 0.37
+        },
+        "pages": 1,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.55)"
+      },
+      {
+        "hex": "#ffffffd9",
+        "name": "white-a85",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.0247,
+        "usage": {
+          "text": 1
+        },
+        "pages": 5,
+        "wide": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)"
+      },
+      {
+        "hex": "#3c2d1e21",
+        "name": "sand-900-a13",
+        "oklch": "oklch(31.0% 0.033 66.1)",
+        "share": 0.0245,
+        "usage": {
+          "gradient": 1
+        },
+        "pages": 5
+      },
+      {
+        "hex": "#e8590c",
+        "name": "orange-500",
+        "oklch": "oklch(64.4% 0.192 41.7)",
+        "share": 0.0195,
+        "usage": {
+          "text": 0.76,
+          "bg": 0.23,
+          "gradient": 0
+        },
+        "pages": 5
+      },
+      {
+        "hex": "#16161b73",
+        "name": "neutral-950-a45",
+        "oklch": "oklch(20.2% 0.010 285.5)",
+        "share": 0.0177,
+        "usage": {
+          "text": 1
+        },
+        "pages": 5,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.45)"
+      },
+      {
+        "hex": "#e8590c12",
+        "name": "orange-500-a7",
+        "oklch": "oklch(64.4% 0.192 41.7)",
+        "share": 0.0123,
+        "usage": {
+          "gradient": 1
+        },
+        "pages": 5
+      },
+      {
+        "hex": "#fab2190f",
+        "name": "yellow-300-a6",
+        "oklch": "oklch(81.1% 0.164 78.5)",
+        "share": 0.0123,
+        "usage": {
+          "gradient": 1
+        },
+        "pages": 5
+      },
+      {
+        "hex": "#14141d1a",
+        "name": "neutral-950-a10",
+        "oklch": "oklch(19.6% 0.018 284.6)",
+        "share": 0.0118,
+        "usage": {
+          "border": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#14141b26",
+        "name": "neutral-950-a15",
+        "oklch": "oklch(19.5% 0.014 285.0)",
+        "share": 0.0099,
+        "usage": {
+          "border": 0.9,
+          "bg": 0.1
+        },
+        "pages": 5,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.15)"
+      },
+      {
+        "hex": "#0069a8",
+        "name": "blue-700",
+        "oklch": "oklch(50.4% 0.128 245.5)",
+        "share": 0.0092,
+        "usage": {
+          "icon": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#0000000f",
+        "name": "black-a6",
+        "oklch": "oklch(0.0% 0.000 0)",
+        "share": 0.0096,
+        "usage": {
+          "shadow": 1
+        },
+        "pages": 5,
+        "merged": [
+          "#0000000a"
+        ]
+      },
+      {
+        "hex": "#ffffffa6",
+        "name": "white-a65",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.0081,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.999994 0.0000455678 0.0000200868 / 0.65)"
+      },
+      {
+        "hex": "#151519bf",
+        "name": "neutral-950-a75",
+        "oklch": "oklch(19.8% 0.008 285.6)",
+        "share": 0.0076,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.75)"
+      },
+      {
+        "hex": "#ffffffe6",
+        "name": "white-a90",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.0065,
+        "usage": {
+          "bg": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
+      },
+      {
+        "hex": "#1111220f",
+        "name": "slate-950-a6",
+        "oklch": "oklch(18.7% 0.034 282.6)",
+        "share": 0.0057,
+        "usage": {
+          "border": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#c44a08",
+        "name": "orange-600",
+        "oklch": "oklch(56.8% 0.169 41.7)",
+        "share": 0.004,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#e8590c59",
+        "name": "orange-500-a35",
+        "oklch": "oklch(64.4% 0.192 41.7)",
+        "share": 0.0036,
+        "usage": {
+          "border": 0.78,
+          "gradient": 0.22
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#16161acc",
+        "name": "neutral-950-a80",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0034,
+        "usage": {
+          "text": 1
+        },
+        "pages": 5,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.8)"
+      },
+      {
+        "hex": "#16161a0a",
+        "name": "neutral-950-a4",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0067,
+        "usage": {
+          "shadow": 1
+        },
+        "pages": 1,
+        "merged": [
+          "#16161a0f",
+          "#16161a0d"
+        ]
+      },
+      {
+        "hex": "#16161a80",
+        "name": "neutral-950-a50",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0028,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.5)"
+      },
+      {
+        "hex": "#f5f3ee",
+        "name": "neutral-100",
+        "oklch": "oklch(96.4% 0.007 88.6)",
+        "share": 0.0026,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#ffffff0d",
+        "name": "white-a5",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.0016,
+        "usage": {
+          "gradient": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#fff0e5",
+        "name": "neutral-100-2",
+        "oklch": "oklch(96.4% 0.022 58.8)",
+        "share": 0.0012,
+        "usage": {
+          "bg": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#00000026",
+        "name": "black-a15",
+        "oklch": "oklch(0.0% 0.000 0)",
+        "share": 0.002,
+        "usage": {
+          "shadow": 1
+        },
+        "pages": 5,
+        "merged": [
+          "#0000001f"
+        ]
+      },
+      {
+        "hex": "#ffb86a",
+        "name": "orange-300",
+        "oklch": "oklch(83.4% 0.126 67.2)",
+        "share": 0.0012,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1,
+        "wide": "lab(80.8059 21.7313 50.4455)"
+      },
+      {
+        "hex": "#17171a59",
+        "name": "neutral-950-a35",
+        "oklch": "oklch(20.6% 0.006 285.9)",
+        "share": 0.0011,
+        "usage": {
+          "text": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.20197 0.00214528 -0.00761044 / 0.35)"
+      },
+      {
+        "hex": "#16161a2e",
+        "name": "neutral-950-a18",
+        "oklch": "oklch(20.2% 0.008 285.7)",
+        "share": 0.0011,
+        "usage": {
+          "shadow": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#ffffff33",
+        "name": "white-a20",
+        "oklch": "oklch(100.0% 0.000 0)",
+        "share": 0.0008,
+        "usage": {
+          "border": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#00bb7c80",
+        "name": "green-500-a50",
+        "oklch": "oklch(69.9% 0.157 160.3)",
+        "share": 0.0008,
+        "usage": {
+          "shadow": 1
+        },
+        "pages": 1,
+        "wide": "oklab(0.695996 -0.162107 0.0511875 / 0.5)"
+      },
+      {
+        "hex": "#e6570c29",
+        "name": "orange-500-a16",
+        "oklch": "oklch(63.9% 0.191 41.3)",
+        "share": 0,
+        "usage": {
+          "gradient": 1
+        },
+        "pages": 1,
+        "wide": "color(srgb 0.909804 0.34902 0.0470588 / 0.16)"
+      },
+      {
+        "hex": "#1d1b18",
+        "name": "neutral-950-2",
+        "oklch": "oklch(22.3% 0.006 78.2)",
+        "share": 0,
+        "usage": {
+          "gradient": 1
+        },
+        "pages": 1
+      },
+      {
+        "hex": "#00bc7d",
+        "name": "green-500",
+        "oklch": "oklch(70.2% 0.158 160.4)",
+        "share": 0,
+        "usage": {
+          "gradient": 0.58,
+          "bg": 0.42
+        },
+        "pages": 1,
+        "wide": "lab(66.9756 -58.27 19.5419)"
+      }
+    ],
+    "gradients": [
+      {
+        "value": "radial-gradient(70% 45% at 85% -5%, rgba(232, 89, 12, 0.07), rgba(0, 0, 0, 0) 70%), radial-gradient(60% 40% at 0px 0px, rgba(250, 178, 25, 0.06), rgba(0, 0, 0, 0) 70%)",
+        "area": 6480000
+      },
+      {
+        "value": "radial-gradient(circle, rgba(60, 45, 30, 0.13) 1px, rgba(0, 0, 0, 0) 1.4px)",
+        "area": 6480000
+      },
+      {
+        "value": "radial-gradient(60% 80% at 100% 100%, rgba(232, 89, 12, 0.35), rgba(0, 0, 0, 0) 70%), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px), linear-gradient(rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px), none",
+        "area": 366083
+      },
+      {
+        "value": "linear-gradient(rgba(0, 0, 0, 0), color(srgb 0.909804 0.34902 0.0470588 / 0.16) 85%, rgb(232, 89, 12) 100%)",
+        "area": 12106
+      },
+      {
+        "value": "repeating-linear-gradient(-45deg, rgb(232, 89, 12) 0px, rgb(232, 89, 12) 10px, rgb(29, 27, 24) 10px, rgb(29, 27, 24) 20px)",
+        "area": 8640
+      },
+      {
+        "value": "linear-gradient(135deg, lab(66.9756 -58.27 19.5419) 50%, rgba(0, 0, 0, 0) 50%)",
+        "area": 512
+      }
+    ],
+    "pairs": [
+      {
+        "fg": "#15151ab3",
+        "bg": "#ffffff",
+        "chars": 840,
+        "contrast": 6.77
+      },
+      {
+        "fg": "#16161b99",
+        "bg": "#ffffff",
+        "chars": 739,
+        "contrast": 4.73
+      },
+      {
+        "fg": "#16161aa6",
+        "bg": "#ffffff",
+        "chars": 657,
+        "contrast": 5.64
+      },
+      {
+        "fg": "#ffffffd9",
+        "bg": "#ffffff",
+        "chars": 480,
+        "contrast": 1
+      },
+      {
+        "fg": "#16161aa6",
+        "bg": "#f5f3ee",
+        "chars": 407,
+        "contrast": 5.39
+      },
+      {
+        "fg": "#16161a",
+        "bg": "#ffffff",
+        "chars": 382,
+        "contrast": 18.04
+      },
+      {
+        "fg": "#16161b73",
+        "bg": "#ffffff",
+        "chars": 261,
+        "contrast": 2.95
+      },
+      {
+        "fg": "#16161a",
+        "bg": "#f5f3ee",
+        "chars": 180,
+        "contrast": 16.27
+      },
+      {
+        "fg": "#15151ab3",
+        "bg": "#f5f3ee",
+        "chars": 146,
+        "contrast": 6.48
+      },
+      {
+        "fg": "#16161a8c",
+        "bg": "#ffffff",
+        "chars": 138,
+        "contrast": 4
+      },
+      {
+        "fg": "#e8590c",
+        "bg": "#f5f3ee",
+        "chars": 111,
+        "contrast": 3.23
+      },
+      {
+        "fg": "#e8590c",
+        "bg": "#ffffff",
+        "chars": 105,
+        "contrast": 3.58
+      }
+    ]
+  },
+  "typography": {
+    "families": [
+      {
+        "family": "IBM Plex Sans",
+        "use": "body",
+        "share": 0.797,
+        "stack": "\"IBM Plex Sans\", \"IBM Plex Sans Fallback\", system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "weights": [
+          "400",
+          "500",
+          "600"
+        ],
+        "files": [
+          {
+            "weight": "100 700",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/7fea77d1d19108bf-s.2e4y-bhazgt_v.woff2"
+          },
+          {
+            "weight": "100 700",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/1bcd0e671759a44c-s.3o0_l_yqebdng.woff2"
+          },
+          {
+            "weight": "100 700",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/e15f58668ad64cb8-s.2mglm451ism6l.woff2"
+          },
+          {
+            "weight": "100 700",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/90c51ce8fb754fe8-s.3bjsqkuy1d2v8.woff2"
+          }
+        ],
+        "source": "Self-hosted",
+        "free": null
+      },
+      {
+        "family": "Anek Latin",
+        "use": "headings",
+        "share": 0.113,
+        "stack": "\"Anek Latin\", \"Anek Latin Fallback\", \"IBM Plex Sans\", \"IBM Plex Sans Fallback\", system-ui, sans-serif",
+        "weights": [
+          "600",
+          "700"
+        ],
+        "files": [
+          {
+            "weight": "100 800",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/dff9f79dfc3c25d6-s.1236hmarabhoq.woff2"
+          },
+          {
+            "weight": "100 800",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/b32b5e5aea8e82e6-s.2rl6lqx-8h-ba.woff2"
+          },
+          {
+            "weight": "100 800",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/e82758f72e0d9782-s.p.106xqzt8ylg6_.woff2"
+          }
+        ],
+        "source": "Self-hosted",
+        "free": null
+      },
+      {
+        "family": "IBM Plex Mono",
+        "use": "code",
+        "share": 0.09,
+        "stack": "\"IBM Plex Mono\", \"IBM Plex Mono Fallback\", ui-monospace, monospace",
+        "weights": [
+          "400",
+          "500",
+          "600"
+        ],
+        "files": [
+          {
+            "weight": "400",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/e390973e931a41c5-s.3zhtymus0wdqb.woff2"
+          },
+          {
+            "weight": "400",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/59b15b4bcd7b1eb5-s.0pmct4677vsxx.woff2"
+          },
+          {
+            "weight": "400",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/77ce6907447ba740-s.3ocirkky1304u.woff2"
+          },
+          {
+            "weight": "400",
+            "style": "normal",
+            "file": "https://buildledger-sable.vercel.app/_next/static/immutable/media/e532fa1b9921e1cd-s.2t9t9wqjy3mle.woff2"
+          }
+        ],
+        "source": "Self-hosted",
+        "free": null
+      }
+    ],
+    "roles": [
+      {
+        "role": "display",
+        "size": 70.5,
+        "lh": 1.1,
+        "ls": -0.01,
+        "weight": "700",
+        "family": "Anek Latin",
+        "transform": null,
+        "share": 0.009,
+        "tags": [
+          "h1"
+        ],
+        "sample": "Every rupee on site,",
+        "phone": 41.6
+      },
+      {
+        "role": "h1",
+        "size": 48,
+        "lh": 1.1,
+        "ls": -0.01,
+        "weight": "700",
+        "family": "Anek Latin",
+        "transform": null,
+        "share": 0.028,
+        "tags": [
+          "h2",
+          "li"
+        ],
+        "sample": "Built around how a site actually runs",
+        "phone": 30
+      },
+      {
+        "role": "h2",
+        "size": 27,
+        "lh": 1.1,
+        "ls": -0.01,
+        "weight": "600",
+        "family": "Anek Latin",
+        "transform": null,
+        "share": 0.005,
+        "tags": [
+          "p"
+        ],
+        "sample": "₹ 38,42,600",
+        "phone": 24
+      },
+      {
+        "role": "h3",
+        "size": 24,
+        "lh": 1.1,
+        "ls": -0.01,
+        "weight": "600",
+        "family": "Anek Latin",
+        "transform": null,
+        "share": 0.008,
+        "tags": [
+          "dd",
+          "h1"
+        ],
+        "sample": "₹6,48,200"
+      },
+      {
+        "role": "h4",
+        "size": 20,
+        "lh": 1.1,
+        "ls": -0.01,
+        "weight": "600",
+        "family": "Anek Latin",
+        "transform": null,
+        "share": 0.052,
+        "tags": [
+          "dd",
+          "h3",
+          "a"
+        ],
+        "sample": "₹"
+      },
+      {
+        "role": "body-lg",
+        "size": 16,
+        "lh": 1.5,
+        "ls": 0,
+        "weight": "400",
+        "family": "IBM Plex Sans",
+        "transform": null,
+        "share": 0.079,
+        "tags": [
+          "p",
+          "a"
+        ],
+        "sample": "Fast to fill in standing on site, clear enough t"
+      },
+      {
+        "role": "body",
+        "size": 14,
+        "lh": 1.625,
+        "ls": 0,
+        "weight": "400",
+        "family": "IBM Plex Sans",
+        "transform": null,
+        "share": 0.536,
+        "tags": [
+          "p",
+          "a",
+          "li",
+          "label"
+        ],
+        "sample": "Pick the material from pictures, enter quantity "
+      },
+      {
+        "role": "body-sm",
+        "size": 12,
+        "lh": 1.333,
+        "ls": 0,
+        "weight": "400",
+        "family": "IBM Plex Sans",
+        "transform": null,
+        "share": 0.124,
+        "tags": [
+          "p",
+          "li",
+          "a"
+        ],
+        "sample": "Kakkanad, Kochi · G+1 · 2,400 sq ft"
+      },
+      {
+        "role": "overline",
+        "size": 11.5,
+        "lh": 1.5,
+        "ls": 0.12,
+        "weight": "500",
+        "family": "IBM Plex Mono",
+        "transform": "uppercase",
+        "share": 0.061,
+        "tags": [
+          "p",
+          "li",
+          "dt",
+          "h2"
+        ],
+        "sample": "Site accounts for Indian builders"
+      },
+      {
+        "role": "code",
+        "size": 11.5,
+        "lh": 1.5,
+        "ls": 0.12,
+        "weight": "500",
+        "family": "IBM Plex Mono",
+        "transform": null,
+        "share": 0.036,
+        "tags": [
+          "p",
+          "li",
+          "dt"
+        ],
+        "sample": "Site accounts for Indian builders"
+      },
+      {
+        "role": "caption",
+        "size": 11,
+        "lh": 1.5,
+        "ls": 0,
+        "weight": "400",
+        "family": "IBM Plex Sans",
+        "transform": null,
+        "share": 0.054,
+        "tags": [
+          "span",
+          "p",
+          "dd",
+          "figcaption"
+        ],
+        "sample": "70% of ₹55,00,000"
+      }
+    ],
+    "sizes": [
+      {
+        "size": 70.5,
+        "share": 0.009,
+        "tags": [
+          "h1"
+        ]
+      },
+      {
+        "size": 48,
+        "share": 0.028,
+        "tags": [
+          "h2",
+          "li"
+        ]
+      },
+      {
+        "size": 27,
+        "share": 0.005,
+        "tags": [
+          "p"
+        ]
+      },
+      {
+        "size": 24,
+        "share": 0.008,
+        "tags": [
+          "h1",
+          "dd"
+        ]
+      },
+      {
+        "size": 20,
+        "share": 0.052,
+        "tags": [
+          "h3",
+          "a",
+          "dd"
+        ]
+      },
+      {
+        "size": 18,
+        "share": 0.037,
+        "tags": [
+          "p"
+        ]
+      },
+      {
+        "size": 16,
+        "share": 0.079,
+        "tags": [
+          "p",
+          "a"
+        ]
+      },
+      {
+        "size": 14,
+        "share": 0.536,
+        "tags": [
+          "p",
+          "a",
+          "li"
+        ]
+      },
+      {
+        "size": 12,
+        "share": 0.124,
+        "tags": [
+          "p",
+          "a",
+          "li"
+        ]
+      },
+      {
+        "size": 11.5,
+        "share": 0.061,
+        "tags": [
+          "p",
+          "h2",
+          "dt"
+        ]
+      },
+      {
+        "size": 11,
+        "share": 0.054,
+        "tags": [
+          "p",
+          "dd",
+          "figcaption"
+        ]
+      },
+      {
+        "size": 10,
+        "share": 0.007,
+        "tags": [
+          "li"
+        ]
+      }
+    ],
+    "weights": [
+      {
+        "weight": "400",
+        "share": 0.721
+      },
+      {
+        "weight": "500",
+        "share": 0.134
+      },
+      {
+        "weight": "600",
+        "share": 0.092
+      },
+      {
+        "weight": "700",
+        "share": 0.053
+      }
+    ],
+    "ratio": 1.2,
+    "smoothing": "antialiased",
+    "matches": {
+      "Anek Latin": [
+        {
+          "family": "Instrument Sans",
+          "error": 0.139,
+          "weights": {
+            "600": 600,
+            "700": 700
+          },
+          "detail": {
+            "600": {
+              "width": 111,
+              "weight": 99,
+              "xHeight": 103
+            },
+            "700": {
+              "width": 110,
+              "weight": 99,
+              "xHeight": 103
+            }
+          }
+        },
+        {
+          "family": "IBM Plex Sans",
+          "error": 0.148,
+          "weights": {
+            "600": 600,
+            "700": 700
+          },
+          "detail": {
+            "600": {
+              "width": 110,
+              "weight": 100,
+              "xHeight": 103
+            },
+            "700": {
+              "width": 109,
+              "weight": 97,
+              "xHeight": 106
+            }
+          }
+        },
+        {
+          "family": "Inter Tight",
+          "error": 0.149,
+          "weights": {
+            "600": 600,
+            "700": 700
+          },
+          "detail": {
+            "600": {
+              "width": 106,
+              "weight": 100,
+              "xHeight": 109
+            },
+            "700": {
+              "width": 106,
+              "weight": 98,
+              "xHeight": 109
+            }
+          }
+        },
+        {
+          "family": "Archivo",
+          "error": 0.17,
+          "weights": {
+            "600": 600,
+            "700": 700
+          },
+          "detail": {
+            "600": {
+              "width": 108,
+              "weight": 99,
+              "xHeight": 106
+            },
+            "700": {
+              "width": 110,
+              "weight": 95,
+              "xHeight": 106
+            }
+          }
+        }
+      ]
+    }
+  },
+  "spacing": {
+    "base": 4,
+    "fit": 0.789,
+    "loose": false,
+    "candidates": [
+      {
+        "unit": 8,
+        "fit": 0.517
+      },
+      {
+        "unit": 4,
+        "fit": 0.789
+      },
+      {
+        "unit": 6,
+        "fit": 0.296
+      },
+      {
+        "unit": 5,
+        "fit": 0.122
+      },
+      {
+        "unit": 10,
+        "fit": 0.122
+      }
+    ],
+    "scale": [
+      {
+        "px": 2,
+        "share": 0.074,
+        "onGrid": false
+      },
+      {
+        "px": 4,
+        "share": 0.08,
+        "onGrid": true
+      },
+      {
+        "px": 6,
+        "share": 0.121,
+        "onGrid": false
+      },
+      {
+        "px": 8,
+        "share": 0.234,
+        "onGrid": true
+      },
+      {
+        "px": 10,
+        "share": 0.066,
+        "onGrid": false
+      },
+      {
+        "px": 12,
+        "share": 0.097,
+        "onGrid": true
+      },
+      {
+        "px": 16,
+        "share": 0.124,
+        "onGrid": true
+      },
+      {
+        "px": 20,
+        "share": 0.035,
+        "onGrid": true
+      },
+      {
+        "px": 24,
+        "share": 0.046,
+        "onGrid": true
+      },
+      {
+        "px": 28,
+        "share": 0.038,
+        "onGrid": true
+      },
+      {
+        "px": 32,
+        "share": 0.025,
+        "onGrid": true
+      },
+      {
+        "px": 40,
+        "share": 0.009,
+        "onGrid": true
+      },
+      {
+        "px": 64,
+        "share": 0.017,
+        "onGrid": true
+      }
+    ],
+    "section": [
+      {
+        "px": 64,
+        "count": 8
+      }
+    ],
+    "sectionPhone": [
+      {
+        "px": 80,
+        "count": 6
+      },
+      {
+        "px": 64,
+        "count": 4
+      },
+      {
+        "px": 40,
+        "count": 3
+      },
+      {
+        "px": 196,
+        "count": 3
+      }
+    ],
+    "phonePadding": [
+      {
+        "px": 8,
+        "count": 87
+      },
+      {
+        "px": 16,
+        "count": 63
+      },
+      {
+        "px": 24,
+        "count": 34
+      },
+      {
+        "px": 6,
+        "count": 24
+      },
+      {
+        "px": 4,
+        "count": 23
+      },
+      {
+        "px": 12,
+        "count": 19
+      },
+      {
+        "px": 2,
+        "count": 12
+      },
+      {
+        "px": 10,
+        "count": 8
+      }
+    ]
+  },
+  "radii": [
+    {
+      "name": "sm",
+      "value": 4,
+      "share": 0.19
+    },
+    {
+      "name": "md",
+      "value": 6,
+      "share": 0.081
+    },
+    {
+      "name": "lg",
+      "value": 8,
+      "share": 0.285
+    },
+    {
+      "name": "xl",
+      "value": 12,
+      "share": 0.127
+    },
+    {
+      "name": "2xl",
+      "value": 16,
+      "share": 0.072
+    },
+    {
+      "name": "full",
+      "value": 9999,
+      "share": 0.235
+    }
+  ],
+  "shadows": {
+    "drop": [
+      {
+        "name": "sm",
+        "value": "rgba(22, 22, 26, 0.04) 0px 1px 2px 0px, rgba(22, 22, 26, 0.06) 0px 4px 12px -4px",
+        "share": 0.171,
+        "elevation": 16,
+        "kind": "drop",
+        "layers": 2
+      },
+      {
+        "name": "md",
+        "value": "rgba(0, 0, 0, 0.04) 0px 1px 2px 0px, rgba(0, 0, 0, 0.12) 0px 12px 32px -12px",
+        "share": 0.049,
+        "elevation": 44,
+        "kind": "drop",
+        "layers": 2
+      },
+      {
+        "name": "lg",
+        "value": "rgba(22, 22, 26, 0.05) 0px 1px 2px 0px, rgba(22, 22, 26, 0.18) 0px 24px 48px -16px",
+        "share": 0.073,
+        "elevation": 72,
+        "kind": "drop",
+        "layers": 2
+      }
+    ],
+    "ring": [
+      {
+        "value": "rgba(0, 0, 0, 0.06) 0px 0px 0px 1px inset",
+        "share": 0.561,
+        "elevation": 0,
+        "kind": "ring",
+        "layers": 1
+      },
+      {
+        "value": "oklab(0.695996 -0.162107 0.0511875 / 0.5) 0px 0px 0px 1px inset",
+        "share": 0.049,
+        "elevation": 0,
+        "kind": "ring",
+        "layers": 1
+      },
+      {
+        "value": "rgba(16, 185, 129, 0.33) 0px 0px 0px 2.07396px",
+        "share": 0.024,
+        "elevation": 0,
+        "kind": "ring",
+        "layers": 1
+      }
+    ],
+    "inset": [
+      {
+        "value": "rgba(0, 0, 0, 0.15) 0px -1px 0px 0px inset",
+        "share": 0.073,
+        "elevation": 1,
+        "kind": "inset",
+        "layers": 1
+      }
+    ]
+  },
+  "borders": {
+    "widths": [
+      {
+        "px": 1,
+        "count": 202
+      }
+    ],
+    "styles": [
+      "solid",
+      "dashed"
+    ]
+  },
+  "motion": {
+    "durations": [
+      {
+        "name": "fast",
+        "ms": 150,
+        "count": 564
+      },
+      {
+        "name": "base",
+        "ms": 500,
+        "count": 32
+      },
+      {
+        "name": "slow",
+        "ms": 800,
+        "count": 26
+      }
+    ],
+    "easings": [
+      {
+        "name": "standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "count": 601
+      },
+      {
+        "name": "alt-1",
+        "value": "cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "count": 26
+      },
+      {
+        "name": "alt-2",
+        "value": "ease",
+        "count": 9
+      }
+    ],
+    "properties": [
+      "color",
+      "border-color",
+      "background-color",
+      "outline-color",
+      "text-decoration-color",
+      "fill",
+      "stroke",
+      "--tw-gradient-from"
+    ],
+    "keyframes": [
+      "tape-creep",
+      "fade-up",
+      "fade-in",
+      "scale-in",
+      "shimmer",
+      "float",
+      "live-pulse",
+      "meter-grow",
+      "marquee",
+      "scan"
+    ],
+    "animations": [
+      {
+        "value": "fade-up|0.5s|cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "count": 16
+      },
+      {
+        "value": "bar-rise|0.9s|cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "count": 5
+      },
+      {
+        "value": "bd-sway|9s|ease-in-out",
+        "count": 4
+      },
+      {
+        "value": "float|7s|ease-in-out",
+        "count": 2
+      },
+      {
+        "value": "fade-in|0.4s|ease-out",
+        "count": 1
+      },
+      {
+        "value": "tape-creep|6s|linear",
+        "count": 1
+      },
+      {
+        "value": "live-pulse|2.2s|ease-out",
+        "count": 1
+      },
+      {
+        "value": "meter-grow|1.4s|cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "count": 1
+      }
+    ],
+    "reducedMotion": true
+  },
+  "layout": {
+    "containers": [
+      {
+        "px": 1152,
+        "count": 15
+      },
+      {
+        "px": 672,
+        "count": 4
+      },
+      {
+        "px": 1120,
+        "count": 4
+      },
+      {
+        "px": 1408,
+        "count": 4
+      }
+    ],
+    "maxWidths": [
+      {
+        "px": 1152,
+        "count": 15
+      },
+      {
+        "px": 672,
+        "count": 1
+      },
+      {
+        "px": 576,
+        "count": 1
+      }
+    ],
+    "breakpoints": [],
+    "approach": "mobile-first (min-width queries)",
+    "gridColumns": [
+      {
+        "cols": 4,
+        "count": 7
+      },
+      {
+        "cols": 3,
+        "count": 4
+      },
+      {
+        "cols": 8,
+        "count": 4
+      },
+      {
+        "cols": 2,
+        "count": 3
+      }
+    ],
+    "bands": [
+      {
+        "bg": "#ffffffb2",
+        "y": 2584,
+        "h": 766
+      },
+      {
+        "bg": "#ffffff",
+        "y": 3933,
+        "h": 454
+      }
+    ],
+    "containerQueries": 0
+  },
+  "components": {
+    "buttons": [
+      {
+        "count": 5,
+        "label": "Sign in",
+        "bg": "#e8590c",
+        "fg": "#ffffff",
+        "gradient": null,
+        "border": null,
+        "radius": 8,
+        "shadow": "rgba(0, 0, 0, 0.15) 0px -1px 0px 0px inset",
+        "h": 36,
+        "w": 318,
+        "padding": [
+          8,
+          137.6,
+          8,
+          137.6
+        ],
+        "gap": 6,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 14,
+          "weight": "500",
+          "lh": 1.429,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+        "parentBg": "#f5f3ee",
+        "y": 14,
+        "variant": "primary",
+        "hover": {
+          "bg": "#c44a08",
+          "fg": "#ffffff",
+          "shadow": null,
+          "transform": null,
+          "border": "0px solid rgb(255, 255, 255)"
+        },
+        "focus": {
+          "outline": "1px auto rgb(16, 16, 16)",
+          "offset": "1px",
+          "shadow": "rgba(0, 0, 0, 0.15) 0px -1px 0px 0px inset"
+        }
+      },
+      {
+        "count": 2,
+        "label": "Start your first project",
+        "bg": "#e8590c",
+        "fg": "#ffffff",
+        "gradient": null,
+        "border": null,
+        "radius": 8,
+        "shadow": "rgba(0, 0, 0, 0.15) 0px -1px 0px 0px inset",
+        "h": 48,
+        "w": 210.9,
+        "padding": [
+          8,
+          24,
+          8,
+          24
+        ],
+        "gap": 6,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 14,
+          "weight": "500",
+          "lh": 1.429,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+        "parentBg": "#f5f3ee",
+        "y": 501.61,
+        "variant": "primary"
+      },
+      {
+        "count": 1,
+        "label": "Sign in",
+        "bg": "#ffffff",
+        "fg": "#16161a",
+        "gradient": null,
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "hex": "#14141b26",
+          "sides": 4
+        },
+        "radius": 8,
+        "shadow": null,
+        "h": 48,
+        "w": 92.9,
+        "padding": [
+          8,
+          25,
+          8,
+          25
+        ],
+        "gap": 6,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 14,
+          "weight": "500",
+          "lh": 1.429,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+        "parentBg": "#f5f3ee",
+        "y": 501.61,
+        "variant": "secondary",
+        "hover": {
+          "bg": "#fff0e5",
+          "fg": "#16161a",
+          "shadow": null,
+          "transform": null,
+          "border": "1px solid oklab(0.644168 0.143103 0.12743 / 0.4)"
+        },
+        "focus": {
+          "outline": "1px auto rgb(16, 16, 16)",
+          "offset": "1px",
+          "shadow": null
+        }
+      },
+      {
+        "count": 1,
+        "label": "Sign in",
+        "bg": null,
+        "fg": "#ffffff",
+        "gradient": null,
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "hex": "#ffffff33",
+          "sides": 4
+        },
+        "radius": 8,
+        "shadow": null,
+        "h": 48,
+        "w": 99,
+        "padding": [
+          0,
+          25,
+          0,
+          25
+        ],
+        "gap": 0,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 16,
+          "weight": "500",
+          "lh": 1.5,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        "parentBg": "#16161a",
+        "y": 3660.77,
+        "variant": "outline",
+        "hover": {
+          "bg": null,
+          "fg": "#ffffff",
+          "shadow": null,
+          "transform": null,
+          "border": "1px solid oklab(0.999994 0.0000455678 0.0000200868 / 0.2)"
+        },
+        "focus": {
+          "outline": "1px auto rgb(16, 16, 16)",
+          "offset": "1px",
+          "shadow": null
+        }
+      }
+    ],
+    "inputs": [
+      {
+        "count": 7,
+        "label": "",
+        "bg": "#ffffff",
+        "fg": "#16161a",
+        "gradient": null,
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "hex": "#14141b26",
+          "sides": 4
+        },
+        "radius": 8,
+        "shadow": null,
+        "h": 38,
+        "w": 318,
+        "padding": [
+          8,
+          12,
+          8,
+          12
+        ],
+        "gap": null,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 14,
+          "weight": "400",
+          "lh": 1.429,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        "parentBg": "#ffffff",
+        "y": 259.39,
+        "placeholder": "#16161a",
+        "focus": {
+          "outline": "1px none rgb(16, 16, 16)",
+          "border": "1px solid oklab(0.20197 0.00214528 -0.00761044 / 0.15)",
+          "shadow": null
+        }
+      }
+    ],
+    "cards": [
+      {
+        "count": 7,
+        "label": "01Material purchasesPick the material fr",
+        "bg": "#ffffff",
+        "fg": "#16161a",
+        "gradient": null,
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "hex": "#1a1a1a14",
+          "sides": 4
+        },
+        "radius": 16,
+        "shadow": "rgba(22, 22, 26, 0.04) 0px 1px 2px 0px, rgba(22, 22, 26, 0.06) 0px 4px 12px -4px",
+        "h": 370.6,
+        "w": 580.8,
+        "padding": [
+          28,
+          28,
+          28,
+          28
+        ],
+        "gap": 0,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 16,
+          "weight": "400",
+          "lh": 1.5,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "opacity, transform 0.8s, 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "parentBg": "#f5f3ee",
+        "y": 1344.81
+      },
+      {
+        "count": 4,
+        "label": "Sign inWelcome back. Sign in to your acc",
+        "bg": "#ffffff",
+        "fg": "#16161a",
+        "gradient": null,
+        "border": {
+          "width": 1,
+          "style": "solid",
+          "hex": "#1c1c1c12",
+          "sides": 4
+        },
+        "radius": 12,
+        "shadow": "rgba(0, 0, 0, 0.04) 0px 1px 2px 0px, rgba(0, 0, 0, 0.12) 0px 12px 32px -12px",
+        "h": 396.4,
+        "w": 384,
+        "padding": [
+          32,
+          32,
+          32,
+          32
+        ],
+        "gap": null,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 16,
+          "weight": "400",
+          "lh": 1.5,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": null,
+        "parentBg": "#f5f3ee",
+        "y": 128
+      },
+      {
+        "count": 1,
+        "label": "OPC 53 GRADE120 BAGSRATE390.00TOTAL46,80",
+        "bg": null,
+        "fg": "#16161b99",
+        "gradient": null,
+        "border": {
+          "width": 1,
+          "style": "dashed",
+          "hex": "#14141b26",
+          "sides": 4
+        },
+        "radius": 12,
+        "shadow": null,
+        "h": 99.5,
+        "w": 304.7,
+        "padding": [
+          16,
+          16,
+          16,
+          16
+        ],
+        "gap": null,
+        "font": {
+          "family": "IBM Plex Mono",
+          "size": 11,
+          "weight": "400",
+          "lh": 1.5,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": null,
+        "parentBg": "#ffffff",
+        "y": 1556.06
+      },
+      {
+        "count": 1,
+        "label": "Free to startPut your next site on one l",
+        "bg": "#16161a",
+        "fg": "#ffffff",
+        "gradient": "radial-gradient(60% 80% at 100% 100%, rgba(232, 89, 12, 0.35), rgba(0, 0, 0, 0) 70%), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px), linear-gradient(rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px), none",
+        "border": null,
+        "radius": 24,
+        "shadow": null,
+        "h": 326.9,
+        "w": 1120,
+        "padding": [
+          64,
+          56,
+          64,
+          56
+        ],
+        "gap": null,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 16,
+          "weight": "400",
+          "lh": 1.5,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": "opacity, transform 0.8s, 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "parentBg": "#f5f3ee",
+        "y": 3445.91
+      }
+    ],
+    "badges": [
+      {
+        "count": 1,
+        "label": "Active",
+        "bg": "#ecfdf5",
+        "fg": "#007a55",
+        "gradient": null,
+        "border": null,
+        "radius": 6,
+        "shadow": null,
+        "h": 24.5,
+        "w": 59.5,
+        "padding": [
+          4,
+          8,
+          4,
+          8
+        ],
+        "gap": 6,
+        "font": {
+          "family": "IBM Plex Sans",
+          "size": 11,
+          "weight": "500",
+          "lh": 1.5,
+          "ls": 0,
+          "transform": null
+        },
+        "backdrop": null,
+        "transition": null,
+        "parentBg": "#ffffff",
+        "y": 168.75
+      }
+    ],
+    "links": [
+      {
+        "fg": "#16161a",
+        "decoration": "none",
+        "thickness": "auto",
+        "offset": "auto",
+        "weight": "700",
+        "where": "standalone",
+        "n": 10,
+        "hover": {
+          "fg": "#16161a",
+          "decoration": "none"
+        }
+      },
+      {
+        "fg": "#e8590c",
+        "decoration": "none",
+        "thickness": "auto",
+        "offset": "auto",
+        "weight": "600",
+        "where": "standalone",
+        "n": 5,
+        "hover": {
+          "fg": "#e8590c",
+          "decoration": "none"
+        }
+      },
+      {
+        "fg": "#16161a",
+        "decoration": "none",
+        "thickness": "auto",
+        "offset": "auto",
+        "weight": "500",
+        "where": "standalone",
+        "n": 1,
+        "hover": {
+          "fg": "#16161a",
+          "decoration": "none"
+        }
+      },
+      {
+        "fg": "#16161b99",
+        "decoration": "none",
+        "thickness": "auto",
+        "offset": "auto",
+        "weight": "400",
+        "where": "standalone",
+        "n": 1,
+        "hover": {
+          "fg": null,
+          "decoration": "underline"
+        }
+      }
+    ],
+    "nav": {
+      "tag": "header",
+      "label": "",
+      "w": 1440,
+      "h": 70,
+      "bg": "#ffffffe6",
+      "fg": "#16161a",
+      "gradient": null,
+      "border": null,
+      "radius": 0,
+      "shadow": null,
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "gap": null,
+      "font": {
+        "family": "IBM Plex Sans",
+        "size": 16,
+        "weight": "400",
+        "lh": 1.5,
+        "ls": 0,
+        "transform": null
+      },
+      "backdrop": "blur(12px)",
+      "transition": null,
+      "parentBg": "#f5f3ee",
+      "y": 0,
+      "position": "sticky"
+    },
+    "footer": {
+      "bg": "#ffffff",
+      "fg": "#16161a",
+      "y": 3933,
+      "h": 454
+    }
+  },
+  "icons": {
+    "count": 5,
+    "logos": 40,
+    "bySize": [
+      {
+        "px": 20,
+        "count": 3,
+        "style": "line",
+        "lineAt24": 1.75
+      },
+      {
+        "px": 12,
+        "count": 1,
+        "style": "line",
+        "lineAt24": 1.58
+      },
+      {
+        "px": 16,
+        "count": 1,
+        "style": "line",
+        "lineAt24": 1.75
+      }
+    ],
+    "style": "line",
+    "lineAt24": 1.75,
+    "drawnAsFills": 0,
+    "coverage": 0.035,
+    "kind": "outline",
+    "kinds": {
+      "outline": 5
+    },
+    "strokeAt24": 2,
+    "cap": "round",
+    "join": "round",
+    "sizes": [
+      {
+        "px": 20,
+        "count": 3
+      },
+      {
+        "px": 12,
+        "count": 1
+      },
+      {
+        "px": 16,
+        "count": 1
+      }
+    ],
+    "viewBoxes": [
+      {
+        "box": 24,
+        "count": 5
+      }
+    ],
+    "currentColor": 1
+  },
+  "effects": {
+    "gradients": [
+      {
+        "value": "radial-gradient(70% 45% at 85% -5%, rgba(232, 89, 12, 0.07), rgba(0, 0, 0, 0) 70%), radial-gradient(60% 40% at 0px 0px, rgba(250, 178, 25, 0.06), rgba(0, 0, 0, 0) 70%)",
+        "area": 6480000
+      },
+      {
+        "value": "radial-gradient(circle, rgba(60, 45, 30, 0.13) 1px, rgba(0, 0, 0, 0) 1.4px)",
+        "area": 6480000
+      },
+      {
+        "value": "radial-gradient(60% 80% at 100% 100%, rgba(232, 89, 12, 0.35), rgba(0, 0, 0, 0) 70%), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px), linear-gradient(rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px), none",
+        "area": 366083
+      },
+      {
+        "value": "linear-gradient(rgba(0, 0, 0, 0), color(srgb 0.909804 0.34902 0.0470588 / 0.16) 85%, rgb(232, 89, 12) 100%)",
+        "area": 12106
+      },
+      {
+        "value": "repeating-linear-gradient(-45deg, rgb(232, 89, 12) 0px, rgb(232, 89, 12) 10px, rgb(29, 27, 24) 10px, rgb(29, 27, 24) 20px)",
+        "area": 8640
+      },
+      {
+        "value": "linear-gradient(135deg, lab(66.9756 -58.27 19.5419) 50%, rgba(0, 0, 0, 0) 50%)",
+        "area": 512
+      }
+    ],
+    "filters": [
+      {
+        "value": "backdrop-filter: blur(12px)",
+        "count": 1
+      }
+    ]
+  },
+  "graphics": {
+    "canvases": [],
+    "videos": 0,
+    "images": 23,
+    "svgImages": 0,
+    "largeSvgs": 16
+  },
+  "css": {
+    "sheets": 2,
+    "system": "--color-",
+    "siteTokens": [
+      {
+        "name": "--foreground",
+        "hex": "#16161a",
+        "value": "#16161a",
+        "uses": 79
+      },
+      {
+        "name": "--brand",
+        "hex": "#e8590c",
+        "value": "#e8590c",
+        "uses": 36
+      },
+      {
+        "name": "--brand-soft",
+        "hex": "#fff0e5",
+        "value": "#fff0e5",
+        "uses": 11
+      },
+      {
+        "name": "--color-emerald-500",
+        "hex": "#00bc7d",
+        "value": "lab(66.9756% -58.27 19.5419)",
+        "uses": 11
+      },
+      {
+        "name": "--surface",
+        "hex": "#ffffff",
+        "value": "#fff",
+        "uses": 11
+      },
+      {
+        "name": "--color-white",
+        "hex": "#ffffff",
+        "value": "#fff",
+        "uses": 9
+      },
+      {
+        "name": "--color-rose-500",
+        "hex": "#ff2056",
+        "value": "lab(56.101% 79.4328 31.4532)",
+        "uses": 7
+      },
+      {
+        "name": "--color-black",
+        "hex": "#000000",
+        "value": "#000",
+        "uses": 5
+      },
+      {
+        "name": "--background",
+        "hex": "#f5f3ee",
+        "value": "#f5f3ee",
+        "uses": 4
+      },
+      {
+        "name": "--color-amber-500",
+        "hex": "#fe9a00",
+        "value": "lab(72.7183% 31.8672 97.9407)",
+        "uses": 4
+      },
+      {
+        "name": "--color-amber-400",
+        "hex": "#ffb900",
+        "value": "lab(80.1641% 16.6016 99.2089)",
+        "uses": 3
+      },
+      {
+        "name": "--brand-strong",
+        "hex": "#c44a08",
+        "value": "#c44a08",
+        "uses": 2
+      },
+      {
+        "name": "--color-amber-300",
+        "hex": "#ffd230",
+        "value": "lab(86.4156% 6.13147 78.3961)",
+        "uses": 2
+      },
+      {
+        "name": "--color-emerald-100",
+        "hex": "#d0fae5",
+        "value": "lab(94.9004% -17.0769 5.63836)",
+        "uses": 2
+      },
+      {
+        "name": "--color-emerald-300",
+        "hex": "#5ee9b5",
+        "value": "lab(83.9203% -48.7124 13.8849)",
+        "uses": 2
+      },
+      {
+        "name": "--color-green-500",
+        "hex": "#00c950",
+        "value": "lab(70.5521% -66.5147 45.8073)",
+        "uses": 2
+      },
+      {
+        "name": "--color-orange-300",
+        "hex": "#ffb86a",
+        "value": "lab(80.8059% 21.7313 50.4455)",
+        "uses": 2
+      },
+      {
+        "name": "--color-orange-500",
+        "hex": "#ff6900",
+        "value": "lab(64.272% 57.1788 90.3583)",
+        "uses": 2
+      },
+      {
+        "name": "--color-red-500",
+        "hex": "#fb2c36",
+        "value": "lab(55.4814% 75.0732 48.8528)",
+        "uses": 2
+      },
+      {
+        "name": "--color-sky-500",
+        "hex": "#00a6f4",
+        "value": "lab(63.3038% -18.433 -51.0407)",
+        "uses": 2
+      },
+      {
+        "name": "--color-violet-500",
+        "hex": "#8e51ff",
+        "value": "lab(49.9355% 55.1776 -81.8963)",
+        "uses": 2
+      },
+      {
+        "name": "--color-amber-100",
+        "hex": "#fef3c6",
+        "value": "lab(95.916% -1.21653 23.111)",
+        "uses": 1
+      },
+      {
+        "name": "--color-amber-50",
+        "hex": "#fffbeb",
+        "value": "lab(98.6252% -.635922 8.42309)",
+        "uses": 1
+      },
+      {
+        "name": "--color-amber-800",
+        "hex": "#973c00",
+        "value": "lab(37.8822% 37.1699 52.2718)",
+        "uses": 1
+      },
+      {
+        "name": "--color-amber-950",
+        "hex": "#461901",
+        "value": "lab(15.8111% 20.9107 23.3752)",
+        "uses": 1
+      },
+      {
+        "name": "--color-emerald-50",
+        "hex": "#ecfdf5",
+        "value": "lab(97.8462% -6.94966 1.85487)",
+        "uses": 1
+      },
+      {
+        "name": "--color-emerald-700",
+        "hex": "#007a55",
+        "value": "lab(44.4871% -41.0396 11.0361)",
+        "uses": 1
+      },
+      {
+        "name": "--color-emerald-800",
+        "hex": "#006045",
+        "value": "lab(35.3675% -33.1188 8.04002)",
+        "uses": 1
+      },
+      {
+        "name": "--color-fuchsia-500",
+        "hex": "#e12afb",
+        "value": "lab(56.4256% 83.132 -64.639)",
+        "uses": 1
+      },
+      {
+        "name": "--color-green-400",
+        "hex": "#05df72",
+        "value": "lab(78.503% -64.9265 39.7492)",
+        "uses": 1
+      },
+      {
+        "name": "--color-green-700",
+        "hex": "#008236",
+        "value": "lab(47.0329% -47.0239 31.4788)",
+        "uses": 1
+      },
+      {
+        "name": "--color-indigo-500",
+        "hex": "#615fff",
+        "value": "lab(48.295% 38.3129 -81.9673)",
+        "uses": 1
+      },
+      {
+        "name": "--color-orange-100",
+        "hex": "#ffedd4",
+        "value": "lab(94.7127% 3.58394 14.3151)",
+        "uses": 1
+      },
+      {
+        "name": "--color-orange-700",
+        "hex": "#ca3500",
+        "value": "lab(46.4615% 57.7275 70.8507)",
+        "uses": 1
+      },
+      {
+        "name": "--color-red-400",
+        "hex": "#ff6467",
+        "value": "lab(63.7053% 60.745 31.3109)",
+        "uses": 1
+      },
+      {
+        "name": "--color-red-700",
+        "hex": "#c10007",
+        "value": "lab(40.4273% 67.2623 53.7441)",
+        "uses": 1
+      },
+      {
+        "name": "--color-rose-100",
+        "hex": "#ffe4e6",
+        "value": "lab(92.8221% 9.86832 2.60075)",
+        "uses": 1
+      },
+      {
+        "name": "--color-rose-200",
+        "hex": "#ffccd3",
+        "value": "lab(86.806% 19.1909 4.07754)",
+        "uses": 1
+      },
+      {
+        "name": "--color-rose-300",
+        "hex": "#ffa1ad",
+        "value": "lab(76.6339% 38.3549 9.68835)",
+        "uses": 1
+      },
+      {
+        "name": "--color-rose-50",
+        "hex": "#fff1f2",
+        "value": "lab(96.2369% 4.94155 1.28011)",
+        "uses": 1
+      },
+      {
+        "name": "--color-rose-700",
+        "hex": "#c70036",
+        "value": "lab(41.1651% 71.6251 30.3087)",
+        "uses": 1
+      },
+      {
+        "name": "--color-sky-100",
+        "hex": "#dff2fe",
+        "value": "lab(94.3709% -4.56053 -8.23453)",
+        "uses": 1
+      },
+      {
+        "name": "--color-sky-300",
+        "hex": "#74d4ff",
+        "value": "lab(80.3307% -20.2945 -31.385)",
+        "uses": 1
+      },
+      {
+        "name": "--color-sky-50",
+        "hex": "#f0f9ff",
+        "value": "lab(97.3623% -2.33802 -4.13098)",
+        "uses": 1
+      },
+      {
+        "name": "--color-sky-700",
+        "hex": "#0069a8",
+        "value": "lab(41.6013% -9.10804 -42.5647)",
+        "uses": 1
+      },
+      {
+        "name": "--color-stone-500",
+        "hex": "#79716b",
+        "value": "lab(48.1164% 2.35701 4.26852)",
+        "uses": 1
+      },
+      {
+        "name": "--color-stone-700",
+        "hex": "#44403b",
+        "value": "lab(27.3812% 1.32917 3.57789)",
+        "uses": 1
+      },
+      {
+        "name": "--color-violet-100",
+        "hex": "#ede9fe",
+        "value": "lab(93.0838% 4.35197 -9.88284)",
+        "uses": 1
+      },
+      {
+        "name": "--color-violet-300",
+        "hex": "#c4b4ff",
+        "value": "lab(76.7419% 18.3911 -37.0706)",
+        "uses": 1
+      },
+      {
+        "name": "--color-violet-600",
+        "hex": "#7f22fe",
+        "value": "lab(41.088% 68.9966 -91.995)",
+        "uses": 1
+      },
+      {
+        "name": "--color-violet-700",
+        "hex": "#7008e7",
+        "value": "lab(35.2783% 67.9912 -88.793)",
+        "uses": 1
+      },
+      {
+        "name": "--accent",
+        "hex": "#0f766e",
+        "value": "#0f766e",
+        "uses": 0
+      },
+      {
+        "name": "--accent-soft",
+        "hex": "#e3f4f1",
+        "value": "#e3f4f1",
+        "uses": 0
+      },
+      {
+        "name": "--status-warning",
+        "hex": "#fab219",
+        "value": "#fab219",
+        "uses": 0
+      }
+    ],
+    "tokenHints": {
+      "primary": {
+        "hex": "#e8590c",
+        "name": "--brand"
+      },
+      "background": {
+        "hex": "#f5f3ee",
+        "name": "--background"
+      },
+      "surface": {
+        "hex": "#ffffff",
+        "name": "--surface"
+      },
+      "text": {
+        "hex": "#16161a",
+        "name": "--foreground"
+      }
+    },
+    "variables": [
+      {
+        "name": "--spacing",
+        "uses": 226,
+        "value": ".25rem",
+        "defs": 1
+      },
+      {
+        "name": "--foreground",
+        "uses": 79,
+        "value": "#16161a",
+        "defs": 1
+      },
+      {
+        "name": "--brand",
+        "uses": 36,
+        "value": "#e8590c",
+        "defs": 1
+      },
+      {
+        "name": "--color-emerald-500",
+        "uses": 11,
+        "value": "#00bc7d",
+        "defs": 2
+      },
+      {
+        "name": "--surface",
+        "uses": 11,
+        "value": "#ffffff",
+        "defs": 1
+      },
+      {
+        "name": "--brand-soft",
+        "uses": 11,
+        "value": "#fff0e5",
+        "defs": 1
+      },
+      {
+        "name": "--status-critical",
+        "uses": 10,
+        "value": "#d03b3b",
+        "defs": 1
+      },
+      {
+        "name": "--color-white",
+        "uses": 9,
+        "value": "#ffffff",
+        "defs": 1
+      },
+      {
+        "name": "--color-rose-500",
+        "uses": 7,
+        "value": "#ff2056",
+        "defs": 2
+      },
+      {
+        "name": "--default-transition-duration",
+        "uses": 7,
+        "value": ".15s",
+        "defs": 1
+      },
+      {
+        "name": "--default-transition-timing-function",
+        "uses": 7,
+        "value": "cubic-bezier(.4, 0, .2, 1)",
+        "defs": 1
+      },
+      {
+        "name": "--color-black",
+        "uses": 5,
+        "value": "#000000",
+        "defs": 1
+      },
+      {
+        "name": "--color-amber-500",
+        "uses": 4,
+        "value": "#fe9a00",
+        "defs": 2
+      },
+      {
+        "name": "--font-weight-semibold",
+        "uses": 4,
+        "value": "600",
+        "defs": 1
+      },
+      {
+        "name": "--background",
+        "uses": 4,
+        "value": "#f5f3ee",
+        "defs": 1
+      },
+      {
+        "name": "--font-body",
+        "uses": 3,
+        "value": "\"IBM Plex Sans\", \"IBM Plex Sans Fallback\"",
+        "defs": 1
+      },
+      {
+        "name": "--font-code",
+        "uses": 3,
+        "value": "\"IBM Plex Mono\", \"IBM Plex Mono Fallback\"",
+        "defs": 1
+      },
+      {
+        "name": "--color-amber-400",
+        "uses": 3,
+        "value": "#ffb900",
+        "defs": 2
+      },
+      {
+        "name": "--radius-md",
+        "uses": 3,
+        "value": ".375rem",
+        "defs": 1
+      },
+      {
+        "name": "--font-heading",
+        "uses": 2,
+        "value": "\"Anek Latin\", \"Anek Latin Fallback\"",
+        "defs": 1
+      },
+      {
+        "name": "--color-red-500",
+        "uses": 2,
+        "value": "#fb2c36",
+        "defs": 2
+      },
+      {
+        "name": "--color-orange-300",
+        "uses": 2,
+        "value": "#ffb86a",
+        "defs": 2
+      },
+      {
+        "name": "--color-orange-500",
+        "uses": 2,
+        "value": "#ff6900",
+        "defs": 2
+      },
+      {
+        "name": "--color-amber-300",
+        "uses": 2,
+        "value": "#ffd230",
+        "defs": 2
+      },
+      {
+        "name": "--color-green-500",
+        "uses": 2,
+        "value": "#00c950",
+        "defs": 2
+      },
+      {
+        "name": "--color-emerald-100",
+        "uses": 2,
+        "value": "#d0fae5",
+        "defs": 2
+      },
+      {
+        "name": "--color-emerald-300",
+        "uses": 2,
+        "value": "#5ee9b5",
+        "defs": 2
+      },
+      {
+        "name": "--color-sky-500",
+        "uses": 2,
+        "value": "#00a6f4",
+        "defs": 2
+      },
+      {
+        "name": "--color-violet-500",
+        "uses": 2,
+        "value": "#8e51ff",
+        "defs": 2
+      },
+      {
+        "name": "--container-xs",
+        "uses": 2,
+        "value": "20rem",
+        "defs": 1
+      },
+      {
+        "name": "--text-xs",
+        "uses": 2,
+        "value": ".75rem",
+        "defs": 1
+      },
+      {
+        "name": "--text-xs--line-height",
+        "uses": 2,
+        "value": "calc(1 / .75)",
+        "defs": 1
+      },
+      {
+        "name": "--text-sm",
+        "uses": 2,
+        "value": ".875rem",
+        "defs": 1
+      },
+      {
+        "name": "--text-sm--line-height",
+        "uses": 2,
+        "value": "calc(1.25 / .875)",
+        "defs": 1
+      },
+      {
+        "name": "--text-lg",
+        "uses": 2,
+        "value": "1.125rem",
+        "defs": 1
+      },
+      {
+        "name": "--text-lg--line-height",
+        "uses": 2,
+        "value": "calc(1.75 / 1.125)",
+        "defs": 1
+      },
+      {
+        "name": "--text-5xl",
+        "uses": 2,
+        "value": "3rem",
+        "defs": 1
+      },
+      {
+        "name": "--text-5xl--line-height",
+        "uses": 2,
+        "value": "1",
+        "defs": 1
+      },
+      {
+        "name": "--font-weight-normal",
+        "uses": 2,
+        "value": "400",
+        "defs": 1
+      },
+      {
+        "name": "--font-weight-medium",
+        "uses": 2,
+        "value": "500",
+        "defs": 1
+      },
+      {
+        "name": "--font-weight-bold",
+        "uses": 2,
+        "value": "700",
+        "defs": 1
+      },
+      {
+        "name": "--tracking-tight",
+        "uses": 2,
+        "value": "-.025em",
+        "defs": 1
+      },
+      {
+        "name": "--tracking-wide",
+        "uses": 2,
+        "value": ".025em",
+        "defs": 1
+      },
+      {
+        "name": "--tracking-wider",
+        "uses": 2,
+        "value": ".05em",
+        "defs": 1
+      },
+      {
+        "name": "--leading-tight",
+        "uses": 2,
+        "value": "1.25",
+        "defs": 1
+      },
+      {
+        "name": "--leading-snug",
+        "uses": 2,
+        "value": "1.375",
+        "defs": 1
+      },
+      {
+        "name": "--leading-relaxed",
+        "uses": 2,
+        "value": "1.625",
+        "defs": 1
+      },
+      {
+        "name": "--ease-out",
+        "uses": 2,
+        "value": "cubic-bezier(0, 0, .2, 1)",
+        "defs": 1
+      },
+      {
+        "name": "--brand-strong",
+        "uses": 2,
+        "value": "#c44a08",
+        "defs": 1
+      },
+      {
+        "name": "--color-red-400",
+        "uses": 1,
+        "value": "#ff6467",
+        "defs": 2
+      },
+      {
+        "name": "--color-red-700",
+        "uses": 1,
+        "value": "#c10007",
+        "defs": 2
+      },
+      {
+        "name": "--color-orange-100",
+        "uses": 1,
+        "value": "#ffedd4",
+        "defs": 2
+      },
+      {
+        "name": "--color-orange-700",
+        "uses": 1,
+        "value": "#ca3500",
+        "defs": 2
+      },
+      {
+        "name": "--color-amber-50",
+        "uses": 1,
+        "value": "#fffbeb",
+        "defs": 2
+      },
+      {
+        "name": "--color-amber-100",
+        "uses": 1,
+        "value": "#fef3c6",
+        "defs": 2
+      },
+      {
+        "name": "--color-amber-800",
+        "uses": 1,
+        "value": "#973c00",
+        "defs": 2
+      },
+      {
+        "name": "--color-amber-950",
+        "uses": 1,
+        "value": "#461901",
+        "defs": 2
+      },
+      {
+        "name": "--color-green-400",
+        "uses": 1,
+        "value": "#05df72",
+        "defs": 2
+      },
+      {
+        "name": "--color-green-700",
+        "uses": 1,
+        "value": "#008236",
+        "defs": 2
+      },
+      {
+        "name": "--color-emerald-50",
+        "uses": 1,
+        "value": "#ecfdf5",
+        "defs": 2
+      }
+    ],
+    "prefixes": [
+      {
+        "prefix": "--tw-",
+        "count": 63
+      },
+      {
+        "prefix": "--color-",
+        "count": 45
+      },
+      {
+        "prefix": "--text-",
+        "count": 18
+      },
+      {
+        "prefix": "--container-",
+        "count": 8
+      },
+      {
+        "prefix": "--font-",
+        "count": 7
+      },
+      {
+        "prefix": "--radius-",
+        "count": 5
+      }
+    ],
+    "properties": [
+      {
+        "name": "--tw-translate-x",
+        "syntax": "\"*\"",
+        "initial": "0"
+      },
+      {
+        "name": "--tw-translate-y",
+        "syntax": "\"*\"",
+        "initial": "0"
+      },
+      {
+        "name": "--tw-translate-z",
+        "syntax": "\"*\"",
+        "initial": "0"
+      },
+      {
+        "name": "--tw-rotate-x",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-rotate-y",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-rotate-z",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-skew-x",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-skew-y",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-space-y-reverse",
+        "syntax": "\"*\"",
+        "initial": "0"
+      },
+      {
+        "name": "--tw-divide-x-reverse",
+        "syntax": "\"*\"",
+        "initial": "0"
+      },
+      {
+        "name": "--tw-border-style",
+        "syntax": "\"*\"",
+        "initial": "solid"
+      },
+      {
+        "name": "--tw-divide-y-reverse",
+        "syntax": "\"*\"",
+        "initial": "0"
+      },
+      {
+        "name": "--tw-leading",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-font-weight",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-tracking",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-ordinal",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-slashed-zero",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-numeric-figure",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-numeric-spacing",
+        "syntax": "\"*\"",
+        "initial": null
+      },
+      {
+        "name": "--tw-numeric-fraction",
+        "syntax": "\"*\"",
+        "initial": null
+      }
+    ],
+    "darkMedia": 0,
+    "darkSelectors": {
+      ".dark": 34
+    },
+    "layers": [
+      "properties",
+      "theme",
+      "base",
+      "utilities"
+    ]
+  },
+  "files": {
+    "screens": [
+      "G:\\Builder\\design-system\\source\\screens\\desktop-home-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-home-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-home-3.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-home-4.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-projects-new-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-projects-new-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-profile-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-profile-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-onboarding-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-onboarding-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-forgot-password-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\desktop-forgot-password-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\phone-home-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\phone-home-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\phone-projects-new-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\phone-projects-new-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\phone-profile-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\phone-profile-2.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\dark-home-1.jpg",
+      "G:\\Builder\\design-system\\source\\screens\\dark-home-2.jpg"
+    ],
+    "icons": "G:\\Builder\\design-system\\source\\screens\\icons.png",
+    "fonts": [
+      "G:\\Builder\\design-system\\source\\screens\\fonts-anek-latin.png"
+    ]
+  },
+  "notes": [
+    "The site looks the same with dark mode on, so there's no dark theme to extract (it may switch with a toggle instead; see css.darkSelectors).",
+    "The CSS has dark-mode selectors (.dark) but the page didn't switch with the system setting: dark mode is a toggle, or a class for dark sections only. Check the screenshots before adding a dark theme."
+  ]
+}

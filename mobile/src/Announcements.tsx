@@ -102,15 +102,15 @@ function Card({ announcement: a, width, onClose }: { announcement: Announcement;
         padding: 14,
         borderRadius: 16,
         borderCurve: "continuous",
-        backgroundColor: "rgba(29, 27, 24, 0.82)",
+        backgroundColor: "rgba(26, 36, 32, 0.85)",
         borderWidth: 1,
         borderColor: "rgba(255,255,255,0.14)",
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(232, 89, 12, 0.22)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-          <Icon size={13} color="#FDBA8C" />
-          <Text style={{ fontSize: 10.5, color: "#FDBA8C", fontWeight: "700", letterSpacing: 0.8 }}>{tag}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(184, 134, 11, 0.22)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+          <Icon size={13} color={colors.brassLight} />
+          <Text style={{ fontSize: 10.5, color: colors.brassLight, fontWeight: "700", letterSpacing: 0.8 }}>{tag}</Text>
         </View>
         <Pressable onPress={onClose} hitSlop={10} accessibilityLabel={`Close ${a.title}`}>
           <X size={18} color="rgba(255,255,255,0.6)" />
@@ -143,7 +143,7 @@ function Card({ announcement: a, width, onClose }: { announcement: Announcement;
       {a.body ? <Text style={{ fontSize: 13.5, color: "rgba(255,255,255,0.75)", lineHeight: 19 }}>{a.body}</Text> : null}
       {a.linkUrl ? (
         <Pressable onPress={() => open(a.linkUrl!)} hitSlop={6} accessibilityRole="link">
-          <Text style={{ color: "#FDBA8C", fontWeight: "700", fontSize: 14 }}>{a.linkLabel ?? "Learn more"} →</Text>
+          <Text style={{ color: colors.brassLight, fontWeight: "700", fontSize: 14 }}>{a.linkLabel ?? "Learn more"} →</Text>
         </Pressable>
       ) : null}
     </View>

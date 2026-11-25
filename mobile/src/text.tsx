@@ -13,7 +13,7 @@ const byWeight: Record<string, string> = {
 };
 
 /**
- * The app's text: IBM Plex Sans for body copy, Anek Latin for weight 800 headlines and numbers.
+ * The app's text: Source Sans 3 for body copy, Fraunces for weight 800 headlines and numbers.
  * Custom fonts carry their own weight, so the family is picked from `fontWeight` (an explicit fontFamily wins).
  */
 export function Text({ style, ...props }: TextProps) {

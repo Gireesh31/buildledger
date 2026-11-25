@@ -3,7 +3,7 @@ import { ConstructionScene } from "./construction-scene";
 import { colors, fonts } from "./theme";
 import { HazardTape } from "./ui";
 
-/** Dark site-board header with a hazard stripe along its bottom edge (stack and tab headers). */
+/** Dark site-board header with a thin brass line along its bottom edge (stack and tab headers). */
 export function HeaderBackground() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.ink, overflow: "hidden" }}>

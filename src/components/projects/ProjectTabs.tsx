@@ -31,19 +31,19 @@ interface Tab {
 }
 
 // The everyday sections are always visible; the rest sit in the "More" menu at the corner.
-// Each section keeps its own colour so it's easy to spot.
+// Icons share one quiet colour; the open section is marked in green.
 const allMainTabs: Tab[] = [
-  { href: "", label: "Overview", icon: LayoutDashboard, color: "text-orange-500" },
-  { href: "/materials", label: "Materials", icon: Package, color: "text-amber-500" },
-  { href: "/labour", label: "Labour", icon: Users, color: "text-emerald-500", feature: "labour" },
-  { href: "/transport", label: "Transport", icon: Truck, color: "text-sky-500", feature: "transport" },
+  { href: "", label: "Overview", icon: LayoutDashboard, color: "text-foreground/55" },
+  { href: "/materials", label: "Materials", icon: Package, color: "text-foreground/55" },
+  { href: "/labour", label: "Labour", icon: Users, color: "text-foreground/55", feature: "labour" },
+  { href: "/transport", label: "Transport", icon: Truck, color: "text-foreground/55", feature: "transport" },
 ];
 
 const allMoreTabs: Tab[] = [
-  { href: "/daily-log", label: "Daily log", icon: NotebookPen, color: "text-violet-500", feature: "dailyLog" },
-  { href: "/files", label: "Bills & photos", icon: Images, color: "text-rose-500", feature: "files" },
-  { href: "/reports", label: "Reports", icon: BarChart3, color: "text-fuchsia-500", feature: "reports" },
-  { href: "/team", label: "Team", icon: UsersRound, color: "text-indigo-500", feature: "team" },
+  { href: "/daily-log", label: "Daily log", icon: NotebookPen, color: "text-foreground/55", feature: "dailyLog" },
+  { href: "/files", label: "Bills & photos", icon: Images, color: "text-foreground/55", feature: "files" },
+  { href: "/reports", label: "Reports", icon: BarChart3, color: "text-foreground/55", feature: "reports" },
+  { href: "/team", label: "Team", icon: UsersRound, color: "text-foreground/55", feature: "team" },
   { href: "/settings", label: "Settings", icon: Settings, color: "text-stone-500" },
 ];
 
